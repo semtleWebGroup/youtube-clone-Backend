@@ -1,6 +1,13 @@
 # Youtub Clone - Backend
 이 레파지토리는 임시로 생성되었습니다.
 
+# 🖥️ 기본 정보
+
+## 📍 버전
+
+- JDK 11
+- org.springframework.boot' version '2.7.7'
+
 # 👨‍👨‍👧‍👦 협업 규칙
 ## 📍 Commit Naming Convention
 
