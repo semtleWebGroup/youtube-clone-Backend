@@ -1,0 +1,22 @@
+# 모두에게 적용될 설정은 이곳에 작성
+
+--- # dev 에만 적용되는 설정
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+--- # test 에만 적용되는 설정
+spring:
+  config:
+    activate:
+      on-profile: "test"
+--- # alpha
+spring:
+  config:
+    activate:
+      on-profile: "alpha"
+--- # prod
+spring:
+  config:
+    activate:
+      on-profile: "prod"
