@@ -1,6 +1,8 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -8,7 +10,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-@Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class VideoRequest {
     @NotNull(message="'title' cannot be null.")
     @Size(max=45, message="'title' length should be <= 45.")
