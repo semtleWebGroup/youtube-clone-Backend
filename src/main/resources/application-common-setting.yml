@@ -1,4 +1,9 @@
 # 모두에게 적용될 설정은 이곳에 작성
+spring:
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 300MB
 
 --- # dev 에만 적용되는 설정
 spring:
