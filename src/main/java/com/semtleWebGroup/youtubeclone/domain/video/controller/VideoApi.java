@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/videos")
@@ -15,7 +17,7 @@ public class VideoApi {
     private final VideoService videoService;
 
     @PostMapping("")
-    public ResponseEntity create(@RequestBody VideoRequest videoRequest) throws Exception {
+    public ResponseEntity create(@Valid @RequestBody VideoRequest videoRequest) throws Exception {
         // TODO: add된 video info 반환.
         Video video = Video.builder()
                 .title(videoRequest.getTitle())
@@ -40,7 +42,7 @@ public class VideoApi {
     }
 
     @PatchMapping("/{videoId}")
-    public ResponseEntity update(@PathVariable Long videoId, @RequestBody VideoRequest videoRequest) {
+    public ResponseEntity update(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) {
         // TODO: title, description만 변경하여 변경 전의 video info 반환.
         Video video = Video.builder()
                 .id(videoId)
