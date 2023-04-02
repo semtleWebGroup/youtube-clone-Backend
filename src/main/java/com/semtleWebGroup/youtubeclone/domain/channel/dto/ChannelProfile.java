@@ -4,12 +4,14 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
+@Getter
+@Setter
 public class ChannelProfile {
-    @NotNull(message = "title은 null이 될 수 없습니다.")
+    @NotBlank(message = "title은 빈값이 될 수 없습니다.")
     @Size(max = 15, message = "title은 15글자를 넘길 수 없습니다.")
     private String title;
 
