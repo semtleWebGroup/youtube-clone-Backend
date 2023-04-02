@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.global.error;
 
+import com.semtleWebGroup.youtubeclone.global.dto.ResponseDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,14 +17,14 @@ import java.util.stream.Collectors;
  * use {@link ErrorResponse#of(ErrorCode, BindingResult)} method to create
  */
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ErrorResponse {
+public class ErrorResponse extends ResponseDto {
     private String message;
     private String status;
     private List<FieldError> errors;
     private String code;
 
     private ErrorResponse(ErrorCode code, List<FieldError> errors){
+        super(false);
         this.message = code.getMessage();
         this.status = code.getStatus().toString();
         this.errors = errors;
@@ -31,6 +32,7 @@ public class ErrorResponse {
     }
 
     private ErrorResponse(ErrorCode code){
+        super(false);
         this.message = code.getMessage();
         this.status = code.getStatus().toString();
         this.errors = new ArrayList<>(); //if errors is null, response empty list instead of null
