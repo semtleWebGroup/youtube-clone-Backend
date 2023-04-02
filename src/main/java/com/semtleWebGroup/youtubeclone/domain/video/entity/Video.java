@@ -23,7 +23,7 @@ public class Video {
     @Column(length=45)
     private String description;
 
-    private String thumbImgPath;
+    private Byte thumbImg;
 
     @CreatedDate
     private LocalDateTime createdTime;
@@ -35,11 +35,11 @@ public class Video {
     private int viewCount;
 
     @Builder
-    public Video(Long id, String title, String description, String thumbImgPath, int videoSec) {
+    public Video(Long id, String title, String description, Byte thumbImg, int videoSec) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.thumbImgPath = thumbImgPath;
+        this.thumbImg = thumbImg;
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
         this.videoSec = videoSec;
