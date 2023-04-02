@@ -35,7 +35,8 @@ public class Video {
     private int viewCount;
 
     @Builder
-    public Video(String title, String description, String thumbImgPath, int videoSec) {
+    public Video(Long id, String title, String description, String thumbImgPath, int videoSec) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.thumbImgPath = thumbImgPath;

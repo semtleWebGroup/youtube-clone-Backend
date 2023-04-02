@@ -15,12 +15,11 @@ public class VideoApi {
     private final VideoService videoService;
 
     @PostMapping("")
-    public ResponseEntity create(@ModelAttribute VideoRequest videoRequest) throws Exception {
-//        Video video = videoService.add(videoRequest);
-        String imagePath = System.getProperty("user.dir") + "/src/main/java/come/semtleWebGroup/youtubeclone/domain/video/storage/temp_image.jpg";
+    public ResponseEntity create(@RequestBody VideoRequest videoRequest) throws Exception {
+        // TODO: add된 video info 반환.
         Video video = Video.builder()
-                .title("ExampleTitle")
-                .description("ExampleDescription").build();
+                .title(videoRequest.getTitle())
+                .description(videoRequest.getDescription()).build();
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -29,9 +28,9 @@ public class VideoApi {
 
     @GetMapping("/{videoId}")
     public ResponseEntity view(@PathVariable Long videoId) {
-//        Video video = videoService.get(videoId);
-        String imagePath = System.getProperty("user.dir") + "/src/main/java/come/semtleWebGroup/youtubeclone/domain/video/storage/temp_image.jpg";
+        // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
         Video video = Video.builder()
+                .id(videoId)
                 .title("ExampleTitle")
                 .description("ExampleDescription").build();
 
@@ -41,18 +40,45 @@ public class VideoApi {
     }
 
     @PatchMapping("/{videoId}")
-    public String update() {
-        return "aa";
+    public ResponseEntity update(@PathVariable Long videoId, @RequestBody VideoRequest videoRequest) {
+        // TODO: title, description만 변경하여 변경 전의 video info 반환.
+        Video video = Video.builder()
+                .id(videoId)
+                .title(videoRequest.getTitle())
+                .description(videoRequest.getDescription()).build();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(video);
     }
 
     @DeleteMapping("/{videoId}")
-    public String delete() {
-        return "aa";
+    public ResponseEntity delete(@PathVariable Long videoId) {
+        // TODO: video media도 삭제하여 삭제 된 video info 반환.
+        Video video = Video.builder()
+                .id(videoId)
+                .title("ExampleTitle")
+                .description("ExampleDescription").build();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(video);
     }
 
     @PostMapping("/{videoId}/like")
-    public String like() {
-        return "aa";
+    public ResponseEntity like(@PathVariable Long videoId) {
+        // TODO: like table에 등록 후 like 수 반환.
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(videoId + " Like");
+    }
+
+    @DeleteMapping("/{videoId}/like")
+    public ResponseEntity dislike(@PathVariable Long videoId) {
+        // TODO: like table에서 삭제 후 dislike 수 반환.
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(videoId + " Dislike");
     }
 
 }
