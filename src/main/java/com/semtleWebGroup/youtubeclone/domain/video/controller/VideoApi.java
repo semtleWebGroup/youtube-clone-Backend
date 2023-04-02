@@ -72,7 +72,7 @@ public class VideoApi {
         // TODO: like table에 등록 후 like 수 반환.
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(videoId + " Like");
+                .body(String.format("{ %d Like }", videoId));
     }
 
     @DeleteMapping("/{videoId}/like")
@@ -80,7 +80,7 @@ public class VideoApi {
         // TODO: like table에서 삭제 후 dislike 수 반환.
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(videoId + " Dislike");
+                .body(String.format("{ %d Dislike }", videoId));
     }
 
 }
