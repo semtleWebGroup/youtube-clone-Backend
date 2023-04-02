@@ -83,17 +83,19 @@ public class VideoMediaController {
      * @param file 작성된 비디오 파일
      * @return 파일이 비었을 경우 BadRequest, 파일이 있는 경우 OK
      */
-    @PostMapping("/videos/{videoId}/media")
-    public ResponseEntity<SseEmitter> videoPosting(@RequestParam(value = "video",required = false) MultipartFile file,
-                                                   @PathVariable("videoId") int videoId) throws IOException {
+    @PostMapping("/videos/media")
+    public ResponseEntity<SseEmitter> videoPosting(@RequestParam(value = "video",required = true) MultipartFile file) throws IOException {
         final SseEmitter emitter = new SseEmitter(30*1000L);
+
+        //videoId 생성로직
+        int videoId = 1234;
 
         videoMediaService.encodeVideo(videoId, new VideoEncodingCallBack() {
             private final int id = videoId;
             @Override
             public void onStart() throws IOException {
                 //send Dummy data
-                emitter.send(SseEmitter.event().data(String.format("video #%d - encoding start",id)));
+                emitter.send(SseEmitter.event().data(String.format("{videoId : %d}",id)));
 
             }
 
