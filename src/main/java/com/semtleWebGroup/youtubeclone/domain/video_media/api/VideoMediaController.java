@@ -1,7 +1,9 @@
 package com.semtleWebGroup.youtubeclone.domain.video_media.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoEncodingCallBack;
 import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoMediaService;
+import com.semtleWebGroup.youtubeclone.domain.video_media.dto.SseVideoEncodingDto;
 import com.semtleWebGroup.youtubeclone.domain.video_media.exception.VideoFileNotExistException;
 import com.semtleWebGroup.youtubeclone.domain.video_media.util.ResourceRegionFactory;
 import lombok.RequiredArgsConstructor;
@@ -95,20 +97,32 @@ public class VideoMediaController {
             @Override
             public void onStart() throws IOException {
                 //send Dummy data
-                emitter.send(SseEmitter.event().data(String.format("{videoId : %d}",id)));
+                emitter.send(
+                        SseEmitter.event().data(
+                                SseVideoEncodingDto.encodingStartDto(id)
+                        )
+                );
 
             }
 
             @Override
             public void onProgress(int percent) throws IOException {
-                emitter.send(SseEmitter.event().data(String.format("video #%d - onprogress : %d %%",id,percent)));
+                emitter.send(
+                        SseEmitter.event().data(
+                                SseVideoEncodingDto.encodingProgressDto(id,percent)
+                        )
+                );
 
             }
 
             @Override
             public void onComplete() {
                 try {
-                    emitter.send(SseEmitter.event().data(String.format("video #%d - complete",id)));
+                    emitter.send(
+                            SseEmitter.event().data(
+                                    SseVideoEncodingDto.encodingCompleteDto(id)
+                            )
+                    );
                 } catch (IOException e){
                     emitter.complete();
                 } finally {
