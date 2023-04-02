@@ -21,7 +21,12 @@ public class HomeApi {
         ArrayList<VideoListResponse> videos = new ArrayList<VideoListResponse>();
         for (int i = 0; i < 20; i++) {
             videos.add(
-                    new VideoListResponse("title" + i, "channel" + i, i, i)
+                    VideoListResponse.builder()
+                            .title("title" + i)
+                            .channelName("channel" + i)
+                            .videoSec(i)
+                            .viewCount(i)
+                            .build()
             );
         }
 

@@ -1,16 +1,18 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
-@Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class VideoListResponse {
+
+    private Long id;
     private String title;
 
     private byte[] thumbnail;
@@ -26,6 +28,7 @@ public class VideoListResponse {
     @CreatedDate
     private LocalDateTime createdTime;
 
+    @Builder
     public VideoListResponse(String title, String channelName, int viewCount, int videoSec) {
         this.title = title;
         this.channelName = channelName;
