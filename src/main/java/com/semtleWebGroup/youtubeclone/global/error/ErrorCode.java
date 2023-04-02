@@ -15,7 +15,10 @@ public enum ErrorCode {
 
     //DB
     OCCUPIED_EMAIL(HttpStatus.CONFLICT,"D001","Sign up With Occupied Email"),
-    OCCUPIED_NICKNAME(HttpStatus.CONFLICT,"D002","Sign up With Occupied Nickname");
+    OCCUPIED_NICKNAME(HttpStatus.CONFLICT,"D002","Sign up With Occupied Nickname"),
+
+    //local file system
+    VIDEO_NOT_EXIST(HttpStatus.NOT_FOUND,"L001","Video File Not Exist");
 
 
     private String message;
