@@ -7,6 +7,7 @@ import com.semtleWebGroup.youtubeclone.domain.video_media.dto.SseVideoEncodingDt
 import com.semtleWebGroup.youtubeclone.domain.video_media.exception.VideoFileNotExistException;
 import com.semtleWebGroup.youtubeclone.domain.video_media.util.ResourceRegionFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -28,7 +29,9 @@ import java.util.List;
 public class VideoMediaController {
 
     private final VideoMediaService videoMediaService;
-    public static final long MAX_CHUNK_SIZE = 1_000_000L; //한번에 최대 보낼 길이
+
+    @Value("${streaming.max-chunk-size}")
+    public long MAX_CHUNK_SIZE ; //한번에 최대 보낼 길이
 
     /**
      * 목업용 간단 비디오 스트리밍 컨트롤러

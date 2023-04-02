@@ -4,6 +4,9 @@ spring:
     multipart:
       max-file-size: 200MB
       max-request-size: 300MB
+streaming:
+  max-chunk-size: 1000000 #비디오 스트리밍 시 한번에 Range헤더로 요청할 수 있는 최대 길이
+
 
 --- # dev 에만 적용되는 설정
 spring:
