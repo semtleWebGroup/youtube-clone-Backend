@@ -1,39 +1,46 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.domain;
 
-import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "channel")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@ToString
 public class Channel {
     @Id
-    @Column(name = "channelid", nullable = false)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "channelid", updatable = false)
+    private Long id;
 
-    @Size(max = 15)
-    @NotNull
-    @Column(name = "title", nullable = false, length = 15)
+    @Column(nullable = false, length = 15, unique = true)
     private String title;
-
-    @Size(max = 70)
-    @Column(name = "description", length = 70)
+    @Column(length = 70)
     private String description;
 
-    @Size(max = 60)
-    @NotNull
-    @Column(name = "profile_img", nullable = false, length = 60)
-    private String profileImg;
+    private String imageName;
+    private String imagePath;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "member_memberid", nullable = false)
-    private Member memberMemberid;
 
+    @Builder
+    public Channel(String title, String description){
+        this.title = title;
+        this.description = description;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public void update(String title, String description){
+        if (title != null) this.title=title;
+        if (description != null) this.description=description;
+    }
 }

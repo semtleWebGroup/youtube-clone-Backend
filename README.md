@@ -8,6 +8,10 @@
 - JDK 11
 - org.springframework.boot' version '2.7.7'
 
+## 📍 Database ERD
+
+![databaseDiagram](./doc/img/database_diagram.png)
+
 # 👨‍👨‍👧‍👦 협업 규칙
 ## 📍 Commit Naming Convention
 
