@@ -1,4 +1,6 @@
 spring:
+  mvc:
+    static-path-pattern: /webapp/**
   h2:
     console:
       enabled: true
@@ -10,7 +12,7 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
 logging:
   level:
