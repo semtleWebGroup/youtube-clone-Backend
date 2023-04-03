@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Video {
     @Id
     @Column(name = "videoid", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Lob
     @Column(name = "thumb_img")

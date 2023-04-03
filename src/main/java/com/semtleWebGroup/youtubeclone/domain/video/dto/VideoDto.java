@@ -14,7 +14,7 @@ import java.time.Instant;
  */
 @Data
 public class VideoDto implements Serializable {
-    private final Integer id;
+    private final Long id;
     private final byte[] thumbImg;
     @Size(max = 45)
     private final String title;
