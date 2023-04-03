@@ -3,6 +3,10 @@ package com.semtleWebGroup.youtubeclone.domain.channel.repository;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ChannelRepository extends JpaRepository<Channel, Long> {
+
+import java.util.List;
+
+public interface ChannelRepository extends JpaRepository<Channel, Integer> {
+    List<Channel> findByTitleContaining(String key);
     boolean existsByTitle(String title);
 }
