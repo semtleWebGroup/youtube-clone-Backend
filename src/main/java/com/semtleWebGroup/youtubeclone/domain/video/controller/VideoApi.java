@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUpdateDto;
@@ -81,17 +82,19 @@ public class VideoApi {
     @PostMapping("/{videoId}/like")
     public ResponseEntity like(@PathVariable Long videoId) {
         // TODO: like table에 등록 후 like 수 반환.
+        VideoLikeResponse like = new VideoLikeResponse(true, 1);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(String.format("{ %d Like }", videoId));
+                .body(like);
     }
 
     @DeleteMapping("/{videoId}/like")
     public ResponseEntity dislike(@PathVariable Long videoId) {
-        // TODO: like table에서 삭제 후 dislike 수 반환.
+        // TODO: like table에서 삭제 후 like 수 반환.
+        VideoLikeResponse like = new VideoLikeResponse(false, 0);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(String.format("{ %d Dislike }", videoId));
+                .body(like);
     }
 
 }
