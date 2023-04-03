@@ -40,14 +40,14 @@ public class ChannelService {
         return newChannel;
     }
 
-    public Channel getChannel(Long id){
+    public Channel getChannel(Integer id){
         Channel channel = channelRepository.findById(id).orElseThrow(()->new NoSuchElementException());
 
         return channel;
     }
 
     @Transactional
-    public Channel updateChannel(Long id, ChannelRequest dto) throws IOException {
+    public Channel updateChannel(Integer id, ChannelRequest dto) throws IOException {
         Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다."));
         oldChannel.update(dto.getChannelProfile().getTitle(), dto.getChannelProfile().getDescription());
 
