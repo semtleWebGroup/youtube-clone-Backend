@@ -1,4 +1,4 @@
-package com.semtleWebGroup.youtubeclone.domain.video.entity;
+package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

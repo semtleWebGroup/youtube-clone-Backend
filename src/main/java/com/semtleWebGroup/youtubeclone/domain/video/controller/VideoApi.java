@@ -1,7 +1,7 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
-import com.semtleWebGroup.youtubeclone.domain.video.entity.Video;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
