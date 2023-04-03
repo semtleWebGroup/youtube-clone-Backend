@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
-import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

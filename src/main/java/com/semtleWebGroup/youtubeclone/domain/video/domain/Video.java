@@ -1,50 +1,49 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
-import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "video")
+@Table(name="video")
+@Getter
+@NoArgsConstructor
 public class Video {
     @Id
-    @Column(name = "videoid", nullable = false)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "videoid", updatable = false)
     private Long id;
 
-    @Lob
-    @Column(name = "thumb_img")
-    private byte[] thumbImg;
-
-    @Size(max = 45)
-    @Column(name = "title", length = 45)
+    @Column(nullable = false, length=45)
     private String title;
 
-    @Size(max = 45)
-    @Column(name = "description", length = 45)
+    @Column(length=45)
     private String description;
 
-    @Column(name = "created_time")
+    private Byte thumbImg;
+
+    @CreatedDate
     private LocalDateTime createdTime;
 
-    @Column(name = "updated_time")
+    @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    @Column(name = "video_sec")
-    private Integer videoSec;
+    private int videoSec;
+    private int viewCount;
 
-    @Column(name = "view_count")
-    private Integer viewCount;
+    @Builder
+    public Video(Long id, String title, String description, Byte thumbImg, int videoSec) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.thumbImg = thumbImg;
+        this.createdTime = LocalDateTime.now();
+        this.updatedTime = LocalDateTime.now();
+        this.videoSec = videoSec;
+        this.viewCount = 0;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "channel_channelid", nullable = false)
-    private Channel channelChannelid;
-
+    }
 }
