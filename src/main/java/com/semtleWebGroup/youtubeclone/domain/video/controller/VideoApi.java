@@ -2,6 +2,7 @@ package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUpdateDto;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewDto;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +20,11 @@ import java.util.List;
 public class VideoApi {
     private final VideoService videoService;
 
-    @PostMapping("")
-    public ResponseEntity create(@Valid @RequestBody VideoRequest videoRequest) throws Exception {
+    @PostMapping("/{videoId}")
+    public ResponseEntity create(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) throws Exception {
         // TODO: add된 video info 반환.
-        Video video = Video.builder()
+        VideoUpdateDto video = VideoUpdateDto.builder()
+                .videoId(videoId)
                 .title(videoRequest.getTitle())
                 .description(videoRequest.getDescription()).build();
 
@@ -53,8 +55,8 @@ public class VideoApi {
     @PatchMapping("/{videoId}")
     public ResponseEntity update(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) {
         // TODO: title, description만 변경하여 변경 전의 video info 반환.
-        Video video = Video.builder()
-                .id(videoId)
+        VideoUpdateDto video = VideoUpdateDto.builder()
+                .videoId(videoId)
                 .title(videoRequest.getTitle())
                 .description(videoRequest.getDescription()).build();
 
@@ -66,8 +68,8 @@ public class VideoApi {
     @DeleteMapping("/{videoId}")
     public ResponseEntity delete(@PathVariable Long videoId) {
         // TODO: video media도 삭제하여 삭제 된 video info 반환.
-        Video video = Video.builder()
-                .id(videoId)
+        VideoUpdateDto video = VideoUpdateDto.builder()
+                .videoId(videoId)
                 .title("ExampleTitle")
                 .description("ExampleDescription").build();
 

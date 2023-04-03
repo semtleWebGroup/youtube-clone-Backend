@@ -22,10 +22,8 @@ public class VideoViewDto {
     @NotEmpty()
     private String title;
 
-    @Size(max=45, message="'description' length should be <= 45.")
     private String description;
 
-    @CreatedDate
     private LocalDateTime createdTime;
 
     private int videoSec;
