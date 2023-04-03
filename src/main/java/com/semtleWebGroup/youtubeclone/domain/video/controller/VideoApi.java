@@ -2,6 +2,7 @@ package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewDto;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,10 +34,16 @@ public class VideoApi {
     @GetMapping("/{videoId}")
     public ResponseEntity view(@PathVariable Long videoId) {
         // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
-        Video video = Video.builder()
-                .id(videoId)
+        List<String> qualityList = new ArrayList<String>();
+        qualityList.add("p1080");
+        qualityList.add("p480");
+        VideoViewDto video = VideoViewDto.builder()
+                .videoId(videoId)
+                .channelId(1L)
+                .channelName("ExampleChannel")
                 .title("ExampleTitle")
-                .description("ExampleDescription").build();
+                .description("ExampleDescription")
+                .qualityList(qualityList).build();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
