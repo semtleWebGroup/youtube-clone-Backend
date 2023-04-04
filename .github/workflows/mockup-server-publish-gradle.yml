@@ -1,0 +1,27 @@
+name: Build and Push Docker Image
+on:
+  push:
+    branches:
+      - mockup
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Grant execute permission to Gradle wrapper
+        run: chmod +x ./gradlew
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Spring Boot image
+        run: ./gradlew bootBuildImage --imageName=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/semtle-youtube-clone-spring-app:latest
+      - name: Push Docker image to Docker Hub
+        run: docker push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/semtle-youtube-clone-spring-app:latest
