@@ -53,8 +53,8 @@ public class ErrorResponse extends ResponseDto {
         return new ErrorResponse(ErrorCode.INVALID_TYPE_VALUE,errors);
     }
 
-    public static ErrorResponse of(InvalidValueException e){
-        return new ErrorResponse(e.getErrorCode(),e.getFieldErrors());
+    public static ErrorResponse of(ErrorCode errorCode, List<FieldError> fieldErrors){
+        return new ErrorResponse(errorCode,fieldErrors);
     }
 
 

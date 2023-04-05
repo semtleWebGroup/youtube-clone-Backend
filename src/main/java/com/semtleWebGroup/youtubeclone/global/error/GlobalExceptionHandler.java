@@ -1,10 +1,7 @@
 package com.semtleWebGroup.youtubeclone.global.error;
 
 
-import com.semtleWebGroup.youtubeclone.global.error.exception.BusinessException;
-import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
-import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
-import com.semtleWebGroup.youtubeclone.global.error.exception.LocalResourceException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +20,19 @@ import java.nio.file.AccessDeniedException;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+
+    /**
+     * 클라이언트의 잘못된 값 전달
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e){
+        log.error("handleMethodArgumentNotValidException", e);
+        ErrorResponse response = ErrorResponse.of(e.getErrorCode(),e.getFieldErrors());
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    }
 
     /**
      * @Validated 로 binding error 발생시 발생
@@ -92,7 +102,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidValueException.class)
     protected ResponseEntity<ErrorResponse> handleInvalidValueException(InvalidValueException e){
         log.error("handleInvalidValueException",e);
-        ErrorResponse response = ErrorResponse.of(e);
+        ErrorResponse response = ErrorResponse.of(e.getErrorCode(),e.getFieldErrors());
         return new ResponseEntity<>(response,e.getErrorCode().getStatus());
     }
 
