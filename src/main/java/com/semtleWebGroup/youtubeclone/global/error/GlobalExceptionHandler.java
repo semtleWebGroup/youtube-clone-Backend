@@ -2,6 +2,9 @@ package com.semtleWebGroup.youtubeclone.global.error;
 
 
 import com.semtleWebGroup.youtubeclone.global.error.exception.BusinessException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.LocalResourceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +77,44 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected ResponseEntity handle(MaxUploadSizeExceededException e){
+        return ResponseEntity.internalServerError().build();
+    }
+
+
+    //Business Exception 직계 자손들
+
+    /**
+     * 유효하지 않은 값에 대한 예외처리
+     * @param e : InvalidException 이나 그 자손들
+     */
+    @ExceptionHandler(InvalidValueException.class)
+    protected ResponseEntity<ErrorResponse> handleInvalidValueException(InvalidValueException e){
+        log.error("handleInvalidValueException",e);
+        ErrorResponse response = ErrorResponse.of(e);
+        return new ResponseEntity<>(response,e.getErrorCode().getStatus());
+    }
+
+    /**
+     * 엔티티 못찾겠다 예외
+     * 더 세분화된 처리를 위해서는 상속을 통해 세분화하세요
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e){
+        log.error("handleEntityNotFoundException",e);
+        ErrorResponse response = ErrorResponse.of(e);
+        return new ResponseEntity<>(response,e.getErrorCode().getStatus());
+    }
+
+    @ExceptionHandler(LocalResourceException.class)
+    protected ResponseEntity<ErrorResponse> handleLocalResourceException(LocalResourceException e){
+        log.error("handleEntityNotFoundException",e);
+        ErrorResponse response = ErrorResponse.of(e);
+        return new ResponseEntity<>(response,e.getErrorCode().getStatus());
+    }
+
+
     /**
      * 위에서 처리 되지 않은 비즈니스 로직상 발생하는 Exception
      */
@@ -85,17 +126,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,errorCode.getStatus());
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    protected ResponseEntity handle(MaxUploadSizeExceededException e){
-        return ResponseEntity.internalServerError().build();
-    }
+
 
     /**
      * 분류되지 않은 에러
      */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e){
-        log.error("handleEntityNotFoundException",e);
+        log.error("handleUnHandledFoundException",e);
         ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
