@@ -2,7 +2,6 @@ package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
-import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUpdateDto;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewDto;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;

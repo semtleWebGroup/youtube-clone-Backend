@@ -8,10 +8,10 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="video")
+@Table(name="video_info")
 @Getter
 @NoArgsConstructor
-public class Video {
+public class VideoInfo {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "videoid", updatable = false)
@@ -35,7 +35,7 @@ public class Video {
     private int viewCount;
 
     @Builder
-    public Video(Long id, String title, String description, Byte thumbImg, int videoSec) {
+    public VideoInfo(Long id, String title, String description, Byte thumbImg, int videoSec) {
         this.id = id;
         this.title = title;
         this.description = description;
