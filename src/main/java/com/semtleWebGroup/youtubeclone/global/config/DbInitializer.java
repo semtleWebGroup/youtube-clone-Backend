@@ -47,6 +47,7 @@ public class DbInitializer {
                     .audioChannel(1)
                     .framePerSec(30)
                     .fileSize(18000)
+                    .videoFormat("mp4")
                     .build()
             );
             testVideoMediaId = testMedia.getId();
