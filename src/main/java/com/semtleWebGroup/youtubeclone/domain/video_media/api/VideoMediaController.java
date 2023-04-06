@@ -39,7 +39,7 @@ public class VideoMediaController {
     public long MAX_CHUNK_SIZE ; //한번에 최대 보낼 길이
 
     /**
-     * 목업용 간단 비디오 스트리밍 컨트롤러
+     * 비디오 스트리밍 API
      * @param httpHeaders : Http request 헤더
      * @param videoId : videoId
      * @return HttpResponse
@@ -48,15 +48,26 @@ public class VideoMediaController {
     public ResponseEntity<List<ResourceRegion>> videoStreaming(@RequestHeader HttpHeaders httpHeaders,
                                                                @PathVariable("videoId") UUID videoId){
 
+        //Range 추출 및 검증 로직
+        List<HttpRange> ranges;
+        if (!httpHeaders.containsKey("Range")){
+            throw new BadRequestException(FieldError.of("Range","null","Request With No Range"));
+        }
+        try {
+            ranges = httpHeaders.getRange();
+        } catch (IllegalArgumentException e){
+            throw new BadRequestException(FieldError.of("Range","invalid",e.getMessage()));
+        }
+        if (CollectionUtils.isEmpty(ranges)){
+            throw new BadRequestException(FieldError.of("Range","null","Request With Empty Range"));
+        }
 
-
-        List<ResourceRegion> resourceRegions = videoStreamingService.createResourceRegion(httpHeaders, videoId);
+        List<ResourceRegion> resourceRegions = videoStreamingService.createResourceRegion(ranges, videoId);
         MediaType mediaType = MediaTypeFactory.getMediaType(resourceRegions.get(0).getResource()).orElse(MediaType.APPLICATION_OCTET_STREAM);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .contentType(mediaType)
                 .body(resourceRegions);
-
     }
 
     /**

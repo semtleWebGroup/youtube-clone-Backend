@@ -31,35 +31,33 @@ public class VideoStreamingService {
     @Value("${streaming.max-chunk-size}")
     public long MAX_CHUNK_SIZE ; //한번에 최대 보낼 길이
 
+
+
     private final VideoMediaRepository videoMediaRepository;
 
-    public List<ResourceRegion> createResourceRegion(HttpHeaders httpHeaders, UUID videoId){
 
-        //Range 추출
-        List<HttpRange> ranges;
-        if (!httpHeaders.containsKey("Range")){
-            throw new BadRequestException(FieldError.of("Range","null","Request With No Range"));
-        }
-        try {
-            ranges = httpHeaders.getRange();
-        } catch (IllegalArgumentException e){
-            throw new BadRequestException(FieldError.of("Range","invalid",e.getMessage()));
-        }
-        if (CollectionUtils.isEmpty(ranges)){
-            throw new BadRequestException(FieldError.of("Range","null","Request With Empty Range"));
-        }
+    /**
+     * 헤더에 맞는 ResourceRegion 을 판단하는 로직
+     * 헤더를 체크하는 로직은 컨트롤러에서 처리 해줘야함
+     *
+     * @param ranges : Http range 헤더
+     * @param videoId : video 테이블 pk
+     * @return ResourceRegion
+     * @throws BadRequestException : DB에 없는 UUID로 동영상을 요청할 때 보안을 위해 Bad Request
+     * @throws VideoFileNotExistException : DB에는 잘 있는데, 로컬 파일이 존재하지 않는 경우
+     */
+    public List<ResourceRegion> createResourceRegion(List<HttpRange> ranges, UUID videoId) throws BadRequestException,VideoFileNotExistException{
 
-        //동영상 가져오기
+        //동영상 파일 정보 불러오기
         VideoMedia videoMedia = videoMediaRepository
                 .findById(videoId)
-                .orElseThrow(() -> new BadRequestException(Collections.emptyList())); //보안을 위해
+                .orElseThrow(() -> new BadRequestException(Collections.emptyList())); //보안을 위해 NotFound 대신 BadRequest 응답 - 내부 정보
 
+        //동영상 파일 가져와서 ResourceRegion 으로
         FileSystemResource video = new FileSystemResource(videoMedia.getFilePath());
         List<ResourceRegion> resourceRegions;
         try {
-            if (CollectionUtils.isEmpty(ranges)) { //Range 안줌
-                resourceRegions = Collections.emptyList();
-            } else if (ranges.size() == 1) { //Range 한개
+            if (ranges.size() == 1) { //Range 한개
                 resourceRegions = List.of(ResourceRegionFactory.fromRange(ranges.get(0), video, MAX_CHUNK_SIZE));
             } else { // Range 여러개
                 resourceRegions = ResourceRegionFactory.fromRanges(ranges, video, MAX_CHUNK_SIZE);
@@ -69,7 +67,6 @@ public class VideoStreamingService {
         }
 
         return resourceRegions;
-
-
     }
+
 }

@@ -41,11 +41,7 @@ public class ResourceRegionFactory {
         long end = range.getRangeEnd(contentLength);
 
         Assert.isTrue(start < contentLength, () -> "'position' exceeds the resource length " + contentLength);
-        //max chunk 보다 큰지 체크
-        if(end-start > maxChunkSize){
-            end = start+maxChunkSize;
-        }
 
-        return new ResourceRegion(resource, start, end - start + 1);
+        return new ResourceRegion(resource, start, Math.min(end-start , maxChunkSize));
     }
 }

@@ -7,7 +7,9 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "video_media")
+@Table(name = "video_media",uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"id","width","height","frame","audio_channel","file_size","video_format"} , name = "video_media_property_unique")
+})
 @Getter @Setter @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VideoMedia {
@@ -19,27 +21,39 @@ public class VideoMedia {
     @Column(name = "id",columnDefinition = "BINARY(16)")
     private UUID id;
 
-    @Column(name = "width")
+    @Column(name = "width",nullable = false)
     private int width; //이거 기준으로 1080p 720p같은 것을 나눔
-    @Column(name = "height")
+    @Column(name = "height",nullable = false)
     private int height;
 
-    @Column(name = "frame")
+    @Column(name = "frame",nullable = false)
     private int framePerSec;
 
-    @Column(name = "audio_channel")
+    @Column(name = "audio_channel",nullable = false)
     private int audioChannel;
 
-    @Column(name = "file_size")
+    @Column(name = "file_size",nullable = false)
     private long fileSize; //KB 단위
 
-    @Column(name = "file_path")
+
+    @Column(name = "video_format",nullable = false)
+    private String videoFormat;
+    @Column(name = "file_path",nullable = false, unique = true)
     private String filePath;
 
-    @Column(name = "video_format")
-    private String videoFormat;
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @JoinColumn(name = "video_id",nullable = false)
+    private Video rootVideo;
 
-    @ManyToOne
-    @JoinColumn(name = "video_id")
-    private Video video;
+    @Builder()
+    public VideoMedia(final int width,final int height,final int framePerSec,final int audioChannel,final long fileSize,final String filePath, final String videoFormat, final Video rootVideo) {
+        this.width = width;
+        this.height = height;
+        this.framePerSec = framePerSec;
+        this.audioChannel = audioChannel;
+        this.fileSize = fileSize;
+        this.filePath = filePath;
+        this.videoFormat = videoFormat;
+        this.rootVideo = rootVideo;
+    }
 }

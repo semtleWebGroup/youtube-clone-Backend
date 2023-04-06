@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface VideoRepository extends JpaRepository<VideoInfo, Integer> {
+public interface VideoInfoRepository extends JpaRepository<VideoInfo, Integer> {
     List<VideoInfo> findByTitleContaining(String key);
+
+
 
 }

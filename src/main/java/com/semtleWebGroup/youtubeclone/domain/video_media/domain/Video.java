@@ -23,15 +23,19 @@ public class Video {
     @Column(name = "video_id",columnDefinition = "BINARY(16)", nullable = false)
     private UUID videoId;
 
-    @Column(name = "video_second")
+    @Column(name = "video_second",nullable = false)
     private long videoSecond;
+
+    @Column(name = "cashed",nullable = false)
+    private boolean isCashed;
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
-    public Video(long videoSecond, Channel channel) {
+    public Video(long videoSecond, boolean isCashed, Channel channel) {
         this.videoSecond = videoSecond;
+        this.isCashed = isCashed;
         this.channel = channel;
     }
 }
