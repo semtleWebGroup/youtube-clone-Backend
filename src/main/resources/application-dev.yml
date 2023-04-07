@@ -14,6 +14,23 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+  security:
+    user:
+      name: user
+      password: 1234
 logging:
   level:
     root: debug
+
+google:
+  redirect:
+    uri: http://localhost:8080/google/login/redirect
+  secret: ''
+  auth:
+    url: https://oauth2.googleapis.com
+    scope: profile,email,openid
+  client:
+    id: ''
+  login:
+    url: https://accounts.google.com
+
