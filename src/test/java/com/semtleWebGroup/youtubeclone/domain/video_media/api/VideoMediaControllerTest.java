@@ -5,10 +5,8 @@ import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoStrea
 import com.semtleWebGroup.youtubeclone.domain.video_media.exception.VideoFileNotExistException;
 import com.semtleWebGroup.youtubeclone.domain.video_media.util.ResourceRegionFactory;
 import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
-import com.semtleWebGroup.youtubeclone.test_super.MockApiTest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,7 +17,6 @@ import org.springframework.http.HttpRange;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -37,7 +34,7 @@ import java.util.UUID;
 @ActiveProfiles("test")
 class VideoMediaControllerTest{
 
-    final static UUID testVideoId = UUID.randomUUID();
+    final static UUID testMediaId = UUID.randomUUID();
     final static UUID invalidId = UUID.randomUUID();
     final static UUID noFileID = UUID.randomUUID();
 
@@ -54,7 +51,7 @@ class VideoMediaControllerTest{
 
 
     @Nested
-    @DisplayName("[API][GET] /videos/{videoId}/media")
+    @DisplayName("[API][GET] /medias/{mediaId}")
     class videoStreaming{
 
         List<HttpRange> range;
@@ -75,7 +72,7 @@ class VideoMediaControllerTest{
                     fileSystemResource,
                     1000);
 
-            when(videoStreamingService.createResourceRegion(range, testVideoId)).thenReturn(resourceRegions);
+            when(videoStreamingService.createResourceRegion(range, testMediaId)).thenReturn(resourceRegions);
             when(videoStreamingService.createResourceRegion(range,invalidId)).thenThrow(new BadRequestException(Collections.emptyList()));
             when(videoStreamingService.createResourceRegion(range,noFileID)).thenThrow(new VideoFileNotExistException(fileSystemResource));
 
@@ -85,7 +82,7 @@ class VideoMediaControllerTest{
         @DisplayName("정상적인 요청")
         public void withValidRequest() throws Exception {
 
-            mockMvc.perform(get("/videos/"+ testVideoId +"/media").header("Range","bytes=0-10000"))
+            mockMvc.perform(get("/medias/"+ testMediaId).header("Range","bytes=0-10000"))
                     .andExpect(status().isPartialContent())
                     .andExpect(header().string("Content-Type",anyOf(
                             is(MediaType.APPLICATION_OCTET_STREAM_VALUE),
@@ -98,7 +95,7 @@ class VideoMediaControllerTest{
         @DisplayName("Range 헤더를 보내지 않을때")
         public void withNoRange() throws Exception {
 
-            mockMvc.perform(get("/videos/"+ testVideoId +"/media"))
+            mockMvc.perform(get("/medias/"+ testMediaId))
                     .andExpect(status().isBadRequest());
         }
 
@@ -106,7 +103,7 @@ class VideoMediaControllerTest{
         @DisplayName("Range 내용 prefix 오류시")
         public void withInvalidPrefix() throws Exception {
 
-            mockMvc.perform(get("/videos/"+ testVideoId +"/media").header("Range","byte=0-10000"))
+            mockMvc.perform(get("/medias/"+ testMediaId).header("Range","byte=0-10000"))
                     .andExpect(status().isBadRequest());
         }
 
@@ -114,14 +111,14 @@ class VideoMediaControllerTest{
         @DisplayName("Range + 빈 범위")
         public void withEmptyRange() throws Exception {
 
-            mockMvc.perform(get("/videos/"+ testVideoId +"/media").header("Range",""))
+            mockMvc.perform(get("/medias/"+ testMediaId).header("Range",""))
                     .andExpect(status().isBadRequest());
         }
         @Test
         @DisplayName("잘못된 UUID 요청")
         public void invalidUUID() throws Exception {
 
-            mockMvc.perform(get("/videos/"+ invalidId +"/media").header("Range","bytes=0-10000"))
+            mockMvc.perform(get("/medias/"+ invalidId).header("Range","bytes=0-10000"))
                     .andExpect(status().isBadRequest());
         }
 
@@ -129,7 +126,7 @@ class VideoMediaControllerTest{
         @DisplayName("서버 내부적으로 로컬파일 실종")
         public void internalFileMissing() throws Exception {
 
-            mockMvc.perform(get("/videos/"+ noFileID +"/media").header("Range","bytes=0-10000"))
+            mockMvc.perform(get("/medias/"+ noFileID).header("Range","bytes=0-10000"))
                     .andExpect(status().isNotFound());
         }
 
