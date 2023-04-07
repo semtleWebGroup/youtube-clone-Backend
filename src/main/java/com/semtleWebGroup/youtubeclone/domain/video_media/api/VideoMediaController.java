@@ -1,11 +1,15 @@
 package com.semtleWebGroup.youtubeclone.domain.video_media.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoEncodingCallBack;
 import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoMediaService;
+import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoStreamingService;
 import com.semtleWebGroup.youtubeclone.domain.video_media.dto.SseVideoEncodingDto;
 import com.semtleWebGroup.youtubeclone.domain.video_media.exception.VideoFileNotExistException;
 import com.semtleWebGroup.youtubeclone.domain.video_media.util.ResourceRegionFactory;
+import com.semtleWebGroup.youtubeclone.global.error.ErrorCode;
+import com.semtleWebGroup.youtubeclone.global.error.FieldError;
+import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -16,70 +20,53 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 public class VideoMediaController {
 
     private final VideoMediaService videoMediaService;
+    private final VideoStreamingService videoStreamingService;
 
     @Value("${streaming.max-chunk-size}")
     public long MAX_CHUNK_SIZE ; //한번에 최대 보낼 길이
 
     /**
-     * 목업용 간단 비디오 스트리밍 컨트롤러
+     * 비디오 스트리밍 API
      * @param httpHeaders : Http request 헤더
-     * @param videoId : videoId
-     * @param resolution : nullable, 요청하는 비디오의 해상도 "1080p", "720p" 와 같이 파라미터에 넣어주세요
+     * @param mediaId : mediaId
      * @return HttpResponse
      */
-    @GetMapping("/videos/{videoId}/media")
+    @GetMapping("/medias/{mediaId}")
     public ResponseEntity<List<ResourceRegion>> videoStreaming(@RequestHeader HttpHeaders httpHeaders,
-                                                               @PathVariable("videoId") int videoId,
-                                                               @RequestParam(value = "resolution",required = false) String resolution){
+                                                               @PathVariable("mediaId") UUID mediaId){
 
-        if (resolution == null){
-            //화질이 설정되지 않았을 경우 적절한 처리
+        //Range 추출 및 검증 로직
+        List<HttpRange> ranges;
+        if (!httpHeaders.containsKey("Range")){
+            throw new BadRequestException(FieldError.of("Range","null","Request With No Range"));
         }
-
-        //파일 불러오기
-        Resource resource = new FileSystemResource(Paths.get("src","main","java","com","semtleWebGroup","youtubeclone","domain","video_media","storage","for_mock","file_example_MP4_1920_18MG.mp4"));
-        Assert.isTrue(resource.exists(), () -> "sample file not exist");
-
-        //length 확인
-        long contentLength;
         try {
-            contentLength = resource.contentLength();
-        } catch (IOException e) {
-            //물리적 파일이 존재하지 않음
-            throw new VideoFileNotExistException(resource);
+            ranges = httpHeaders.getRange();
+        } catch (IllegalArgumentException e){
+            throw new BadRequestException(FieldError.of("Range","invalid",e.getMessage()));
+        }
+        if (CollectionUtils.isEmpty(ranges)){
+            throw new BadRequestException(FieldError.of("Range","null","Request With Empty Range"));
         }
 
-        //ResourceRegion 만들기
-        List<ResourceRegion> resourceRegions;
-        List<HttpRange> ranges = httpHeaders.getRange();
-        try {
-            if (CollectionUtils.isEmpty(ranges)) { //Range 안줌
-                resourceRegions = Collections.emptyList();
-            } else if (ranges.size() == 1) { //Range 한개
-                resourceRegions = List.of(ResourceRegionFactory.fromRange(ranges.get(0), resource, MAX_CHUNK_SIZE));
-            } else { // Range 여러개
-                resourceRegions = ResourceRegionFactory.fromRanges(ranges, resource, MAX_CHUNK_SIZE);
-            }
-        } catch (IOException e) {
-            throw new VideoFileNotExistException(resource);
-        }
+        List<ResourceRegion> resourceRegions = videoStreamingService.createResourceRegion(ranges, mediaId);
+        MediaType mediaType = MediaTypeFactory.getMediaType(resourceRegions.get(0).getResource()).orElse(MediaType.APPLICATION_OCTET_STREAM);
 
-        //응답 보내기
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                .contentType(MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM))
+                .contentType(mediaType)
                 .body(resourceRegions);
     }
 

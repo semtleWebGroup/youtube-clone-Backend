@@ -1,10 +1,10 @@
 package com.semtleWebGroup.youtubeclone.domain.video_media.exception;
 
 import com.semtleWebGroup.youtubeclone.global.error.ErrorCode;
-import com.semtleWebGroup.youtubeclone.global.error.exception.ResourceNotFoundException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.LocalResourceException;
 import org.springframework.core.io.Resource;
 
-public class VideoFileNotExistException extends ResourceNotFoundException {
+public class VideoFileNotExistException extends LocalResourceException {
 
     private final Resource reasonResource;
 
