@@ -41,12 +41,12 @@ public class VideoMediaController {
     /**
      * 비디오 스트리밍 API
      * @param httpHeaders : Http request 헤더
-     * @param videoId : videoId
+     * @param mediaId : mediaId
      * @return HttpResponse
      */
-    @GetMapping("/videos/{videoId}/media")
+    @GetMapping("/medias/{mediaId}")
     public ResponseEntity<List<ResourceRegion>> videoStreaming(@RequestHeader HttpHeaders httpHeaders,
-                                                               @PathVariable("videoId") UUID videoId){
+                                                               @PathVariable("mediaId") UUID mediaId){
 
         //Range 추출 및 검증 로직
         List<HttpRange> ranges;
@@ -62,7 +62,7 @@ public class VideoMediaController {
             throw new BadRequestException(FieldError.of("Range","null","Request With Empty Range"));
         }
 
-        List<ResourceRegion> resourceRegions = videoStreamingService.createResourceRegion(ranges, videoId);
+        List<ResourceRegion> resourceRegions = videoStreamingService.createResourceRegion(ranges, mediaId);
         MediaType mediaType = MediaTypeFactory.getMediaType(resourceRegions.get(0).getResource()).orElse(MediaType.APPLICATION_OCTET_STREAM);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
