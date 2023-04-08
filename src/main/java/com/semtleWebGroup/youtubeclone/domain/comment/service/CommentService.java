@@ -4,7 +4,7 @@ import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.CommentLike;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentLikeRequest;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
-import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentLikeRespository;
+import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentLikeRepository;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +19,11 @@ import java.util.Optional;
 @Transactional
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final CommentLikeRespository commentLikeRespository;
+    private final CommentLikeRepository commentLikeRepository;
     @Autowired
-    public CommentService(CommentRepository commentRepository,CommentLikeRespository commentLikeRespository) {
+    public CommentService(CommentRepository commentRepository, CommentLikeRepository commentLikeRepository) {
         this.commentRepository = commentRepository;
-        this.commentLikeRespository = commentLikeRespository;
+        this.commentLikeRepository = commentLikeRepository;
     }
 
     public Comment write(CommentRequest dto){
@@ -60,11 +60,11 @@ public class CommentService {
                 .channelId(likeDto.getChannelId())
                 .build();
         newCommentLike.setCommentId(commentId);
-        commentLikeRespository.save(newCommentLike);
+        commentLikeRepository.save(newCommentLike);
         return newCommentLike;
     }
     public void unlike(Integer id){
-        commentLikeRespository.deleteById(id);
+        commentLikeRepository.deleteById(id);
     }
 
 }
