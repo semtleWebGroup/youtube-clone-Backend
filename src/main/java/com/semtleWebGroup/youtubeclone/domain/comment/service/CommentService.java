@@ -1,8 +1,10 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.service;
 
-import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
+import com.semtleWebGroup.youtubeclone.domain.comment.domain.CommentLike;
+import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentLikeRequest;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
+import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentLikeRespository;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,18 +19,20 @@ import java.util.Optional;
 @Transactional
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final CommentLikeRespository commentLikeRespository;
     @Autowired
-    public CommentService(CommentRepository commentRepository) {
+    public CommentService(CommentRepository commentRepository,CommentLikeRespository commentLikeRespository) {
         this.commentRepository = commentRepository;
+        this.commentLikeRespository = commentLikeRespository;
     }
 
     public Comment write(CommentRequest dto){
-        Comment entity = Comment.builder()
+        Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .build();
 
-        commentRepository.save(entity);
-        return entity;
+        commentRepository.save(newComment);
+        return newComment;
     }
 
     public Optional<Comment> updateComment(Integer idx, CommentRequest dto) {
@@ -49,6 +53,18 @@ public class CommentService {
 
     public void commentDelete(Integer id){
         commentRepository.deleteById(id);
+    }
+
+    public CommentLike like(Integer commentId,CommentLikeRequest likeDto){
+        CommentLike newCommentLike = CommentLike.builder()
+                .channelId(likeDto.getChannelId())
+                .build();
+        newCommentLike.setCommentId(commentId);
+        commentLikeRespository.save(newCommentLike);
+        return newCommentLike;
+    }
+    public void unlike(Integer id){
+        commentLikeRespository.deleteById(id);
     }
 
 }
