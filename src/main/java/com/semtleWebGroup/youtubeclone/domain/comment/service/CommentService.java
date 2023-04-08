@@ -23,12 +23,12 @@ public class CommentService {
     }
 
     public Comment write(CommentRequest dto){
-        Comment newComment = Comment.builder()
+        Comment entity = Comment.builder()
                 .contents(dto.getContent())
                 .build();
 
-        commentRepository.save(newComment);
-        return newComment;
+        commentRepository.save(entity);
+        return entity;
     }
 
     public Optional<Comment> updateComment(Integer idx, CommentRequest dto) {
@@ -50,13 +50,5 @@ public class CommentService {
     public void commentDelete(Integer id){
         commentRepository.deleteById(id);
     }
-
-    public Comment getCommentId(Integer id){
-        Comment comment = commentRepository.findById(id).orElseThrow(()->new NoSuchElementException());
-        return comment;
-    }
-
-
-
 
 }

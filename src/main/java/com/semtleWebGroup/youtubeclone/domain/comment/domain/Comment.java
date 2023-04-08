@@ -44,24 +44,18 @@ public class Comment {
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
     }
-//
-//    @OneToMany(mappedBy = "commentCommentid")
-//    private Set<CommentLike> commentLikes = new LinkedHashSet<>();
-//
-//    @OneToMany(mappedBy = "commentCommentid")
-//    private Set<Comment> comments = new LinkedHashSet<>()
 
 //    @NotNull
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "videoPageId", nullable = false)
-//    private Video videoPageId;
+//    @JoinColumn(name = "video_id",nullable = false)
+//    private Video video;
 //
 //    @NotNull
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "channelId", nullable = false)
-//    private Channel channelId;
-//
-//    @NotNull
+//    @JoinColumn(name = "channel_id", nullable = false)
+//    private Channel channel;
+
+    //    @NotNull
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "commentCommentId", nullable = false)
 //    private Comment commentCommentId;
