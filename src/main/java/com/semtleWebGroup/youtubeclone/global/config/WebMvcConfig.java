@@ -39,12 +39,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
             
             private Pageable getLimitsFromAnnotation(Pageable p, MethodParameter methodParameter) {
                 
-                // @interface custom한 interface로 가져온 max, min size 반영
                 PageableLimits limits = methodParameter.getParameterAnnotation(PageableLimits.class);
                 
                 if (limits == null) return p;
                 
-                // max로 설정한 size보다 페이지 개수가 더 높으면, max 설정 개수를 size로 설정
                 if (p.getPageSize() > limits.maxSize())
                     return PageRequest.of(p.getPageNumber(), limits.maxSize(), p.getSort());
                 else if (p.getPageSize() < limits.minSize())
@@ -53,7 +51,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 return p;
             }
         };
-        
         resolver.setMaxPageSize(Integer.MAX_VALUE);
         resolvers.add(resolver);
         WebMvcConfigurer.super.addArgumentResolvers(resolvers);
