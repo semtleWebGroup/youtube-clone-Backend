@@ -65,6 +65,10 @@ public class ChannelService {
         return oldChannel;
     }
 
+    public void deleteChannel(Long channelId){
+        channelRepository.deleteById(channelId);
+    }
+
     public List<Channel> getAllChannel(){
 
         return channelRepository.findAll();

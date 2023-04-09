@@ -85,8 +85,9 @@ public class ChannelApi {
      * @return 성공시 OK 실패시 다른 ErrorCode 예정
      */
     @DeleteMapping("/{channelId}/subscribtion")
-    public ResponseEntity cancleSubscribtion(@PathVariable("channelId")Long channelId){
-//        final Channel channel = subscribeService.cancleSubscribe(channelId);
+    public ResponseEntity cancleSubscribtion(@RequestParam("myid")Long myid,
+                                             @PathVariable("channelId")Long channelId){
+        subscribeService.unsubscribe(myid, channelId);
 
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
@@ -98,7 +99,7 @@ public class ChannelApi {
      */
     @DeleteMapping("/{channelId}")
     public ResponseEntity deleteChannel(@PathVariable("channelId")Long channelId){
-//        final Channel channel = channelService.deleteChannel(channelId);
+        channelService.deleteChannel(channelId);
 
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
