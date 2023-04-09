@@ -48,7 +48,7 @@ public class ChannelApi {
      * @return 현재는 entity 자체를 반환. 프론트 사용 데이터 보고 overfetching 줄일 예정
      */
     @GetMapping("/{channelId}")
-    public ResponseEntity getChannelInfo(@PathVariable("channelId")Integer channelId){
+    public ResponseEntity getChannelInfo(@PathVariable("channelId")Long channelId){
         Channel channel = channelService.getChannel(channelId);
 
         return ResponseEntity.status(HttpStatus.OK).body(channel);
@@ -109,7 +109,7 @@ public class ChannelApi {
      * @throws Exception 이미지 첨부 관련 Exception
      */
     @PatchMapping("/{channelId}")
-    public ResponseEntity editChannel(@PathVariable("channelId")Integer channelId,
+    public ResponseEntity editChannel(@PathVariable("channelId")Long channelId,
                                       @ModelAttribute ChannelRequest dto) throws Exception{
         final Channel channel = channelService.updateChannel(channelId, dto);
 
