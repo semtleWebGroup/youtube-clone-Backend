@@ -26,10 +26,13 @@ jobs:
 
 #      - name: Grant execute permission for gradlew
 #        run: chmod +x gradlew
+      # 빌드 파일이 저장될 경로를 만듭니다.
+      - name: build path mkdir
+        run: mkdir -p build/libs/
 
       # 전에 빌드된 파일이 있으면 삭제해서 초기화합니다.
       - name: Delete file
-        run: rm ./build/libs/*
+        run: rm -rf ./build/libs/*
 
       # jar 을 빌드합니다
       - name: Execute bootJar
