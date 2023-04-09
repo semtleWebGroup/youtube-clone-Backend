@@ -26,6 +26,14 @@ public class ChannelService {
                 .title(dto.getChannelProfile().getTitle())
                 .description(dto.getChannelProfile().getDescription())
                 .build();
+        saveChannelImgFromDto(dto, newChannel);
+
+        channelRepository.save(newChannel);
+
+        return newChannel;
+    }
+
+    private static void saveChannelImgFromDto(ChannelRequest dto, Channel newChannel) throws IOException {
         String projectPath = System.getProperty("user.dir") + "/src/main/resources/webapp/";
 
         UUID uuid = UUID.randomUUID();
@@ -34,10 +42,6 @@ public class ChannelService {
         dto.getProfile_img().transferTo(savePath);
         newChannel.setImageName(fileName);
         newChannel.setImagePath("/resources/webapp/" + fileName);
-
-        channelRepository.save(newChannel);
-
-        return newChannel;
     }
 
     public Channel getChannel(Long id){
@@ -51,14 +55,7 @@ public class ChannelService {
         Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다."));
         oldChannel.update(dto.getChannelProfile().getTitle(), dto.getChannelProfile().getDescription());
 
-        String projectPath = System.getProperty("user.dir") + "/src/main/resources/webapp/";
-
-        UUID uuid = UUID.randomUUID();
-        String fileName = uuid + "_" + dto.getProfile_img().getOriginalFilename();
-        Path savePath = Paths.get(projectPath,fileName).toAbsolutePath();
-        dto.getProfile_img().transferTo(savePath);
-        oldChannel.setImageName(fileName);
-        oldChannel.setImagePath("/resources/webapp/" + fileName);
+        saveChannelImgFromDto(dto, oldChannel);
 
         channelRepository.save(oldChannel);
 
