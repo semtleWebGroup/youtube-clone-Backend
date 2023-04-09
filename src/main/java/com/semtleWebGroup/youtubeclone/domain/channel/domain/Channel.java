@@ -3,6 +3,8 @@ package com.semtleWebGroup.youtubeclone.domain.channel.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "channel")
@@ -19,6 +21,13 @@ public class Channel {
     private String title;
     @Column(length = 70)
     private String description;
+
+    @ManyToMany
+    @JoinTable(name = "subscription",
+    joinColumns = @JoinColumn(name = "channel_id"),
+    inverseJoinColumns = @JoinColumn(name = "subscriber_id")
+    )
+    private Set<Channel> subscribedChannels = new HashSet<>();
 
     private String imageName;
     private String imagePath;
