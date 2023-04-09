@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,14 +56,24 @@ public class ChannelService {
         Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다."));
         oldChannel.update(dto.getChannelProfile().getTitle(), dto.getChannelProfile().getDescription());
 
-        saveChannelImgFromDto(dto, oldChannel);
+        deleteChannelImgFromEntity(oldChannel);
+        if (dto.getProfile_img() != null)  saveChannelImgFromDto(dto, oldChannel);
 
         channelRepository.save(oldChannel);
 
         return oldChannel;
     }
 
+    private void deleteChannelImgFromEntity(Channel oldChannel) {
+        String filePath = System.getProperty("user.dir") + "/src/main" + oldChannel.getImagePath();
+        File file = new File(filePath);
+        file.delete();
+    }
+
+    @Transactional
     public void deleteChannel(Long channelId){
+        Channel oldChannel = channelRepository.findById(channelId).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다."));
+        deleteChannelImgFromEntity(oldChannel);
         channelRepository.deleteById(channelId);
     }
 
