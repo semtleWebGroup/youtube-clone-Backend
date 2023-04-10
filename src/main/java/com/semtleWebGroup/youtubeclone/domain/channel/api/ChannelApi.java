@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semtleWebGroup.youtubeclone.domain.channel.application.ChannelService;
 import com.semtleWebGroup.youtubeclone.domain.channel.application.SubscribeService;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
@@ -10,10 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/v1/channels")
+@RequestMapping("/channels")
 @RequiredArgsConstructor
 @Slf4j
 public class ChannelApi {
@@ -23,10 +25,9 @@ public class ChannelApi {
     /**
      * @param ChannelRequest form-data 형식으로 channelProfile.title, channelProfile.description, profile_img
      * @return 현재는 entity 자체를 반환. 프론트 사용 데이터 보고 overfetching 줄일 예정
-     * @throws 이미지 첨부 관련 exception
      */
     @PostMapping("")
-    public ResponseEntity create(@ModelAttribute ChannelRequest dto) throws Exception {
+    public ResponseEntity create(@ModelAttribute ChannelRequest dto){
         Channel channel = channelService.addChannel(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
@@ -38,8 +39,10 @@ public class ChannelApi {
      */
     @PostMapping("/{channelId}/subscribtion")
     public ResponseEntity subscribeChannel(@PathVariable("channelId")Long channelId,
-                                           @RequestParam("myid")Long myid){
-        subscribeService.subscribe(myid, channelId);
+                                           @RequestBody Map<String, Object> requestBody){
+        ObjectMapper objectMapper = new ObjectMapper();
+        Long myId = objectMapper.convertValue(requestBody.get("myid"), Long.class);
+        subscribeService.subscribe(Long.valueOf(myId), channelId);
 
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
@@ -68,11 +71,11 @@ public class ChannelApi {
     }
 
     /**
-     * @param myid 현재 로그인 한 채널의 정보. 토큰이나 세션으로 관리 필요
-     * @return myid가 구독한 채널리스트 가져오기
+     * @param channelId 구독 리스트를 조회할 채널
+     * @return channelId가 구독한 채널리스트 가져오기
      */
-    @GetMapping("/subscribiton")
-    public ResponseEntity getSubscribtionList(@RequestParam("myid")Long channelId){
+    @GetMapping("/{channelId}/subscribiton")
+    public ResponseEntity getSubscribtionList(@PathVariable("channelId")Long channelId){
         final Set<Channel> channelList = subscribeService.getSubscribedChannels(channelId);
 
 
@@ -81,20 +84,22 @@ public class ChannelApi {
 
     /**
      * 구독 취소
-     * @param channelId
+     * @param channelId - 구독을 취소할 채널 id, 채널 정보 수정 권한 확인할 토큰 필요. 현재는 myid로 대체
      * @return 성공시 OK 실패시 다른 ErrorCode 예정
      */
     @DeleteMapping("/{channelId}/subscribtion")
-    public ResponseEntity cancleSubscribtion(@RequestParam("myid")Long myid,
-                                             @PathVariable("channelId")Long channelId){
-        subscribeService.unsubscribe(myid, channelId);
+    public ResponseEntity cancleSubscribtion(@PathVariable("channelId")Long channelId,
+                                             @RequestBody Map<String, Object> requestBody){
+        ObjectMapper objectMapper = new ObjectMapper();
+        Long myId = objectMapper.convertValue(requestBody.get("myid"), Long.class);
+        subscribeService.unsubscribe(Long.valueOf(myId), channelId);
 
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
     /**
      * 채널 삭제
-     * @param channelId
+     * @param channelId - 삭제할 채널id, 채널 정보 수정 권한 확인할 토큰 필요.
      * @return 성공시 OK 실패시 다른 ErrorCode 예정
      */
     @DeleteMapping("/{channelId}")
@@ -112,7 +117,7 @@ public class ChannelApi {
      */
     @PatchMapping("/{channelId}")
     public ResponseEntity editChannel(@PathVariable("channelId")Long channelId,
-                                      @ModelAttribute ChannelRequest dto) throws Exception{
+                                      @ModelAttribute ChannelRequest dto){
         final Channel channel = channelService.updateChannel(channelId, dto);
 
 

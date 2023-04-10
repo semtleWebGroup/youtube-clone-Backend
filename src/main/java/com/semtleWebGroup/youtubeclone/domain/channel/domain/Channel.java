@@ -27,10 +27,12 @@ public class Channel {
     private String description;
 
     @ManyToMany
+    // 자기 참조로 M:N관계
     @JoinTable(name = "subscription",
-    joinColumns = @JoinColumn(name = "channel_id"),
-    inverseJoinColumns = @JoinColumn(name = "subscriber_id")
+    joinColumns = @JoinColumn(name = "channel_id"), // 엔티티와 매핑될 외래키 지정
+    inverseJoinColumns = @JoinColumn(name = "subscriber_id")    // 매핑될 다른 엔티티의 외래키 지정
     )
+    // 구독 채널은 중복이 될 수 없으므로 set 사용
     private Set<Channel> subscribedChannels = new HashSet<>();
 
     private String imageName;

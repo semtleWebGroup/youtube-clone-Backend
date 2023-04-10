@@ -22,7 +22,7 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
 
     @Transactional
-    public Channel addChannel(ChannelRequest dto) throws Exception{
+    public Channel addChannel(ChannelRequest dto){
         Channel newChannel = Channel.builder()
                 .title(dto.getChannelProfile().getTitle())
                 .description(dto.getChannelProfile().getDescription())
@@ -34,15 +34,25 @@ public class ChannelService {
         return newChannel;
     }
 
-    private static void saveChannelImgFromDto(ChannelRequest dto, Channel newChannel) throws IOException {
+    private static void saveChannelImgFromDto(ChannelRequest dto, Channel newChannel){
         String projectPath = System.getProperty("user.dir") + "/src/main/resources/webapp/";
 
+        // 같은 파일 이름을 올리더라도 겹치지 않게 파일이름 변경
         UUID uuid = UUID.randomUUID();
         String fileName = uuid + "_" + dto.getProfile_img().getOriginalFilename();
+
+        // 저장할 경로 설정
         Path savePath = Paths.get(projectPath,fileName).toAbsolutePath();
-        dto.getProfile_img().transferTo(savePath);
-        newChannel.setImageName(fileName);
-        newChannel.setImagePath("/resources/webapp/" + fileName);
+        try {
+            // multipartfile 저장
+            dto.getProfile_img().transferTo(savePath);
+
+            // 엔티티에 저장한 파일명과 위치 저장
+            newChannel.setImageName(fileName);
+            newChannel.setImagePath("/resources/webapp/" + fileName);
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 저장에 실패했습니다.", e);
+        }
     }
 
     public Channel getChannel(Long id){
@@ -52,7 +62,7 @@ public class ChannelService {
     }
 
     @Transactional
-    public Channel updateChannel(Long id, ChannelRequest dto) throws IOException {
+    public Channel updateChannel(Long id, ChannelRequest dto){
         Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다."));
         oldChannel.update(dto.getChannelProfile().getTitle(), dto.getChannelProfile().getDescription());
 
@@ -65,6 +75,7 @@ public class ChannelService {
     }
 
     private void deleteChannelImgFromEntity(Channel oldChannel) {
+        // 엔티티에 저장된 파일의 경로로 삭제
         String filePath = System.getProperty("user.dir") + "/src/main" + oldChannel.getImagePath();
         File file = new File(filePath);
         file.delete();
