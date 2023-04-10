@@ -37,7 +37,6 @@ public class VideoApi {
 
     @GetMapping("/{videoId}")
     public ResponseEntity view(@PathVariable Integer videoId) {
-        // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
         Video video = videoService.addViewCount(videoId);
         return ResponseEntity
                 .status(HttpStatus.OK)
