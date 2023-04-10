@@ -35,6 +35,10 @@ public class Video extends BaseTime{
         this.description = description;
     }
 
+    public void incrementViewCount() {
+        this.viewCount += 1;
+    }
+
     public void update(String title, String description) {
         this.title = title;
         this.description = description;
@@ -43,10 +47,6 @@ public class Video extends BaseTime{
     public void update(String title, String description, String thumbImg) {
         this.title = title;
         this.description = description;
-        this.thumbImg = thumbImg;
-    }
-
-    public void setThumbImg(String thumbImg) {
         this.thumbImg = thumbImg;
     }
 }

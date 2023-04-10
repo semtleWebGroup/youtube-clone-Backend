@@ -18,7 +18,6 @@ public class VideoService {
     private VideoRepository videoRepository;
 
     public Video add(Integer id, VideoRequest dto, MultipartFile file) throws IOException {
-        // get video by id
         Video video = this.get(id);
 
         // save thumbnail image
@@ -27,10 +26,9 @@ public class VideoService {
         File saveFile = new File(dir, thumbImgName);
         file.transferTo(saveFile);
 
-        // update and save video
         video.update(dto.getTitle(), dto.getDescription(), thumbImgName);
-        videoRepository.save(video);
 
+        videoRepository.save(video);
         return video;
     }
 
@@ -43,15 +41,20 @@ public class VideoService {
     }
 
     public Video edit(Integer id, VideoRequest dto) {
-        // get video by id
-        Video originVideo = this.get(id);
-        Video newVideo = originVideo;
+        Video video = this.get(id);
 
-        // update and save video
-        newVideo.update(dto.getTitle(), dto.getDescription());
-        videoRepository.save(newVideo);
+        video.update(dto.getTitle(), dto.getDescription());
 
-        // return original video
-        return originVideo;
+        videoRepository.save(video);
+        return video;
+    }
+
+    public Video addViewCount(Integer id) {
+        Video video = this.get(id);
+
+        video.incrementViewCount();
+
+        videoRepository.save(video);
+        return video;
     }
 }
