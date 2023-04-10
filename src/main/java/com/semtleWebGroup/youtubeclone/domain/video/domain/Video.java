@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name="video")
 @Getter
 @NoArgsConstructor
-public class Video {
+public class Video extends BaseTime{
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "videoid", updatable = false)
@@ -25,13 +25,8 @@ public class Video {
 
     private String thumbImg;
 
-    @CreatedDate
-    private LocalDateTime createdTime;
-
-    @LastModifiedDate
-    private LocalDateTime updatedTime;
-
     private int videoSec;
+
     private int viewCount;
 
     @Builder
@@ -40,15 +35,18 @@ public class Video {
         this.description = description;
     }
 
-    public void updateTitle(String title) {
+    public void update(String title, String description) {
         this.title = title;
-    }
-
-    public void updateDescription(String description) {
         this.description = description;
     }
 
-    public void updateThumbImg(String thumbImg) {
+    public void update(String title, String description, String thumbImg) {
+        this.title = title;
+        this.description = description;
+        this.thumbImg = thumbImg;
+    }
+
+    public void setThumbImg(String thumbImg) {
         this.thumbImg = thumbImg;
     }
 }
