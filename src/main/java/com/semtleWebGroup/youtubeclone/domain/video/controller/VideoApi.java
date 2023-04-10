@@ -31,23 +31,7 @@ public class VideoApi {
             @RequestPart("thumbImg") MultipartFile file
         ) throws Exception
     {
-        // get video by id
-        Video video = videoService.get(videoId);
-
-        // save thumbnail image
-        String dir = System.getProperty("user.dir") + "\\src\\main\\resources\\webapp\\thumbnails";
-        String thumbImgName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        File saveFile = new File(dir, thumbImgName);
-        System.out.println(file);
-        file.transferTo(saveFile);
-
-        // update video
-        video.updateTitle(dto.getTitle());
-        video.updateDescription(dto.getDescription());
-        video.updateThumbImg(thumbImgName);
-
-        // save and return video
-        videoService.create(video);
+        Video video = videoService.add(videoId, dto, file);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(video);
@@ -63,22 +47,18 @@ public class VideoApi {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-//                .body(video);
                 .body("aa");
     }
 
     @PatchMapping("/{videoId}")
-    public ResponseEntity update(@PathVariable Integer videoId, @Valid @RequestBody VideoRequest videoRequest) {
-        // TODO: title, description만 변경하여 변경 전의 video info 반환.
-//        Video video = Video.builder()
-//                .id(videoId)
-//                .title(videoRequest.getTitle())
-//                .description(videoRequest.getDescription()).build();
-
+    public ResponseEntity update(
+            @PathVariable Integer videoId,
+            @Valid @RequestBody VideoRequest dto
+    ) {
+        Video video = videoService.edit(videoId, dto);
         return ResponseEntity
                 .status(HttpStatus.OK)
-//                .body(video);
-                .body("");
+                .body(video);
     }
 
     @DeleteMapping("/{videoId}")
