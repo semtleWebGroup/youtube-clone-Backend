@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,11 +38,6 @@ public class VideoApi {
     @GetMapping("/{videoId}")
     public ResponseEntity view(@PathVariable Integer videoId) {
         // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
-//        Video video = Video.builder()
-//                .id(videoId)
-//                .title("ExampleTitle")
-//                .description("ExampleDescription").build();
-
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body("aa");
@@ -63,15 +56,9 @@ public class VideoApi {
 
     @DeleteMapping("/{videoId}")
     public ResponseEntity delete(@PathVariable Integer videoId) {
-        // TODO: video media도 삭제하여 삭제 된 video info 반환.
-//        Video video = Video.builder()
-//                .id(videoId)
-//                .title("ExampleTitle")
-//                .description("ExampleDescription").build();
-
+        // TODO: video 및 video media도 삭제하여 삭제 된 video info 반환.
         return ResponseEntity
                 .status(HttpStatus.OK)
-//                .body(video);
                 .body("");
     }
 
