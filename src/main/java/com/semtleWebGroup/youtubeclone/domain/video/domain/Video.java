@@ -15,7 +15,7 @@ public class Video {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "videoid", updatable = false)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length=45)
     private String title;
@@ -23,7 +23,7 @@ public class Video {
     @Column(length=45)
     private String description;
 
-    private Byte thumbImg;
+    private String thumbImg;
 
     @CreatedDate
     private LocalDateTime createdTime;
@@ -35,15 +35,20 @@ public class Video {
     private int viewCount;
 
     @Builder
-    public Video(Long id, String title, String description, Byte thumbImg, int videoSec) {
-        this.id = id;
+    public Video(String title, String description) {
         this.title = title;
         this.description = description;
-        this.thumbImg = thumbImg;
-        this.createdTime = LocalDateTime.now();
-        this.updatedTime = LocalDateTime.now();
-        this.videoSec = videoSec;
-        this.viewCount = 0;
+    }
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+    public void updateThumbImg(String thumbImg) {
+        this.thumbImg = thumbImg;
     }
 }

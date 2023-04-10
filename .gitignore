@@ -227,3 +227,6 @@ README.html
 *.iml
 .idea
 .exercism
+
+### user file
+src/main/resources/webapp/thumbnails/*
