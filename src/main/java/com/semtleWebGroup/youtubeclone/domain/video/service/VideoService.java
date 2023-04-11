@@ -23,6 +23,12 @@ public class VideoService {
     @Autowired
     private VideoRepository videoRepository;
 
+    private VideoInfo getVideoInfoByVideoId(UUID videoId) {
+        VideoInfo videoInfo = videoInfoRepository.findByVideo_VideoId(videoId)
+                .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
+        return videoInfo;
+    }
+
     @Transactional
     public VideoInfo add(UUID videoId, VideoRequest dto, Blob thumbImg) {
         Video video = videoRepository.findById(videoId)
@@ -42,9 +48,14 @@ public class VideoService {
         return newVideoInfo;
     }
 
-    private VideoInfo getVideoInfoByVideoId(UUID videoId) {
-        VideoInfo videoInfo = videoInfoRepository.findByVideo_VideoId(videoId)
-            .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
+    @Transactional
+    public VideoInfo view(UUID videoId) {
+        VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
+        if (videoInfo.getVideo().isCashed()) {
+            throw new InvalidValueException("Video encoding is not finished.");
+        }
+        videoInfo.incrementViewCount();
+        videoInfoRepository.save(videoInfo);
         return videoInfo;
     }
 
@@ -57,13 +68,12 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoInfo view(UUID videoId) {
+    public VideoInfo delete(UUID videoId) {
+        // TODO: VideoMedia, Video 등 관련 모든 데이터 삭제 필요.
         VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
-        if (videoInfo.getVideo().isCashed()) {
-            throw new InvalidValueException("Video encoding is not finished.");
-        }
-        videoInfo.incrementViewCount();
-        videoInfoRepository.save(videoInfo);
+        videoInfoRepository.deleteById(videoInfo.getId());
         return videoInfo;
     }
+
+
 }

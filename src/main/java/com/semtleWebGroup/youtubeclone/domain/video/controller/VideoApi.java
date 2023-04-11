@@ -47,17 +47,10 @@ public class VideoApi {
             throw new BadRequestException(FieldError.of("videoId", String.valueOf(videoId), e.getMessage()));
         }
 
-        VideoResponse videoResponse = VideoResponse.builder()
-            .videoId(videoInfo.getVideo().getVideoId())
-            .title(videoInfo.getTitle())
-            .description(videoInfo.getDescription())
-            .createTime(videoInfo.getCreatedTime())
-            .updatedTime(videoInfo.getUpdatedTime())
-            .build();
-
+        VideoResponse videoResponse = new VideoResponse(videoInfo);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(videoResponse);
+            .status(HttpStatus.CREATED)
+            .body(videoResponse);
     }
 
     @GetMapping("/{videoId}")
@@ -95,8 +88,8 @@ public class VideoApi {
                 .build();
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(videoViewResponse);
+            .status(HttpStatus.OK)
+            .body(videoViewResponse);
     }
 
     @PatchMapping("/{videoId}")
@@ -112,30 +105,26 @@ public class VideoApi {
             throw new BadRequestException(FieldError.of("videoId", String.valueOf(videoId), e.getMessage()));
         }
 
-        VideoResponse videoResponse = VideoResponse.builder()
-                .videoId(videoInfo.getVideo().getVideoId())
-                .title(videoInfo.getTitle())
-                .description(videoInfo.getDescription())
-                .createTime(videoInfo.getCreatedTime())
-                .updatedTime(videoInfo.getUpdatedTime())
-                .build();
-
+        VideoResponse videoResponse = new VideoResponse(videoInfo);
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(videoResponse);
+            .status(HttpStatus.OK)
+            .body(videoResponse);
     }
 
     @DeleteMapping("/{videoId}")
     public ResponseEntity delete(@PathVariable UUID videoId) {
-        // TODO: video media도 삭제하여 삭제 된 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title("ExampleTitle")
-                .description("ExampleDescription").build();
+        VideoInfo videoInfo;
 
+        try {
+            videoInfo = videoService.delete(videoId);
+        } catch (EntityNotFoundException e) {
+            throw new BadRequestException(FieldError.of("videoId", String.valueOf(videoId), e.getMessage()));
+        }
+
+        VideoResponse videoResponse = new VideoResponse(videoInfo);
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(video);
+            .status(HttpStatus.OK)
+            .body(videoResponse);
     }
 
     @PostMapping("/{videoId}/like")
