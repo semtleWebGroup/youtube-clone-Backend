@@ -7,7 +7,7 @@ import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video_media.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +16,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class VideoService {
 
-    @Autowired
-    private VideoInfoRepository videoInfoRepository;
-    @Autowired
-    private VideoRepository videoRepository;
+    private final VideoInfoRepository videoInfoRepository;
+    private final VideoRepository videoRepository;
 
     private VideoInfo getVideoInfoByVideoId(UUID videoId) {
         VideoInfo videoInfo = videoInfoRepository.findByVideo_VideoId(videoId)
