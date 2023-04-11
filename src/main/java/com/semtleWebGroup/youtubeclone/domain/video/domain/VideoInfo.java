@@ -5,6 +5,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,7 +24,8 @@ public class VideoInfo {
     @Column(length=45)
     private String description;
 
-    private Byte thumbImg;
+    @Lob
+    private Blob thumbImg;
 
     @CreatedDate
     private LocalDateTime createdTime;
@@ -35,7 +37,7 @@ public class VideoInfo {
     private int viewCount;
 
     @Builder
-    public VideoInfo(Long id, String title, String description, Byte thumbImg, int videoSec) {
+    public VideoInfo(Long id, String title, String description, Blob thumbImg, int videoSec) {
         this.id = id;
         this.title = title;
         this.description = description;
