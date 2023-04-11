@@ -4,17 +4,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class VideoViewDto {
+public class VideoViewResponse {
     private UUID videoId;
     private Long channelId;
     private String channelName;
@@ -31,7 +29,7 @@ public class VideoViewDto {
     private List<String> qualityList;
 
     @Builder
-    public VideoViewDto(
+    public VideoViewResponse(
             UUID videoId,
             Long channelId,
             String channelName,
@@ -39,6 +37,7 @@ public class VideoViewDto {
             int channelSubscriberCount,
             String title,
             String description,
+            LocalDateTime createdTime,
             Long videoSec,
             int viewCount,
             int likeCount,
@@ -51,7 +50,7 @@ public class VideoViewDto {
         this.channelProfileImg = channelProfileImg;
         this.channelSubscriberCount = channelSubscriberCount;
         this.title = title;
-        this.createdTime = LocalDateTime.now();
+        this.createdTime = createdTime;
         this.description = description;
         this.videoSec = videoSec;
         this.viewCount = viewCount;

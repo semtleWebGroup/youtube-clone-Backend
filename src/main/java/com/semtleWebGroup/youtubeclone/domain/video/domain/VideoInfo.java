@@ -38,21 +38,17 @@ public class VideoInfo extends BaseTime {
     private int viewCount;
 
     @Builder
-    public VideoInfo(String title, String description, Video video) {
+    public VideoInfo(String title, String description, Video video, Blob thumbImg) {
+        this.video = video;
         this.title = title;
         this.description = description;
-        this.video = video;
+        this.thumbImg = thumbImg;
+        this.viewCount = 0;
     }
 
     public void update(String title, String description) {
         this.title = title;
         this.description = description;
-    }
-
-    public void update(String title, String description, Blob thumbImg) {
-        this.title = title;
-        this.description = description;
-        this.thumbImg = thumbImg;
     }
 
     public void incrementViewCount() {

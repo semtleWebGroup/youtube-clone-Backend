@@ -6,11 +6,13 @@ import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoInfoReposito
 import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video_media.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Blob;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,37 +20,37 @@ public class VideoService {
 
     @Autowired
     private VideoInfoRepository videoInfoRepository;
+    @Autowired
     private VideoRepository videoRepository;
 
     @Transactional
-    public VideoInfo add(UUID id, VideoRequest dto, Blob thumbImg) {
-        VideoInfo video = this.get(id);
-        video.update(dto.getTitle(), dto.getDescription(), thumbImg);
-        videoInfoRepository.save(video);
-        return video;
+    public VideoInfo add(UUID videoId, VideoRequest dto, Blob thumbImg) {
+        Video video = videoRepository.findById(videoId)
+            .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
+
+        Optional<VideoInfo> videoInfo = videoInfoRepository.findByVideo(video);
+        if (videoInfo != null)
+            throw new InvalidValueException("Video info of video is already exist.");
+
+        VideoInfo newVideoInfo = VideoInfo.builder()
+            .video(video)
+            .title(dto.getTitle())
+            .description(dto.getDescription())
+            .thumbImg(thumbImg)
+            .build();
+        videoInfoRepository.save(newVideoInfo);
+        return newVideoInfo;
     }
 
-    public VideoInfo getVideoInfoByVideoId(UUID videoId) {
+    private VideoInfo getVideoInfoByVideoId(UUID videoId) {
         VideoInfo videoInfo = videoInfoRepository.findByVideo_VideoId(videoId)
-            .orElseThrow(()-> new EntityNotFoundException(
-                String.format("Video %d is not found.", videoId)
-            ));
+            .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
         return videoInfo;
-    }
-
-    private VideoInfo get(UUID id) {
-//        VideoInfo videoInfo = videoInfoRepository.findById(id)
-//                .orElseThrow(()-> new EntityNotFoundException(
-//                        String.format("%d is not found.", id)
-//                ));
-        // TODO: videoId를 이용하여 videoInfoId를 찾아서 videoInfo를 가져와야 함.
-//        return videoInfo;
-        return null;
     }
 
     @Transactional
     public VideoInfo edit(UUID videoId, VideoRequest dto) {
-        VideoInfo video = this.get(videoId);
+        VideoInfo video = this.getVideoInfoByVideoId(videoId);
         video.update(dto.getTitle(), dto.getDescription());
         videoInfoRepository.save(video);
         return video;
