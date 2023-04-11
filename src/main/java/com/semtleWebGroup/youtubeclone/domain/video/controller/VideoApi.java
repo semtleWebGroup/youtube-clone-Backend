@@ -51,7 +51,7 @@ public class VideoApi {
     @Transactional
     public ResponseEntity view(@PathVariable UUID videoId) throws Exception {
         // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
-        VideoInfo videoInfo = videoService.getVideoInfoByVideoId(videoId);
+        VideoInfo videoInfo = videoService.view(videoId);
         Video video = videoInfo.getVideo();
         Channel channel = video.getChannel();
         ArrayList<String> qualityList = new ArrayList<String>();

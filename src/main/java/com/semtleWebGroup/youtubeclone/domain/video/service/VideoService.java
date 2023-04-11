@@ -56,12 +56,9 @@ public class VideoService {
 
     @Transactional
     public VideoInfo view(UUID videoId) {
-
-
-        // TODO: channel 관련 정보, media type list도 join해서 보내줄 것
-        VideoInfo video = this.get(videoId);
-        video.incrementViewCount();
-        videoInfoRepository.save(video);
-        return video;
+        VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
+        videoInfo.incrementViewCount();
+        videoInfoRepository.save(videoInfo);
+        return videoInfo;
     }
 }
