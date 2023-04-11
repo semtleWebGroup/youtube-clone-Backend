@@ -8,6 +8,4 @@ import java.util.List;
 public interface VideoInfoRepository extends JpaRepository<VideoInfo, Long> {
     List<VideoInfo> findByTitleContaining(String key);
 
-
-
 }

@@ -2,6 +2,8 @@ package com.semtleWebGroup.youtubeclone.global.config;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
+import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoInfoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video_media.domain.VideoMedia;
 import com.semtleWebGroup.youtubeclone.domain.video_media.repository.VideoMediaRepository;
@@ -34,11 +36,18 @@ public class DbInitializer {
     @Bean
     public CommandLineRunner initDummyData(ChannelRepository channelRepository,
                                            VideoRepository videoRepository,
-                                           VideoMediaRepository videoMediaRepository){
+                                           VideoMediaRepository videoMediaRepository,
+                                           VideoInfoRepository videoInfoRepository){
         //테스트용 비디오 넣기
         return (arg) -> {
             Channel testChannel = channelRepository.save(new Channel("영국남자", "영국 사람들"));
             Video testVideo = videoRepository.save(new Video(31, false, testChannel));
+            VideoInfo testVideoInfo = videoInfoRepository.save(VideoInfo.builder()
+                    .title("예시제목")
+                    .description("예시설명")
+                    .video(testVideo)
+                    .build()
+            );
             VideoMedia testMedia = videoMediaRepository.save(VideoMedia.builder()
                     .rootVideo(testVideo)
                     .height(1080)

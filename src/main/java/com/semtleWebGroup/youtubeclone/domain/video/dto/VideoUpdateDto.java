@@ -5,15 +5,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class VideoUpdateDto {
-    private Long videoId;
+    private UUID videoId;
     private String title;
     private String description;
 
     @Builder
-    public VideoUpdateDto(Long videoId, String title, String description) {
+    public VideoUpdateDto(UUID videoId, String title, String description) {
         this.videoId = videoId;
         this.title = title;
         this.description = description;

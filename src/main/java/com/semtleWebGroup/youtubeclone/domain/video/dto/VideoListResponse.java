@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class VideoListResponse {
 
-    private Long id;
+    private UUID id;
     private String title;
 
     private byte[] thumbnail;

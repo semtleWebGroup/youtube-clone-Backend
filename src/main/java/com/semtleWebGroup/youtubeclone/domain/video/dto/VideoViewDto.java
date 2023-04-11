@@ -10,11 +10,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class VideoViewDto {
-    private Long videoId;
+    private UUID videoId;
     private Long channelId;
     private String channelName;
     private Byte[] channelProfileImg;
@@ -34,7 +35,7 @@ public class VideoViewDto {
 
     @Builder
     public VideoViewDto(
-            Long videoId,
+            UUID videoId,
             Long channelId,
             String channelName,
             Byte[] channelProfileImg,

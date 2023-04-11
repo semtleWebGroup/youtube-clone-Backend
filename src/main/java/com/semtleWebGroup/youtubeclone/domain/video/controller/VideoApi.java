@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class VideoApi {
 
     @PostMapping("/{videoId}")
     public ResponseEntity create(
-            @PathVariable Long videoId,
+            @PathVariable UUID videoId,
             @RequestPart VideoRequest dto,
             @RequestPart("thumbImg") MultipartFile file
     ) throws Exception
@@ -37,14 +38,15 @@ public class VideoApi {
         Blob blobImg = null;
 
         // save and return video
-        VideoInfo video = videoService.add(videoId, dto, blobImg);
+//        VideoInfo video = videoService.add(videoId, dto, blobImg);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(video);
+//                .body(video);
+                .body(videoId);
     }
 
     @GetMapping("/{videoId}")
-    public ResponseEntity view(@PathVariable Long videoId) {
+    public ResponseEntity view(@PathVariable UUID videoId) {
         // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
         List<String> qualityList = new ArrayList<String>();
         qualityList.add("p1080");
@@ -64,7 +66,7 @@ public class VideoApi {
 
     @PatchMapping("/{videoId}")
     public ResponseEntity update(
-            @PathVariable Long videoId,
+            @PathVariable UUID videoId,
             @Valid @RequestBody VideoRequest dto
     ) {
         VideoInfo video = videoService.edit(videoId, dto);
@@ -75,7 +77,7 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity delete(@PathVariable Long videoId) {
+    public ResponseEntity delete(@PathVariable UUID videoId) {
         // TODO: video media도 삭제하여 삭제 된 video info 반환.
         VideoUpdateDto video = VideoUpdateDto.builder()
                 .videoId(videoId)
@@ -88,7 +90,7 @@ public class VideoApi {
     }
 
     @PostMapping("/{videoId}/like")
-    public ResponseEntity like(@PathVariable Long videoId) {
+    public ResponseEntity like(@PathVariable UUID videoId) {
         // TODO: like table에 등록 후 like 수 반환.
         VideoLikeResponse like = new VideoLikeResponse(true, 1);
         return ResponseEntity
@@ -97,7 +99,7 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}/like")
-    public ResponseEntity dislike(@PathVariable Long videoId) {
+    public ResponseEntity dislike(@PathVariable UUID videoId) {
         // TODO: like table에서 삭제 후 like 수 반환.
         VideoLikeResponse like = new VideoLikeResponse(false, 0);
         return ResponseEntity
