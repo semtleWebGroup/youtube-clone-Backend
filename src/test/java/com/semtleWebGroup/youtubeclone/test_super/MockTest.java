@@ -22,4 +22,5 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @Disabled
 public class MockTest {
+
 }
