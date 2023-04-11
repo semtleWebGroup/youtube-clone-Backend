@@ -31,24 +31,16 @@ public class VideoApi {
     @Transactional
     @PostMapping("/{videoId}")
     public ResponseEntity create(
-            @PathVariable Integer videoId,
+            @PathVariable Long videoId,
             @RequestPart VideoRequest dto,
             @RequestPart("thumbImg") MultipartFile file
     ) throws Exception
     {
-        // get video by id
-        VideoInfo video = videoService.get(videoId);
-
-        // TODO: convert thumbnail image type (to Blob)
+        // TODO: convert thumbImg file type (to Blob)
         Blob blobImg = null;
 
-        // update video
-        video.updateTitle(dto.getTitle());
-        video.updateDescription(dto.getDescription());
-        video.updateThumbImg(blobImg); // TODO
-
         // save and return video
-        videoService.create(video);
+        VideoInfo video = videoService.add(videoId, dto, blobImg);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(video);
@@ -74,12 +66,11 @@ public class VideoApi {
     }
 
     @PatchMapping("/{videoId}")
-    public ResponseEntity update(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) {
-        // TODO: title, description만 변경하여 변경 전의 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title(videoRequest.getTitle())
-                .description(videoRequest.getDescription()).build();
+    public ResponseEntity update(
+            @PathVariable Long videoId,
+            @Valid @RequestBody VideoRequest dto
+    ) {
+        VideoInfo video = videoService.edit(videoId, dto);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -8,17 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.Blob;
 
 @Service
 public class VideoService {
     @Autowired
     private VideoInfoRepository videoInfoRepository;
 
-    public void create(VideoInfo video) throws IOException {
+    public VideoInfo add(Long id, VideoRequest dto, Blob thumbImg) {
+        VideoInfo video = this.get(id);
+        video.update(dto.getTitle(), dto.getDescription(), thumbImg);
         videoInfoRepository.save(video);
+        return video;
     }
 
-    public VideoInfo get(Integer id) {
+    public VideoInfo get(Long id) {
         VideoInfo videoInfo = videoInfoRepository.findById(id)
                 .orElseThrow(()-> new EntityNotFoundException(
                         String.format("%d is not found.", id)
@@ -26,7 +30,18 @@ public class VideoService {
         return videoInfo;
     }
 
-    public VideoInfo edit(VideoInfo video, String title, String description, Byte[] thumbImg) {
+    public VideoInfo edit(Long id, VideoRequest dto) {
+        VideoInfo video = this.get(id);
+        video.update(dto.getTitle(), dto.getDescription());
+        videoInfoRepository.save(video);
+        return video;
+    }
+
+    public VideoInfo view(Long id) {
+        // TODO: channel 관련 정보, media type list도 join해서 보내줄 것
+        VideoInfo video = this.get(id);
+        video.incrementViewCount();
+        videoInfoRepository.save(video);
         return video;
     }
 }

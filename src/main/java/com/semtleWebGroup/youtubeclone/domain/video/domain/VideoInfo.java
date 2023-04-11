@@ -36,16 +36,19 @@ public class VideoInfo extends BaseTime {
         this.description = description;
     }
 
-    public void updateTitle(String title) {
+    public void update(String title, String description) {
         this.title = title;
-    }
-
-    public void updateDescription(String description) {
         this.description = description;
     }
 
-    public void updateThumbImg(Blob thumbImg) {
+    public void update(String title, String description, Blob thumbImg) {
+        this.title = title;
+        this.description = description;
         this.thumbImg = thumbImg;
+    }
+
+    public void incrementViewCount() {
+        this.viewCount += 1;
     }
 
 }
