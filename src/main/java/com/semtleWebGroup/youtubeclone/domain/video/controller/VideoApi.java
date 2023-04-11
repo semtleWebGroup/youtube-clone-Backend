@@ -104,11 +104,25 @@ public class VideoApi {
             @PathVariable UUID videoId,
             @Valid @RequestBody VideoRequest dto
     ) {
-        VideoInfo video = videoService.edit(videoId, dto);
+        VideoInfo videoInfo;
+
+        try {
+            videoInfo = videoService.edit(videoId, dto);
+        } catch (EntityNotFoundException e) {
+            throw new BadRequestException(FieldError.of("videoId", String.valueOf(videoId), e.getMessage()));
+        }
+
+        VideoResponse videoResponse = VideoResponse.builder()
+                .videoId(videoInfo.getVideo().getVideoId())
+                .title(videoInfo.getTitle())
+                .description(videoInfo.getDescription())
+                .createTime(videoInfo.getCreatedTime())
+                .updatedTime(videoInfo.getUpdatedTime())
+                .build();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(video);
+                .body(videoResponse);
     }
 
     @DeleteMapping("/{videoId}")

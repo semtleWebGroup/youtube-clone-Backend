@@ -49,6 +49,7 @@ public class VideoInfo extends BaseTime {
     public void update(String title, String description) {
         this.title = title;
         this.description = description;
+        setUpdatedTime(LocalDateTime.now());
     }
 
     public void incrementViewCount() {

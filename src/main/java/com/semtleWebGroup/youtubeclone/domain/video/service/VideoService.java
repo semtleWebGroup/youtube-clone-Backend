@@ -50,10 +50,10 @@ public class VideoService {
 
     @Transactional
     public VideoInfo edit(UUID videoId, VideoRequest dto) {
-        VideoInfo video = this.getVideoInfoByVideoId(videoId);
-        video.update(dto.getTitle(), dto.getDescription());
-        videoInfoRepository.save(video);
-        return video;
+        VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
+        videoInfo.update(dto.getTitle(), dto.getDescription());
+        videoInfoRepository.save(videoInfo);
+        return videoInfo;
     }
 
     @Transactional
