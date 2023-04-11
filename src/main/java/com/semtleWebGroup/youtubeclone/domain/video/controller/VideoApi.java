@@ -69,6 +69,8 @@ public class VideoApi {
             videoInfo = videoService.view(videoId);
         } catch (EntityNotFoundException e) {
             throw new BadRequestException(FieldError.of("videoId", String.valueOf(videoId), e.getMessage()));
+        } catch (InvalidValueException e) {
+            throw new BadRequestException(FieldError.of("videoId", String.valueOf(videoId), e.getMessage()));
         }
 
         Video video = videoInfo.getVideo();

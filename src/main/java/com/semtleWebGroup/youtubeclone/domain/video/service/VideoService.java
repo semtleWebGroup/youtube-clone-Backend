@@ -59,6 +59,9 @@ public class VideoService {
     @Transactional
     public VideoInfo view(UUID videoId) {
         VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
+        if (videoInfo.getVideo().isCashed()) {
+            throw new InvalidValueException("Video encoding is not finished.");
+        }
         videoInfo.incrementViewCount();
         videoInfoRepository.save(videoInfo);
         return videoInfo;
