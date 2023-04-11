@@ -62,7 +62,7 @@ public class VideoApi {
 
     @GetMapping("/{videoId}")
     @Transactional
-    public ResponseEntity view(@PathVariable UUID videoId) throws Exception {
+    public ResponseEntity view(@PathVariable UUID videoId) {
         VideoInfo videoInfo;
 
         try {
