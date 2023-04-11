@@ -17,6 +17,4 @@ public class VideoRequest {
     @Size(max=45, message="'description' length should be <= 45.")
     private String description;
 
-//    private MultipartFile thumbImg;
-
 }

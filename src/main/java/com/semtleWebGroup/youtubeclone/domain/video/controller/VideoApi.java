@@ -1,33 +1,54 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
+import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUpdateDto;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewDto;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/videos")
 public class VideoApi {
+    @Autowired
     private final VideoService videoService;
 
+    @Transactional
     @PostMapping("/{videoId}")
-    public ResponseEntity create(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) throws Exception {
-        // TODO: add된 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title(videoRequest.getTitle())
-                .description(videoRequest.getDescription()).build();
+    public ResponseEntity create(
+            @PathVariable Integer videoId,
+            @RequestPart VideoRequest dto,
+            @RequestPart("thumbImg") MultipartFile file
+    ) throws Exception
+    {
+        // get video by id
+        VideoInfo video = videoService.get(videoId);
 
+        // TODO: convert thumbnail image type (to Blob)
+        Blob blobImg = null;
+
+        // update video
+        video.updateTitle(dto.getTitle());
+        video.updateDescription(dto.getDescription());
+        video.updateThumbImg(blobImg); // TODO
+
+        // save and return video
+        videoService.create(video);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(video);

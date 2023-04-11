@@ -4,14 +4,18 @@ import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoInfoRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class VideoService {
+    @Autowired
     private VideoInfoRepository videoInfoRepository;
 
-    public VideoInfo add(VideoRequest dto) {
-        return new VideoInfo();
+    public void create(VideoInfo video) throws IOException {
+        videoInfoRepository.save(video);
     }
 
     public VideoInfo get(Integer id) {
@@ -20,5 +24,9 @@ public class VideoService {
                         String.format("%d is not found.", id)
                 ));
         return videoInfo;
+    }
+
+    public VideoInfo edit(VideoInfo video, String title, String description, Byte[] thumbImg) {
+        return video;
     }
 }
