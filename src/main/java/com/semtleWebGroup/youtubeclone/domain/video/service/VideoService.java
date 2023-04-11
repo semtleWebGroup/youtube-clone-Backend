@@ -6,6 +6,7 @@ import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoInfoReposito
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.sql.Blob;
@@ -15,6 +16,7 @@ public class VideoService {
     @Autowired
     private VideoInfoRepository videoInfoRepository;
 
+    @Transactional
     public VideoInfo add(Long id, VideoRequest dto, Blob thumbImg) {
         VideoInfo video = this.get(id);
         video.update(dto.getTitle(), dto.getDescription(), thumbImg);
@@ -30,6 +32,7 @@ public class VideoService {
         return videoInfo;
     }
 
+    @Transactional
     public VideoInfo edit(Long id, VideoRequest dto) {
         VideoInfo video = this.get(id);
         video.update(dto.getTitle(), dto.getDescription());
@@ -37,6 +40,7 @@ public class VideoService {
         return video;
     }
 
+    @Transactional
     public VideoInfo view(Long id) {
         // TODO: channel 관련 정보, media type list도 join해서 보내줄 것
         VideoInfo video = this.get(id);

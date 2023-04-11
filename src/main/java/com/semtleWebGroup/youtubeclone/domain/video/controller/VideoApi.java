@@ -15,11 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +26,6 @@ public class VideoApi {
     @Autowired
     private final VideoService videoService;
 
-    @Transactional
     @PostMapping("/{videoId}")
     public ResponseEntity create(
             @PathVariable Long videoId,
