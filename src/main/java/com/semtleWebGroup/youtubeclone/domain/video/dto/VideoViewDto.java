@@ -22,12 +22,9 @@ public class VideoViewDto {
     private int channelSubscriberCount;
     @NotEmpty()
     private String title;
-
     private String description;
-
     private LocalDateTime createdTime;
-
-    private int videoSec;
+    private Long videoSec;
     private int viewCount;
     private int likeCount;
     private boolean isLike;
@@ -42,7 +39,7 @@ public class VideoViewDto {
             int channelSubscriberCount,
             String title,
             String description,
-            int videoSec,
+            Long videoSec,
             int viewCount,
             int likeCount,
             boolean isLike,

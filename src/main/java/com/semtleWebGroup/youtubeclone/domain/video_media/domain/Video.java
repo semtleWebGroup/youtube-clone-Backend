@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video_media.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -31,6 +32,7 @@ public class Video {
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "channel_id", nullable = false)
+    @JsonIgnore
     private Channel channel;
 
     public Video(long videoSecond, boolean isCashed, Channel channel) {

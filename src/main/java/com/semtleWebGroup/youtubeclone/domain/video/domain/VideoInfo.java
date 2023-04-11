@@ -22,7 +22,7 @@ public class VideoInfo extends BaseTime {
     @Column(name = "video_info_id", updatable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @OneToOne()
     @JoinColumn(name = "videoid", nullable = false)
     private Video video;
 
