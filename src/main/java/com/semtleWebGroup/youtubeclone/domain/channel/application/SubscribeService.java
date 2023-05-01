@@ -2,6 +2,7 @@ package com.semtleWebGroup.youtubeclone.domain.channel.application;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,13 @@ public class SubscribeService {
     @Transactional
     public void subscribe(Long channelId, Long subscribedChannelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널 아이디를 찾을 수 없음 : " + channelId));
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", channelId)
+                ));
         Channel subscribedChannel = channelRepository.findById(subscribedChannelId)
-                .orElseThrow(()-> new IllegalArgumentException("구독할 채널 아이디를 찾을 수 없음 : " + subscribedChannelId));
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", subscribedChannelId)
+                ));
 
         channel.getSubscribedChannels().add(subscribedChannel);
         channelRepository.save(channel);
@@ -27,18 +32,32 @@ public class SubscribeService {
     @Transactional
     public void unsubscribe(Long channelId, Long subscribedChannelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널 아이디를 찾을 수 없음 : " + channelId));
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", channelId)
+                ));
         Channel subscribedChannel = channelRepository.findById(subscribedChannelId)
-                .orElseThrow(()-> new IllegalArgumentException("구독할 채널 아이디를 찾을 수 없음 : " + subscribedChannelId));
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", subscribedChannelId)
+                ));
         channel.getSubscribedChannels().remove(subscribedChannel);
         channelRepository.save(channel);
     }
 
     public Set<Channel> getSubscribedChannels(Long channelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(()-> new IllegalArgumentException("채널 아이디를 찾을 수 없음 : " + channelId));
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", channelId)
+                ));
 
         return channel.getSubscribedChannels();
     }
 
+    public Long getCountOfSubscribers(Long channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", channelId)
+                ));
+
+        return (long) channel.getSubscribers().size();
+    }
 }

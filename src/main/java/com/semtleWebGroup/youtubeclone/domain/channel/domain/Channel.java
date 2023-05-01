@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
+import java.sql.Blob;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,8 +36,12 @@ public class Channel {
     // 구독 채널은 중복이 될 수 없으므로 set 사용
     private Set<Channel> subscribedChannels = new HashSet<>();
 
-    private String imageName;
-    private String imagePath;
+    // 구독자 수를 찾기 위해
+    @ManyToMany(mappedBy = "subscribedChannels")
+    private Set<Channel> subscribers = new HashSet<>();
+
+    @Lob
+    private Blob channelImage;
 
 
     @Builder
@@ -45,16 +50,22 @@ public class Channel {
         this.description = description;
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
+    public void setChannelImage(Blob imageFile) {
+        this.channelImage = imageFile;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
+
 
     public void update(String title, String description){
         if (title != null) this.title=title;
         if (description != null) this.description=description;
+    }
+
+    public void setSubscribedChannels(Set<Channel> subscribedChannels) {
+        this.subscribedChannels = subscribedChannels;
+    }
+
+    public void setSubscribers(Set<Channel> subscribers) {
+        this.subscribers = subscribers;
     }
 }

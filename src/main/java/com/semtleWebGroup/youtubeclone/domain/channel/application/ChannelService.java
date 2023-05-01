@@ -4,14 +4,18 @@ import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import com.semtleWebGroup.youtubeclone.domain.channel.exception.TitleDuplicateException;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.sql.rowset.serial.SerialBlob;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -27,7 +31,9 @@ public class ChannelService {
                 .title(dto.getChannelProfile().getTitle())
                 .description(dto.getChannelProfile().getDescription())
                 .build();
-        saveChannelImgFromDto(dto, newChannel);
+        if (dto.getProfile_img() != null){
+            saveChannelImgFromDto(dto, newChannel);
+        }
 
         channelRepository.save(newChannel);
 
@@ -35,38 +41,31 @@ public class ChannelService {
     }
 
     private static void saveChannelImgFromDto(ChannelRequest dto, Channel newChannel){
-        String projectPath = System.getProperty("user.dir") + "/src/main/resources/webapp/";
-
-        // 같은 파일 이름을 올리더라도 겹치지 않게 파일이름 변경
-        UUID uuid = UUID.randomUUID();
-        String fileName = uuid + "_" + dto.getProfile_img().getOriginalFilename();
-
-        // 저장할 경로 설정
-        Path savePath = Paths.get(projectPath,fileName).toAbsolutePath();
         try {
-            // multipartfile 저장
-            dto.getProfile_img().transferTo(savePath);
-
-            // 엔티티에 저장한 파일명과 위치 저장
-            newChannel.setImageName(fileName);
-            newChannel.setImagePath("/resources/webapp/" + fileName);
+            Blob blob = new SerialBlob(dto.getProfile_img().getBytes());
+            newChannel.setChannelImage(blob);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException("이미지 저장에 실패했습니다.", e);
+            throw new RuntimeException(e);
         }
     }
 
     public Channel getChannel(Long id){
-        Channel channel = channelRepository.findById(id).orElseThrow(()->new NoSuchElementException());
+        Channel channel = channelRepository.findById(id).orElseThrow(()->new EntityNotFoundException(
+                String.format("%d is not found.", id)
+        ));
 
         return channel;
     }
 
     @Transactional
     public Channel updateChannel(Long id, ChannelRequest dto){
-        Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다."));
+        Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new EntityNotFoundException(
+                String.format("%d is not found.", id)
+        ));
         oldChannel.update(dto.getChannelProfile().getTitle(), dto.getChannelProfile().getDescription());
 
-        deleteChannelImgFromEntity(oldChannel);
         if (dto.getProfile_img() != null)  saveChannelImgFromDto(dto, oldChannel);
 
         channelRepository.save(oldChannel);
@@ -74,18 +73,14 @@ public class ChannelService {
         return oldChannel;
     }
 
-    private void deleteChannelImgFromEntity(Channel oldChannel) {
-        // 엔티티에 저장된 파일의 경로로 삭제
-        String filePath = System.getProperty("user.dir") + "/src/main" + oldChannel.getImagePath();
-        File file = new File(filePath);
-        file.delete();
-    }
 
     @Transactional
     public void deleteChannel(Long channelId){
-        Channel oldChannel = channelRepository.findById(channelId).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다."));
-        deleteChannelImgFromEntity(oldChannel);
-        channelRepository.deleteById(channelId);
+        Channel oldChannel = channelRepository.findById(channelId).orElseThrow(()->new EntityNotFoundException(
+                String.format("%d is not found.", channelId)
+        ));
+
+        channelRepository.delete(oldChannel);
     }
 
     public List<Channel> getAllChannel(){
@@ -97,6 +92,5 @@ public class ChannelService {
         if (channelRepository.existsByTitle(title)){
             throw new TitleDuplicateException(title);
         }
-        return;
     }
 }

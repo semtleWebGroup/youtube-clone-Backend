@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semtleWebGroup.youtubeclone.domain.channel.application.ChannelService;
 import com.semtleWebGroup.youtubeclone.domain.channel.application.SubscribeService;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/channels")
@@ -29,8 +30,9 @@ public class ChannelApi {
     @PostMapping("")
     public ResponseEntity create(@ModelAttribute ChannelRequest dto){
         Channel channel = channelService.addChannel(dto);
+        ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     /**
@@ -55,8 +57,9 @@ public class ChannelApi {
     @GetMapping("/{channelId}")
     public ResponseEntity getChannelInfo(@PathVariable("channelId")Long channelId){
         Channel channel = channelService.getChannel(channelId);
+        ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
 
-        return ResponseEntity.status(HttpStatus.OK).body(channel);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     /**
@@ -77,9 +80,18 @@ public class ChannelApi {
     @GetMapping("/{channelId}/subscribiton")
     public ResponseEntity getSubscribtionList(@PathVariable("channelId")Long channelId){
         final Set<Channel> channelList = subscribeService.getSubscribedChannels(channelId);
+        List<ChannelDto> response = channelList.stream().map(ChannelDto::new).collect(Collectors.toList());
 
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
-        return ResponseEntity.status(HttpStatus.OK).body(channelList);
+    @GetMapping("/{channelId}/subscribers")
+    public ResponseEntity displayCountOfSubscribers(@PathVariable Long channelId){
+        Map<String,String> response = new HashMap<>();
+        Long count = subscribeService.getCountOfSubscribers(channelId);
+        response.put("count",count.toString());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -119,8 +131,9 @@ public class ChannelApi {
     public ResponseEntity editChannel(@PathVariable("channelId")Long channelId,
                                       @ModelAttribute ChannelRequest dto){
         final Channel channel = channelService.updateChannel(channelId, dto);
+        ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
 
 
-        return ResponseEntity.status(HttpStatus.OK).body(channel);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }
