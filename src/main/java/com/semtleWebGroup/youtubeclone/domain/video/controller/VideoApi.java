@@ -1,18 +1,19 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUpdateDto;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewDto;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,16 +22,21 @@ public class VideoApi {
     private final VideoService videoService;
 
     @PostMapping("/{videoId}")
-    public ResponseEntity create(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) throws Exception {
-        // TODO: add된 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title(videoRequest.getTitle())
-                .description(videoRequest.getDescription()).build();
+    public ResponseEntity create(
+            @PathVariable UUID videoId,
+            @RequestPart VideoRequest dto,
+            @RequestPart("thumbImg") MultipartFile thumbImg
+    ) {
+        // TODO: convert thumbImg file type (to Blob)
+        Blob blobImg = null;
+        VideoInfo videoInfo;
 
+        videoInfo = videoService.add(videoId, dto, blobImg);
+
+        VideoResponse videoResponse = new VideoResponse(videoInfo);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(video);
+            .status(HttpStatus.CREATED)
+            .body(videoResponse);
     }
 
     @GetMapping("/{videoId}")

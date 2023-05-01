@@ -14,7 +14,9 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND,"C006","Entity Not Found" ),
 
     //local file system
-    VIDEO_NOT_EXIST(HttpStatus.NOT_FOUND,"L001","Video File Not Exist");
+    VIDEO_NOT_EXIST(HttpStatus.NOT_FOUND,"L001","Video File Not Exist"),
+
+    VIDEO_INFO_ALREADY_EXIST(HttpStatus.CONFLICT, "V001", "Video Info Already Exists");
 
 
     private String message;

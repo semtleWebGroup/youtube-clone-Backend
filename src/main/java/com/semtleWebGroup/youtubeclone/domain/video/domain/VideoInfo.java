@@ -1,11 +1,15 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
+import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.sql.Blob;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name="video_info")
@@ -13,9 +17,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class VideoInfo {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "videoid", updatable = false)
-    private Long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name="uuid2", strategy = "uuid2")
+    @Column(name = "video_info_id",columnDefinition = "BINARY(16)", nullable = false)
+    private UUID videoInfoId;
 
     @Column(nullable = false, length=45)
     private String title;
@@ -23,7 +28,7 @@ public class VideoInfo {
     @Column(length=45)
     private String description;
 
-    private Byte thumbImg;
+    private Blob thumbImg;
 
     @CreatedDate
     private LocalDateTime createdTime;
@@ -31,19 +36,20 @@ public class VideoInfo {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    private int videoSec;
     private int viewCount;
 
+    @OneToOne
+    @JoinColumn(name = "video_id",nullable = false)
+    private Video video;
+
     @Builder
-    public VideoInfo(Long id, String title, String description, Byte thumbImg, int videoSec) {
-        this.id = id;
+    public VideoInfo(String title, String description, Video video, Blob thumbImg) {
+        this.video = video;
         this.title = title;
         this.description = description;
         this.thumbImg = thumbImg;
+        this.viewCount = 0;
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
-        this.videoSec = videoSec;
-        this.viewCount = 0;
-
     }
 }
