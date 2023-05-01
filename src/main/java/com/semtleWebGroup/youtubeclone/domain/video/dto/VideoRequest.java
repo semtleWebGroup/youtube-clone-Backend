@@ -18,6 +18,7 @@ public class VideoRequest {
     @Size(max=45, message="'title' length should be <= 45.")
     private String title;
 
+    @NotEmpty(message="'description' cannot be empty.")
     @Size(max=45, message="'description' length should be <= 45.")
     private String description;
 

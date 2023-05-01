@@ -7,14 +7,12 @@ import com.semtleWebGroup.youtubeclone.domain.video.exception.VideoNotCachedExce
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoInfoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video_media.repository.VideoRepository;
-import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Blob;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -22,6 +20,12 @@ import java.util.UUID;
 public class VideoService {
     private final VideoInfoRepository videoInfoRepository;
     private final VideoRepository videoRepository;
+
+    private VideoInfo getVideoInfoByVideoId(UUID videoId) {
+        VideoInfo videoInfo = videoInfoRepository.findByVideo_VideoId(videoId)
+                .orElseThrow(()-> new EntityNotFoundException("Video Info is not found."));
+        return videoInfo;
+    }
 
     @Transactional
     public VideoInfo add(UUID videoId, VideoRequest dto, Blob thumbImg) {
@@ -43,11 +47,23 @@ public class VideoService {
         return newVideoInfo;
     }
 
-    public VideoInfo get(UUID id) {
-        VideoInfo videoInfo = videoInfoRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException(
-                        String.format("%d is not found.", id)
-                ));
+    @Transactional
+    public VideoInfo view(UUID videoId) {
+        VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
+
+        // Video.isCached가 False인 경우 error
+        if (!videoInfo.getVideo().isCashed()) throw new VideoNotCachedException("Video is caching.");
+
+        videoInfo.incrementViewCount();
+        videoInfoRepository.save(videoInfo);
+        return videoInfo;
+    }
+
+    @Transactional
+    public VideoInfo edit(UUID videoId, VideoRequest dto) {
+        VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
+        videoInfo.update(dto.getTitle(), dto.getDescription());
+        videoInfoRepository.save(videoInfo);
         return videoInfo;
     }
 }

@@ -2,7 +2,9 @@ package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
 import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
+import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
+import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoMediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import java.util.UUID;
 @RequestMapping("/videos")
 public class VideoApi {
     private final VideoService videoService;
+    private final VideoLikeService videoLikeService;
+    private final VideoMediaService videoMediaService;
 
     @PostMapping("/{videoId}")
     public ResponseEntity create(
@@ -39,35 +43,31 @@ public class VideoApi {
     }
 
     @GetMapping("/{videoId}")
-    public ResponseEntity view(@PathVariable Long videoId) {
-        // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
-        List<String> qualityList = new ArrayList<String>();
-        qualityList.add("p1080");
-        qualityList.add("p480");
-        VideoViewDto video = VideoViewDto.builder()
-                .videoId(videoId)
-                .channelId(1L)
-                .channelName("ExampleChannel")
-                .title("ExampleTitle")
-                .description("ExampleDescription")
-                .qualityList(qualityList).build();
+    public ResponseEntity view(@PathVariable UUID videoId) {
+        VideoInfo videoInfo = videoInfo = videoService.view(videoId);
+
+        VideoViewResponse videoViewResponse = VideoViewResponse.builder()
+                .videoInfo(videoInfo)
+                .videoLike(videoLikeService.get(videoInfo.getVideo().getVideoId()))
+//                .qualityList(videoMediaService.getQualityList(videoInfo.getVideo().getVideoId())) // TODO
+                .build();
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(video);
+            .status(HttpStatus.OK)
+            .body(videoViewResponse);
     }
 
     @PatchMapping("/{videoId}")
-    public ResponseEntity update(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) {
-        // TODO: title, description만 변경하여 변경 전의 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title(videoRequest.getTitle())
-                .description(videoRequest.getDescription()).build();
+    public ResponseEntity update(
+            @PathVariable UUID videoId,
+            @Valid @RequestBody VideoRequest dto
+    ) {
+        VideoInfo videoInfo = videoService.edit(videoId, dto);
 
+        VideoResponse videoResponse = new VideoResponse(videoInfo);
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(video);
+            .status(HttpStatus.OK)
+            .body(videoResponse);
     }
 
     @DeleteMapping("/{videoId}")

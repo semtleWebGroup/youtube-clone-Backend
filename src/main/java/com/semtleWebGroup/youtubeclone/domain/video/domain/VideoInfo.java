@@ -52,4 +52,18 @@ public class VideoInfo {
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
     }
+
+    public void update(String title, String description) {
+        this.title = title;
+        this.description = description;
+        setUpdatedTime(LocalDateTime.now());
+    }
+
+    public void incrementViewCount() {
+        this.viewCount += 1;
+    }
+
+    public void setUpdatedTime(LocalDateTime updatedTime) {
+        this.updatedTime = updatedTime;
+    }
 }
