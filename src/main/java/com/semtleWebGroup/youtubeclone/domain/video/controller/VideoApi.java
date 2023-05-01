@@ -9,8 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.rowset.serial.SerialBlob;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,13 +29,9 @@ public class VideoApi {
             @PathVariable UUID videoId,
             @RequestPart VideoRequest dto,
             @RequestPart("thumbImg") MultipartFile thumbImg
-    ) {
-        // TODO: convert thumbImg file type (to Blob)
-        Blob blobImg = null;
-        VideoInfo videoInfo;
-
-        videoInfo = videoService.add(videoId, dto, blobImg);
-
+    ) throws IOException, SQLException {
+        Blob blobImg = new SerialBlob(thumbImg.getBytes());
+        VideoInfo videoInfo = videoService.add(videoId, dto, blobImg);
         VideoResponse videoResponse = new VideoResponse(videoInfo);
         return ResponseEntity
             .status(HttpStatus.CREATED)
