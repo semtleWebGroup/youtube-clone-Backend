@@ -18,7 +18,7 @@ import java.util.Optional;
 @RequestMapping("/v1/comments")
 public class CommentApi {
     private final CommentService commentService;
-    @Autowired
+
     public CommentApi(CommentService commentService) {
         this.commentService = commentService;
     }

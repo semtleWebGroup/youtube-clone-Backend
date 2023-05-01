@@ -20,7 +20,7 @@ import java.util.Optional;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
-    @Autowired
+
     public CommentService(CommentRepository commentRepository, CommentLikeRepository commentLikeRepository) {
         this.commentRepository = commentRepository;
         this.commentLikeRepository = commentLikeRepository;
@@ -31,12 +31,11 @@ public class CommentService {
                 .contents(dto.getContent())
                 .build();
 
-        commentRepository.save(newComment);
-        return newComment;
+        return commentRepository.save(newComment);
     }
 
     public Optional<Comment> updateComment(Integer idx, CommentRequest dto) {
-        Optional<Comment> entity = Optional.ofNullable(commentRepository.findById(idx).orElseThrow(() -> new NoSuchElementException("해당 댓글이 없습니다.")));
+        Optional<Comment> entity = commentRepository.findById(idx);
         entity.ifPresent(t ->{
             if(dto.getContent() != null) {
                 t.setContents(dto.getContent());
@@ -60,8 +59,7 @@ public class CommentService {
                 .channelId(likeDto.getChannelId())
                 .build();
         newCommentLike.setCommentId(commentId);
-        commentLikeRepository.save(newCommentLike);
-        return newCommentLike;
+        return commentLikeRepository.save(newCommentLike);
     }
     public void unlike(Integer id){
         commentLikeRepository.deleteById(id);

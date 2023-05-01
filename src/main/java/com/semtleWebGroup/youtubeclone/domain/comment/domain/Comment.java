@@ -4,7 +4,6 @@ import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -54,10 +53,10 @@ public class Comment {
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "channel_id", nullable = false)
 //    private Channel channel;
-
-    //    @NotNull
+//
+//    @NotNull
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "commentCommentId", nullable = false)
+//    @JoinColumn(name = "commentId", nullable = false)
 //    private Comment commentCommentId;
 
 
