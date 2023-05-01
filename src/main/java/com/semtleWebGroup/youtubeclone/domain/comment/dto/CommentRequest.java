@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 public class CommentRequest {
-    //@Size(max=45, message="'content' length should be <= 45.")
+    @Size(max=45, message="'content' length should be <= 45.")
     private String content;
 
 //    private Integer videoPageId;

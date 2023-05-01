@@ -9,4 +9,5 @@ import lombok.Setter;
 @Setter
 public class CommentLikeRequest {
     private Integer channelId;
+
 }

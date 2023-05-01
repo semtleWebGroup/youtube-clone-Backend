@@ -44,22 +44,19 @@ public class Comment {
         this.updatedTime = LocalDateTime.now();
     }
 
-//    @NotNull
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "video_id",nullable = false)
-//    private Video video;
-//
-//    @NotNull
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "channel_id", nullable = false)
-//    private Channel channel;
-//
-//    @NotNull
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "commentId", nullable = false)
-//    private Comment commentCommentId;
+    //@NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "video_id")
+    private Video video;
 
+    //@NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
 
+//    @OneToMany(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "comment_id")
+    private Integer root_comment_id;
 }
 
 

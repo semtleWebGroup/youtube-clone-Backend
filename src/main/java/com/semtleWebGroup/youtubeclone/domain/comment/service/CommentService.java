@@ -58,6 +58,7 @@ public class CommentService {
         CommentLike newCommentLike = CommentLike.builder()
                 .channelId(likeDto.getChannelId())
                 .build();
+
         newCommentLike.setCommentId(commentId);
         return commentLikeRepository.save(newCommentLike);
     }
