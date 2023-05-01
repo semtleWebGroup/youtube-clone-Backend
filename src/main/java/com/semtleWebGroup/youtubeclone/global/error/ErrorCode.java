@@ -16,7 +16,8 @@ public enum ErrorCode {
     //local file system
     VIDEO_NOT_EXIST(HttpStatus.NOT_FOUND,"L001","Video File Not Exist"),
 
-    VIDEO_INFO_ALREADY_EXIST(HttpStatus.CONFLICT, "V001", "Video Info Already Exists");
+    VIDEO_INFO_ALREADY_EXIST(HttpStatus.CONFLICT, "V001", "Video Info Already Exists"),
+    VIDEO_NOT_CACHED(HttpStatus.SERVICE_UNAVAILABLE, "V002", "Video Not Cached");
 
 
     private String message;
