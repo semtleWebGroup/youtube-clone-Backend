@@ -24,7 +24,6 @@ import java.util.UUID;
 public class VideoApi {
     private final VideoService videoService;
     private final VideoLikeService videoLikeService;
-    private final VideoMediaService videoMediaService;
 
     @PostMapping("/{videoId}")
     public ResponseEntity create(
@@ -42,14 +41,7 @@ public class VideoApi {
 
     @GetMapping("/{videoId}")
     public ResponseEntity view(@PathVariable UUID videoId) {
-        VideoInfo videoInfo = videoInfo = videoService.view(videoId);
-
-        VideoViewResponse videoViewResponse = VideoViewResponse.builder()
-                .videoInfo(videoInfo)
-                .videoLike(videoLikeService.get(videoInfo.getVideo().getVideoId()))
-//                .qualityList(videoMediaService.getQualityList(videoInfo.getVideo().getVideoId())) // TODO
-                .build();
-
+        VideoViewResponse videoViewResponse = videoService.view(videoId);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(videoViewResponse);

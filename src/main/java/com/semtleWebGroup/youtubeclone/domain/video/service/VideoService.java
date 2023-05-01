@@ -2,6 +2,8 @@ package com.semtleWebGroup.youtubeclone.domain.video.service;
 
 import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoResponse;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.exception.VideoInfoExistException;
 import com.semtleWebGroup.youtubeclone.domain.video.exception.VideoNotCachedException;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoInfoRepository;
@@ -55,7 +57,7 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoInfo view(UUID videoId) {
+    public VideoViewResponse view(UUID videoId) {
         VideoInfo videoInfo = this.getVideoInfoByVideoId(videoId);
 
         // Video.isCached가 False인 경우 error
@@ -63,7 +65,13 @@ public class VideoService {
 
         videoInfo.incrementViewCount();
         videoInfoRepository.save(videoInfo);
-        return videoInfo;
+
+        VideoViewResponse videoViewResponse = VideoViewResponse.builder()
+            .videoInfo(videoInfo)
+            .videoLike(videoLikeService.get(videoInfo.getVideo().getVideoId()))
+//                .qualityList(videoMediaService.getQualityList(videoInfo.getVideo().getVideoId())) // TODO
+            .build();
+        return videoViewResponse;
     }
 
     @Transactional
