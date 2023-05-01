@@ -21,10 +21,4 @@ public class VideoRequest {
     @NotEmpty(message="'description' cannot be empty.")
     @Size(max=45, message="'description' length should be <= 45.")
     private String description;
-
-    @CreatedDate
-    private LocalDateTime createdTime;
-
-    @LastModifiedDate
-    private LocalDateTime updatedTime;
 }

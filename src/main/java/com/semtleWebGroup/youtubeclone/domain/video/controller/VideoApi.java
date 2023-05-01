@@ -16,8 +16,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -71,16 +69,13 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity delete(@PathVariable Long videoId) {
-        // TODO: video media도 삭제하여 삭제 된 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title("ExampleTitle")
-                .description("ExampleDescription").build();
+    public ResponseEntity delete(@PathVariable UUID videoId) {
+        VideoInfo videoInfo = videoService.delete(videoId);
 
+        VideoResponse videoResponse = new VideoResponse(videoInfo);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(video);
+                .body(videoResponse);
     }
 
     @PostMapping("/{videoId}/like")
