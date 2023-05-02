@@ -1,6 +1,7 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
-import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,12 +16,12 @@ import java.util.UUID;
 @Table(name="video_info")
 @Getter
 @NoArgsConstructor
-public class VideoInfo {
+public class Video {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
-    @Column(name = "video_info_id",columnDefinition = "BINARY(16)", nullable = false)
-    private UUID videoInfoId;
+    @Column(name = "video_id",columnDefinition = "BINARY(16)", nullable = false)
+    private UUID videoId;
 
     @Column(nullable = false, length=45)
     private String title;
@@ -38,19 +39,23 @@ public class VideoInfo {
 
     private int viewCount;
 
-    @OneToOne
-    @JoinColumn(name = "video_id",nullable = false)
-    private Video video;
+    private Long videoSec;
+
+    private MediaServerSpokesman.EncodingStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "channel_id",nullable = false)
+    private Channel channel;
 
     @Builder
-    public VideoInfo(String title, String description, Video video, Blob thumbImg) {
-        this.video = video;
+    public Video(String title, String description, Blob thumbImg, Channel channel) {
         this.title = title;
         this.description = description;
         this.thumbImg = thumbImg;
         this.viewCount = 0;
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
+        this.channel = channel;
     }
 
     public void update(String title, String description) {

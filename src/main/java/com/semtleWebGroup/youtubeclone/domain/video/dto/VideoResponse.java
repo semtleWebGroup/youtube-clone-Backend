@@ -1,6 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
-import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +17,11 @@ public class VideoResponse {
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 
-    public VideoResponse(VideoInfo videoInfo) {
-        this.videoId = videoInfo.getVideo().getVideoId();
-        this.title = videoInfo.getTitle();
-        this.description = videoInfo.getDescription();
-        this.createdTime = videoInfo.getCreatedTime();
-        this.updatedTime = videoInfo.getUpdatedTime();
+    public VideoResponse(Video video) {
+        this.videoId = video.getVideoId();
+        this.title = video.getTitle();
+        this.description = video.getDescription();
+        this.createdTime = video.getCreatedTime();
+        this.updatedTime = video.getUpdatedTime();
     }
 }

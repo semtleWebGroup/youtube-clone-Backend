@@ -1,8 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
-import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
-import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,23 +41,23 @@ public class VideoViewResponse {
 
     @Builder
     public VideoViewResponse(
-            VideoInfo videoInfo,
+            Video video,
             VideoLikeResponse videoLike
     ) {
-        this.videoId = videoInfo.getVideo().getVideoId();
-        this.videoSec = videoInfo.getVideo().getVideoSecond();
+        this.videoId = video.getVideoId();
+        this.videoSec = video.getVideoSec();
 
-        this.channelId = videoInfo.getVideo().getChannel().getId();
-        this.channelName = videoInfo.getVideo().getChannel().getTitle();
-//        this.channelProfileImg = videoInfo.getVideo().getChannel().getProfileImg(); // TODO
+        this.channelId = video.getChannel().getId();
+        this.channelName = video.getChannel().getTitle();
+//        this.channelProfileImg = video.getChannel().getProfileImg(); // TODO
         this.channelProfileImg = null;
-//        this.channelSubscriberCount = videoInfo.getVideo().getChannel().getSubscriberCount(); // TODO
+//        this.channelSubscriberCount = video.getVideo().getChannel().getSubscriberCount(); // TODO
         this.channelSubscriberCount = 0;
 
-        this.title = videoInfo.getTitle();
-        this.createdTime = videoInfo.getCreatedTime();
-        this.description = videoInfo.getDescription();
-        this.viewCount = videoInfo.getViewCount();
+        this.title = video.getTitle();
+        this.createdTime = video.getCreatedTime();
+        this.description = video.getDescription();
+        this.viewCount = video.getViewCount();
 
         this.likeCount = videoLike.getLikeCount();
         this.isLike = videoLike.isLike(); // ? 왜 getIsLike가 아니라 isLike인지 잘 모르겠음.

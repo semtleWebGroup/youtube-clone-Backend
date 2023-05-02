@@ -1,10 +1,9 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
-import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoInfo;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
-import com.semtleWebGroup.youtubeclone.domain.video_media.application.VideoMediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +31,8 @@ public class VideoApi {
             @RequestPart("thumbImg") MultipartFile thumbImg
     ) throws IOException, SQLException {
         Blob blobImg = new SerialBlob(thumbImg.getBytes());
-        VideoInfo videoInfo = videoService.add(videoId, dto, blobImg);
-        VideoResponse videoResponse = new VideoResponse(videoInfo);
+        Video video = videoService.add(videoId, dto, blobImg);
+        VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(videoResponse);
@@ -52,9 +51,9 @@ public class VideoApi {
             @PathVariable UUID videoId,
             @Valid @RequestBody VideoRequest dto
     ) {
-        VideoInfo videoInfo = videoService.edit(videoId, dto);
+        Video video = videoService.edit(videoId, dto);
 
-        VideoResponse videoResponse = new VideoResponse(videoInfo);
+        VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(videoResponse);
@@ -62,9 +61,9 @@ public class VideoApi {
 
     @DeleteMapping("/{videoId}")
     public ResponseEntity delete(@PathVariable UUID videoId) {
-        VideoInfo videoInfo = videoService.delete(videoId);
+        Video video = videoService.delete(videoId);
 
-        VideoResponse videoResponse = new VideoResponse(videoInfo);
+        VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(videoResponse);
