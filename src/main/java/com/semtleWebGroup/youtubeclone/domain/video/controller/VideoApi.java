@@ -4,6 +4,7 @@ import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
+import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +25,26 @@ public class VideoApi {
     private final VideoService videoService;
     private final VideoLikeService videoLikeService;
 
+    @PostMapping("")
+    public ResponseEntity upload(
+            @RequestPart MultipartFile videoFile,
+            @RequestPart(required = false) MultipartFile thumbImg
+    ) throws MediaServerException {
+        Video video = videoService.upload(videoFile, thumbImg);
+        VideoResponse videoResponse = new VideoResponse(video);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(videoResponse);
+    }
+
     @PostMapping("/{videoId}")
     public ResponseEntity create(
-            @PathVariable UUID videoId,
-            @RequestPart VideoRequest dto,
-            @RequestPart("thumbImg") MultipartFile thumbImg
+        @PathVariable UUID videoId,
+        @RequestPart @Valid VideoRequest dto,
+        @RequestPart(required=false) MultipartFile thumbImg
     ) throws IOException, SQLException {
-        Blob blobImg = new SerialBlob(thumbImg.getBytes());
-        Video video = videoService.add(videoId, dto, blobImg);
+        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
+        Video video = videoService.edit(videoId, dto, blobImg);
         VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -48,10 +61,12 @@ public class VideoApi {
 
     @PatchMapping("/{videoId}")
     public ResponseEntity update(
-            @PathVariable UUID videoId,
-            @Valid @RequestBody VideoRequest dto
-    ) {
-        Video video = videoService.edit(videoId, dto);
+        @PathVariable UUID videoId,
+        @RequestPart @Valid VideoRequest dto,
+        @RequestPart(required=false) MultipartFile thumbImg
+    ) throws IOException, SQLException {
+        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
+        Video video = videoService.edit(videoId, dto, blobImg);
         VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -59,7 +74,7 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity delete(@PathVariable UUID videoId) {
+    public ResponseEntity delete(@PathVariable UUID videoId) throws MediaServerException {
         Video video = videoService.delete(videoId);
         VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity

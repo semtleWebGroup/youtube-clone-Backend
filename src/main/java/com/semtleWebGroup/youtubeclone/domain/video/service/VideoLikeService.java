@@ -18,4 +18,8 @@ public class VideoLikeService {
             .isLike(false) // TODO: 토큰을 확인해서 해당 채널-비디오 id가 맞는 like가 있는지 확인해야 함. like/dislike 기능 구현되면 수정할 예정.
             .build();
     }
+
+    public void delete(UUID videoId) {
+        return;
+    }
 }
