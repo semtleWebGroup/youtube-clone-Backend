@@ -3,7 +3,6 @@ package com.semtleWebGroup.youtubeclone.domain.video.service;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewResponse;
-import com.semtleWebGroup.youtubeclone.domain.video.exception.VideoInfoExistException;
 import com.semtleWebGroup.youtubeclone.domain.video.exception.VideoNotCachedException;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
@@ -24,36 +23,30 @@ public class VideoService {
     private final MediaServerSpokesman mediaServerSpokesman;
 
     private Video getVideoInfoByVideoId(UUID videoId) {
-        Video video = videoRepository.findByVideo_VideoId(videoId)
-                .orElseThrow(()-> new EntityNotFoundException("Video Info is not found."));
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
         return video;
     }
 
     @Transactional
     public Video add(UUID videoId, VideoRequest dto, Blob thumbImg) {
         // Video가 없는 경우 error
-        Video video = videoRepository.findById(videoId).orElseThrow(()-> new EntityNotFoundException("Video is not found."));
-        // Video.status가 FINISHED가 아닌 경우 error
+        Video video = getVideoInfoByVideoId(videoId);
+        // Video가 아직 캐싱되지 않았다면 error
         if (video.getStatus() != MediaServerSpokesman.EncodingStatus.FINISHED) throw new VideoNotCachedException("Video is caching.");
-        // video에 대한 videoInfo가 이미 있는 경우 error
-        Video videoInfo = videoRepository.findByVideo(video);
-        if (videoInfo != null) throw new VideoInfoExistException("Video info of video is already exist.");
 
-        Video newVideo = Video.builder()
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .thumbImg(thumbImg)
-                .build();
-        videoRepository.save(newVideo);
-        return newVideo;
+        video.update(dto.getTitle(), dto.getDescription(), thumbImg);
+        videoRepository.save(video);
+        return video;
     }
 
     @Transactional
     public VideoViewResponse view(UUID videoId) {
         Video video = this.getVideoInfoByVideoId(videoId);
 
-        // Video.isCached가 False인 경우 error
-        if (video.getStatus() != MediaServerSpokesman.EncodingStatus.FINISHED) throw new VideoNotCachedException("Video is caching.");
+        // Video가 아직 캐싱되지 않았다면 error
+        if (video.getStatus() != MediaServerSpokesman.EncodingStatus.FINISHED)
+            throw new VideoNotCachedException("Video is caching.");
 
         video.incrementViewCount();
         videoRepository.save(video);
@@ -61,7 +54,7 @@ public class VideoService {
         VideoViewResponse videoViewResponse = VideoViewResponse.builder()
             .video(video)
             .videoLike(videoLikeService.get(video.getVideoId()))
-//                .qualityList(videoMediaService.getQualityList(videoInfo.getVideo().getVideoId())) // TODO
+//                .qualityList(mediaServerSpokesman.getQualityList(videoInfo.getVideo().getVideoId())) // TODO
             .build();
         return videoViewResponse;
     }

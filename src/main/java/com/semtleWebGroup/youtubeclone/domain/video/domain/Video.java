@@ -58,6 +58,11 @@ public class Video {
         this.channel = channel;
     }
 
+    public void update(String title, String description, Blob thumbImg) {
+        this.update(title, description);
+        this.thumbImg = thumbImg;
+    }
+
     public void update(String title, String description) {
         this.title = title;
         this.description = description;

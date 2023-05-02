@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.video_media.domain.Video;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;

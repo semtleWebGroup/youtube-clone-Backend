@@ -52,7 +52,6 @@ public class VideoApi {
             @Valid @RequestBody VideoRequest dto
     ) {
         Video video = videoService.edit(videoId, dto);
-
         VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -62,7 +61,6 @@ public class VideoApi {
     @DeleteMapping("/{videoId}")
     public ResponseEntity delete(@PathVariable UUID videoId) {
         Video video = videoService.delete(videoId);
-
         VideoResponse videoResponse = new VideoResponse(video);
         return ResponseEntity
                 .status(HttpStatus.OK)
