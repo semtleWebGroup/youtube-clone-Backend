@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name="video_info")
+@Table(name="video")
 @Getter
 @NoArgsConstructor
 public class Video {
