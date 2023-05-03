@@ -167,4 +167,33 @@ public class SubscribeServiceTest extends MockTest {
             assertEquals(2L, result);
         }
     }
+
+    @Nested
+    @DisplayName("isSubscribed 메서드")
+    class isSubscribed {
+        @Test
+        @DisplayName("isSubscribed 테스트 - 성공")
+        public void testIsSubscribed() {
+            Long channelId = 1L;
+            Long subscriberId = 2L;
+
+            Channel channel = Channel.builder()
+                    .title("test channel")
+                    .build();
+
+            Channel subscriber = Channel.builder()
+                    .title("test subscriber")
+                    .build();
+
+            Set<Channel> subscribers = new HashSet<>();
+            subscribers.add(subscriber);
+            channel.setSubscribers(subscribers);
+
+            when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
+            when(channelRepository.findById(subscriberId)).thenReturn(Optional.of(subscriber));
+
+            assertTrue(subscribeService.isSubscribed(channelId, subscriberId));
+        }
+    }
+
 }
