@@ -3,8 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.video.service;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewResponse;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
@@ -12,7 +11,6 @@ import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerExcepti
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Blob;
 
@@ -32,7 +30,7 @@ public class VideoService {
         return video;
     }
 
-    public Video upload(MultipartFile videoFile, MultipartFile thumbImg) throws MediaServerException {
+    public VideoResponse upload(VideoUploadDto dto) throws MediaServerException {
         // TODO: 채널 받게끔 수정
         Channel channel = new Channel("title", "description");
         channelRepository.save(channel);
@@ -41,8 +39,9 @@ public class VideoService {
                 .channel(channel)
                 .build();
         videoRepository.save(video);
-        mediaServerSpokesman.sendEncodingRequest(videoFile, video.getVideoId(), thumbImg);
-        return video;
+
+        mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getVideoId(), dto.getThumbImg());
+        return new VideoResponse(video);
     }
 
     @Transactional
@@ -60,22 +59,22 @@ public class VideoService {
     }
 
     @Transactional
-    public Video edit(UUID videoId, VideoRequest dto, Blob thumbImg) {
-        Video video = this.getVideo(videoId);
-        if (thumbImg == null)
+    public VideoResponse edit(VideoEditDto dto) {
+        Video video = this.getVideo(dto.getVideoId());
+        if (dto.getThumbImg() == null)
             video.update(dto.getTitle(), dto.getDescription());
         else
-            video.update(dto.getTitle(), dto.getDescription(), thumbImg);
+            video.update(dto.getTitle(), dto.getDescription(), dto.getThumbImg());
         videoRepository.save(video);
-        return video;
+        return new VideoResponse(video);
     }
 
     @Transactional
-    public Video delete(UUID videoId) throws MediaServerException {
+    public VideoResponse delete(UUID videoId) throws MediaServerException {
         mediaServerSpokesman.deleteVideo(videoId);
         videoLikeService.delete(videoId);
         Video video = this.getVideo(videoId);
         videoRepository.delete(video);
-        return video;
+        return new VideoResponse(video);
     }
 }

@@ -43,6 +43,7 @@ public class VideoViewResponse {
     public VideoViewResponse(
             Video video,
             VideoLikeResponse videoLike
+            //ArrayList<String> qualityList // TODO
     ) {
         this.videoId = video.getVideoId();
         this.videoSec = video.getVideoSec();
@@ -60,7 +61,7 @@ public class VideoViewResponse {
         this.viewCount = video.getViewCount();
 
         this.likeCount = videoLike.getLikeCount();
-        this.isLike = videoLike.isLike(); // ? 왜 getIsLike가 아니라 isLike인지 잘 모르겠음.
+        this.isLike = videoLike.isLike();
 
         ArrayList<String> qualityList = new ArrayList<String>();
         qualityList.add("1080p");
