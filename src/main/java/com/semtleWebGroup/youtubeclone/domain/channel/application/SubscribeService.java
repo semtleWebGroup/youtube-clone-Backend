@@ -60,4 +60,19 @@ public class SubscribeService {
 
         return (long) channel.getSubscribers().size();
     }
+
+    public boolean isSubscribed(Long channelId, Long subscriberId) {
+        // channelId와 subscriberId로 해당 채널과 구독자를 찾아온다.
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", channelId)
+                ));
+        Channel subscriber = channelRepository.findById(subscriberId)
+                .orElseThrow(()->new EntityNotFoundException(
+                        String.format("%d is not found.", subscriberId)
+                ));
+
+        // 해당 구독자가 채널을 구독하고 있는지 여부를 판단하여 반환
+        return channel.getSubscribers().contains(subscriber);
+    }
 }

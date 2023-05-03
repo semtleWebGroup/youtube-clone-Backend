@@ -95,6 +95,24 @@ public class ChannelApi {
     }
 
     /**
+     * @param channelId 대상 채널
+     * @param subscriberId 로그인 한 사용자 채널
+     * @return
+     */
+    @GetMapping("/{channelId}/subscribed/{subscriberId}")
+    public ResponseEntity checkSubscribe(@PathVariable Long channelId,
+                                         @PathVariable Long subscriberId){
+        Map<String,String> response = new HashMap<>();
+        if (subscribeService.isSubscribed(channelId,subscriberId)){
+            response.put("status","true");
+        } else {
+            response.put("status","false");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
      * 구독 취소
      * @param channelId - 구독을 취소할 채널 id, 채널 정보 수정 권한 확인할 토큰 필요. 현재는 myid로 대체
      * @return 성공시 OK 실패시 다른 ErrorCode 예정

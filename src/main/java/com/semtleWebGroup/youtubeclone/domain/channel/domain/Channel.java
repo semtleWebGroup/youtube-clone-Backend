@@ -19,7 +19,7 @@ import java.util.Set;
 public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "channelid", updatable = false)
+    @Column(name = "channel_id", updatable = false)
     private Long id;
 
     @Column(nullable = false, length = 15, unique = true)
