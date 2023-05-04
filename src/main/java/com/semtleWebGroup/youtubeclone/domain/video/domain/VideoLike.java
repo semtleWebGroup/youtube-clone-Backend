@@ -3,10 +3,8 @@ package com.semtleWebGroup.youtubeclone.domain.video.domain;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Entity
 @Table(name="video_like")
@@ -15,10 +13,9 @@ import java.util.UUID;
 public class VideoLike {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name="uuid2", strategy = "uuid2")
-    @Column(name = "video_like_id",columnDefinition = "BINARY(16)", nullable = false)
-    private UUID videoLikeId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "video_like_id",columnDefinition = "BIGINT(20)", nullable = false)
+    private Long videoLikeId;
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
