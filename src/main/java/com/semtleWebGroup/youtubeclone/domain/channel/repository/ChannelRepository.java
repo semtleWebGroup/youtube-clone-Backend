@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ChannelRepository extends JpaRepository<Channel, Integer> {
+public interface ChannelRepository extends JpaRepository<Channel, Long> {
     List<Channel> findByTitleContaining(String key);
     boolean existsByTitle(String title);
 }
