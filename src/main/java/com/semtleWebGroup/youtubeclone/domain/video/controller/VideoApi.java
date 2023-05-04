@@ -1,81 +1,96 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoRequest;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUpdateDto;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewDto;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
+import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
+import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.rowset.serial.SerialBlob;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/videos")
 public class VideoApi {
     private final VideoService videoService;
+    private final VideoLikeService videoLikeService;
+
+    @PostMapping("")
+    public ResponseEntity upload(
+            @RequestPart MultipartFile videoFile,
+            @RequestPart(required = false) MultipartFile thumbImg
+    ) throws MediaServerException {
+        VideoUploadDto dto = VideoUploadDto.builder()
+                .videoFile(videoFile)
+                .thumbImg(thumbImg)
+                .build();
+        VideoResponse videoResponse = videoService.upload(dto);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(videoResponse);
+    }
 
     @PostMapping("/{videoId}")
-    public ResponseEntity create(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) throws Exception {
-        // TODO: add된 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title(videoRequest.getTitle())
-                .description(videoRequest.getDescription()).build();
-
+    public ResponseEntity create(
+        @PathVariable UUID videoId,
+        @RequestPart @Valid VideoRequest data,
+        @RequestPart(required=false) MultipartFile thumbImg
+    ) throws IOException, SQLException {
+        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
+        VideoEditDto dto = VideoEditDto.builder()
+            .videoId(videoId)
+            .title(data.getTitle())
+            .description(data.getDescription())
+            .thumbImg(blobImg)
+            .build();
+        VideoResponse videoResponse = videoService.edit(dto);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(video);
+            .status(HttpStatus.CREATED)
+            .body(videoResponse);
     }
 
     @GetMapping("/{videoId}")
-    public ResponseEntity view(@PathVariable Long videoId) {
-        // TODO: 썸네일 없는 video info 반환. + 조회수 증가 필요
-        List<String> qualityList = new ArrayList<String>();
-        qualityList.add("p1080");
-        qualityList.add("p480");
-        VideoViewDto video = VideoViewDto.builder()
-                .videoId(videoId)
-                .channelId(1L)
-                .channelName("ExampleChannel")
-                .title("ExampleTitle")
-                .description("ExampleDescription")
-                .qualityList(qualityList).build();
-
+    public ResponseEntity view(@PathVariable UUID videoId) {
+        VideoViewResponse videoViewResponse = videoService.view(videoId);
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(video);
+            .status(HttpStatus.OK)
+            .body(videoViewResponse);
     }
 
     @PatchMapping("/{videoId}")
-    public ResponseEntity update(@PathVariable Long videoId, @Valid @RequestBody VideoRequest videoRequest) {
-        // TODO: title, description만 변경하여 변경 전의 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title(videoRequest.getTitle())
-                .description(videoRequest.getDescription()).build();
-
+    public ResponseEntity update(
+        @PathVariable UUID videoId,
+        @RequestPart @Valid VideoRequest data,
+        @RequestPart(required=false) MultipartFile thumbImg
+    ) throws IOException, SQLException {
+        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
+        VideoEditDto dto = VideoEditDto.builder()
+            .videoId(videoId)
+            .title(data.getTitle())
+            .description(data.getDescription())
+            .thumbImg(blobImg)
+            .build();
+        VideoResponse videoResponse = videoService.edit(dto);
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(video);
+            .status(HttpStatus.OK)
+            .body(videoResponse);
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity delete(@PathVariable Long videoId) {
-        // TODO: video media도 삭제하여 삭제 된 video info 반환.
-        VideoUpdateDto video = VideoUpdateDto.builder()
-                .videoId(videoId)
-                .title("ExampleTitle")
-                .description("ExampleDescription").build();
-
+    public ResponseEntity delete(@PathVariable UUID videoId) throws MediaServerException {
+        VideoResponse videoResponse = videoService.delete(videoId);
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(video);
+            .status(HttpStatus.OK)
+            .body(videoResponse);
     }
 
     @PostMapping("/{videoId}/like")

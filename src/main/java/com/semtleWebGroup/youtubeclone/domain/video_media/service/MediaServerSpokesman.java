@@ -5,6 +5,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class MediaServerSpokesman {
      * @implNote 비디오 파일과 비디오 아이디는 필수 인자이고, 썸네일 파일은 없을 시 미디어 서버에서 첫 프레임을 썸네일로 지정함 <br>
      * 이 메서드는 비동기 적으로 처리되며, ok 사인은 인코딩이 완료 됨을 의미하지 않고, 쓰레드 풀의 대기열에 잘 등록됬다는 것을 의미함.
      */
-    public void sendEncodingRequest(FilePart videoFile, UUID videoId, @Nullable FilePart thumbnailFile) throws MediaServerException {
+    public void sendEncodingRequest(MultipartFile videoFile, UUID videoId, @Nullable MultipartFile thumbnailFile) throws MediaServerException {
         Assert.notNull(videoFile,"videoFile must not be null");
         Assert.notNull(videoId,"videoId must not be null");
     }
