@@ -14,7 +14,7 @@ public class VideoLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "video_like_id",columnDefinition = "BIGINT(20)", nullable = false)
+    @Column(name = "video_like_id",columnDefinition = "BIGINT", nullable = false)
     private Long videoLikeId;
 
     @ManyToOne
