@@ -24,7 +24,7 @@ public class VideoService {
     private final MediaServerSpokesman mediaServerSpokesman;
     private final ChannelRepository channelRepository; // Upload를 위해 임시 사용
 
-    private Video getVideo(UUID videoId) {
+    public Video getVideo(UUID videoId) {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
         return video;
