@@ -14,15 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Blob;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class VideoService {
     private final VideoRepository videoRepository;
-    private final VideoLikeService videoLikeService;
     private final MediaServerSpokesman mediaServerSpokesman;
-    private final ChannelRepository channelRepository; // Upload를 위해 임시 사용
 
     public Video getVideo(UUID videoId) {
         Video video = videoRepository.findById(videoId)
@@ -31,12 +30,8 @@ public class VideoService {
     }
 
     public VideoResponse upload(VideoUploadDto dto) throws MediaServerException {
-        // TODO: 채널 받게끔 수정
-        Channel channel = new Channel("title", "description");
-        channelRepository.save(channel);
-
         Video video = Video.builder()
-                .channel(channel)
+                .channel(dto.getChannel())
                 .build();
         videoRepository.save(video);
 
@@ -45,14 +40,14 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoViewResponse view(UUID videoId) {
+    public VideoViewResponse view(UUID videoId, Channel channel) {
         Video video = this.getVideo(videoId);
         video.incrementViewCount();
         videoRepository.save(video);
 
         VideoViewResponse videoViewResponse = VideoViewResponse.builder()
             .video(video)
-            .videoLike(videoLikeService.get(video.getVideoId()))
+            .isLike(video.isLike(channel))
 //                .qualityList(mediaServerSpokesman.getQualityList(video.getVideoId())) // TODO
             .build();
         return videoViewResponse;
@@ -61,6 +56,7 @@ public class VideoService {
     @Transactional
     public VideoResponse edit(VideoEditDto dto) {
         Video video = this.getVideo(dto.getVideoId());
+        // TODO: 권한 확인
         if (dto.getThumbImg() == null)
             video.update(dto.getTitle(), dto.getDescription());
         else
@@ -70,9 +66,9 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoResponse delete(UUID videoId) throws MediaServerException {
+    public VideoResponse delete(UUID videoId, Channel channel) throws MediaServerException {
+        // TODO: 권한 확인
         mediaServerSpokesman.deleteVideo(videoId);
-        videoLikeService.delete(videoId);
         Video video = this.getVideo(videoId);
         videoRepository.delete(video);
         return new VideoResponse(video);

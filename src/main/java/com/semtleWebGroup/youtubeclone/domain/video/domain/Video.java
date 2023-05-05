@@ -10,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -43,6 +45,9 @@ public class Video {
 
     private MediaServerSpokesman.EncodingStatus status;
 
+    @OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.REMOVE)
+    private Set<Channel> likedChannels = new HashSet<>();
+
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
@@ -72,5 +77,11 @@ public class Video {
 
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public int getLikeCount() { return this.likedChannels.size(); }
+
+    public Boolean isLike(Channel channel) {
+        return channel == null? false : this.likedChannels.contains(channel);
     }
 }

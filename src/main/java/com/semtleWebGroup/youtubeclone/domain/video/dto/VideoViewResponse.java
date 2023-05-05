@@ -44,7 +44,7 @@ public class VideoViewResponse {
     @Builder
     public VideoViewResponse(
             Video video,
-            VideoLikeResponse videoLike
+            Boolean isLike
             //ArrayList<String> qualityList // TODO
     ) {
         this.videoId = video.getVideoId();
@@ -59,8 +59,8 @@ public class VideoViewResponse {
         this.channelProfileImg = convertBlobToBytes(video.getChannel().getChannelImage());
         this.channelSubscriberCount = video.getChannel().getSubscribers().size();
 
-        this.likeCount = videoLike.getLikeCount();
-        this.isLike = videoLike.isLike();
+        this.likeCount = video.getLikeCount();
+        this.isLike = isLike;
 
         ArrayList<String> qualityList = new ArrayList<String>();
         qualityList.add("1080p");

@@ -1,9 +1,15 @@
 package com.semtleWebGroup.youtubeclone.domain.video.service;
 
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoLike;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoLikeRepository;
+import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -11,15 +17,38 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VideoLikeService {
     private final VideoLikeRepository videoLikeRepository;
+    private final VideoService videoService;
+    private final VideoRepository videoRepository;
 
-    public VideoLikeResponse get(UUID videoId) {
+    public VideoLikeResponse get(Video video, Channel channel) {
         return VideoLikeResponse.builder()
-            .likeCount(0) // TODO: video에서 like 수를 반환하는 메서드가 있어야 함.
-            .isLike(false) // TODO: 토큰을 확인해서 해당 채널-비디오 id가 맞는 like가 있는지 확인해야 함. like/dislike 기능 구현되면 수정할 예정.
-            .build();
+                .likeCount(video.getLikeCount())
+                .isLike(video.isLike(channel))
+                .build();
     }
 
-    public void delete(UUID videoId) {
-        return;
+    @Transactional
+    public VideoLikeResponse add(UUID videoId, Channel channel) {
+        Video video = videoService.getVideo(videoId);
+        VideoLike videoLike = VideoLike.builder()
+                .channel(channel)
+                .video(video)
+                .build();
+        video.getLikedChannels().add(channel);
+        videoRepository.save(video);
+        videoLikeRepository.save(videoLike);
+        return VideoLikeResponse.builder()
+                .likeCount(video.getLikeCount())
+                .isLike(video.isLike(channel))
+                .build();
+    }
+
+    public VideoLikeResponse delete(UUID videoId, Channel channel) {
+        Video video = videoService.getVideo(videoId);
+        videoLikeRepository.deleteByVideoAndChannel(video, channel);
+        return VideoLikeResponse.builder()
+                .likeCount(video.getLikeCount())
+                .isLike(video.isLike(channel))
+                .build();
     }
 }
