@@ -22,6 +22,7 @@ public class VideoLikeService {
 
     public VideoLikeResponse get(Video video, Channel channel) {
         return VideoLikeResponse.builder()
+                .videoId(video.getVideoId())
                 .likeCount(video.getLikeCount())
                 .isLike(video.isLike(channel))
                 .build();
@@ -37,18 +38,15 @@ public class VideoLikeService {
         video.getLikedChannels().add(channel);
         videoRepository.save(video);
         videoLikeRepository.save(videoLike);
-        return VideoLikeResponse.builder()
-                .likeCount(video.getLikeCount())
-                .isLike(video.isLike(channel))
-                .build();
+        return this.get(video, channel);
     }
 
+    @Transactional
     public VideoLikeResponse delete(UUID videoId, Channel channel) {
         Video video = videoService.getVideo(videoId);
+        video.getLikedChannels().remove(channel);
+        videoRepository.save(video);
         videoLikeRepository.deleteByVideoAndChannel(video, channel);
-        return VideoLikeResponse.builder()
-                .likeCount(video.getLikeCount())
-                .isLike(video.isLike(channel))
-                .build();
+        return this.get(video, channel);
     }
 }

@@ -4,6 +4,7 @@ import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoLike;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoLikeRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
@@ -58,20 +59,49 @@ public class VideoLikeServiceTest extends MockTest {
                     .build();
 
             when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+            when(videoRepository.save(video)).thenReturn(video);
+            when(videoLikeRepository.save(videoLike)).thenReturn(videoLike);
 
             // when
-            videoLikeService.add(videoId, channel);
+            VideoLikeResponse videoLikeResponse = videoLikeService.add(videoId, channel);
 
             // then
-            assertEquals(1, video.getLikeCount());
-            assertTrue(video.isLike(channel));
-        }
-
-        @Test
-        @DisplayName("get 테스트 - channel이 있을 경우")
-        void testAddWithNoChannel() {
-
+            assertEquals(1, videoLikeResponse.getLikeCount());
+            assertTrue(videoLikeResponse.isLike());
         }
     }
 
+    @Nested
+    @DisplayName("delete 메서드")
+    class delete {
+        @Test
+        @DisplayName("delete 테스트 - 성공")
+        void testAdd() {
+            // given
+            Channel channel = Channel.builder()
+                    .title("Title")
+                    .description("Description")
+                    .build();
+            UUID videoId = UUID.randomUUID();
+            Video video = Video.builder()
+                    .channel(channel)
+                    .build();
+            video.getLikedChannels().add(channel);
+            VideoLike videoLike = VideoLike.builder()
+                    .channel(channel)
+                    .video(video)
+                    .build();
+
+            when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+            when(videoRepository.save(video)).thenReturn(video);
+            when(videoLikeRepository.deleteByVideoAndChannel(video, channel)).thenReturn(videoLike);
+
+            // when
+            videoLikeService.delete(videoId, channel);
+
+            // then
+            assertEquals(0, video.getLikeCount());
+            assertFalse(video.isLike(channel));
+        }
+    }
 }
