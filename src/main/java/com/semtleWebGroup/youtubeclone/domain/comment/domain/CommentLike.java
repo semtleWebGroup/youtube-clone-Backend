@@ -20,15 +20,11 @@ public class CommentLike {
     @Column(name = "commentLikeId")
     private Integer id;
 //    @NotNull
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "channelId", nullable = false)
-    private Integer channelId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channelId", nullable = false)
+    private Channel channelId;
 //    @NotNull
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "commentId", nullable = false)
-    private Integer commentId;
-    @Builder
-    public CommentLike(Integer channelId) {
-        this.channelId = channelId;
-    }
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "commentId", nullable = false)
+    private Comment commentId;
 }
