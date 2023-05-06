@@ -48,7 +48,7 @@ public class Video {
     @OneToMany(fetch=FetchType.LAZY)
     private Set<Channel> likedChannels = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
 
     @ManyToOne
