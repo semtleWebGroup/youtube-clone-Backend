@@ -1,5 +1,7 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.dto;
 
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,11 +17,5 @@ import java.time.LocalDateTime;
 public class CommentRequest {
     @Size(max=45, message="'content' length should be <= 45.")
     private String content;
-
-//    private Integer videoPageId;
-//
-//    private Integer channelId;
-//
-//    private Integer commentCommentId;
 
 }
