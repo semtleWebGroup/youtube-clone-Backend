@@ -33,16 +33,17 @@ public class VideoLikeService {
                 .channel(channel)
                 .video(video)
                 .build();
-        video.getLikedChannels().add(channel);
-        videoService.save(video);
         videoLikeRepository.save(videoLike);
+        video.getLikes().add(videoLike);
+        videoService.save(video);
         return this.get(video, channel);
     }
 
     @Transactional
     public VideoLikeResponse delete(UUID videoId, Channel channel) {
         Video video = videoService.getVideo(videoId);
-        video.getLikedChannels().remove(channel);
+        VideoLike videoLike = videoLikeRepository.findByVideoAndChannel(video, channel);
+        video.getLikes().remove(videoLike);
         videoService.save(video);
         videoLikeRepository.deleteByVideoAndChannel(video.getId(), channel.getId());
         return this.get(video, channel);

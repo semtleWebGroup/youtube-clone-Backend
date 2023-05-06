@@ -86,14 +86,15 @@ public class VideoLikeServiceTest extends MockTest {
             Video video = Video.builder()
                     .channel(channel)
                     .build();
-            video.getLikedChannels().add(channel);
             VideoLike videoLike = VideoLike.builder()
                     .channel(channel)
                     .video(video)
                     .build();
+            video.getLikes().add(videoLike);
 
             when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
             when(videoRepository.save(video)).thenReturn(video);
+            when(videoLikeRepository.findByVideoAndChannel(video, channel)).thenReturn(videoLike);
 
             // when
             videoLikeService.delete(videoId, channel);

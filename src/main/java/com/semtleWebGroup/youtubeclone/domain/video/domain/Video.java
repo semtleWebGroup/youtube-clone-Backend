@@ -45,9 +45,6 @@ public class Video {
 
     private MediaServerSpokesman.EncodingStatus status;
 
-    @OneToMany(fetch=FetchType.LAZY)
-    private Set<Channel> likedChannels = new HashSet<>();
-
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
 
@@ -82,9 +79,12 @@ public class Video {
         this.updatedTime = updatedTime;
     }
 
-    public int getLikeCount() { return this.likedChannels.size(); }
+    public int getLikeCount() { return this.likes.size(); }
 
     public Boolean isLike(Channel channel) {
-        return channel == null? false : this.likedChannels.contains(channel);
+        if (channel == null) return false;
+        for (VideoLike vl : this.likes)
+            if (vl.getChannel().equals(channel)) return true;
+        return false;
     }
 }
