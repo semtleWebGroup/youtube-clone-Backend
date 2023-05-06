@@ -8,8 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Entity
@@ -55,22 +53,10 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
-    @Column(name = "likeCount")
-    private Long likeCount;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.REMOVE)
-    private Set<CommentLike> commentLikeList = new HashSet<>();
-    public void mappingPostLike(CommentLike commentLike) {
-        this.commentLikeList.add(commentLike);
-    }
 
-    public void updateLikeCount() {
-        this.likeCount = (long) this.commentLikeList.size();
-    }
-
-    public void discountLike(CommentLike commentLike) {
-        this.commentLikeList.remove(commentLike);
-    }
-
+//    @OneToMany(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "comment_id")
+    private Integer root_comment_id;
 }
 
 

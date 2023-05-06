@@ -54,27 +54,16 @@ public class CommentService {
         commentRepository.deleteById(id);
     }
 
-    public void postLike(Integer commentId, String email) {
-        Comment comment = commentRepository.getById(commentId);
-        C user = getUserInService(email);
-        Optional<CommentLike> byPostAndUser = CommentLikeRepository.findByPostAndUser(comment, user);
+    public CommentLike like(Integer commentId,CommentLikeRequest likeDto){
+        CommentLike newCommentLike = CommentLike.builder()
+                .channelId(likeDto.getChannelId())
+                .build();
 
-        byPostAndUser.ifPresentOrElse(
-                // 좋아요 있을경우 삭제
-                postLike -> {
-                    postLikeRepository.delete(postLike);
-                    post.discountLike(postLike);
-                },
-                // 좋아요가 없을 경우 좋아요 추가
-                () -> {
-                    PostLike postLike = PostLike.builder().build();
-
-                    postLike.mappingPost(post);
-                    postLike.mappingUser(user);
-                    post.updateLikeCount();
-
-                    postLikeRepository.save(postLike);
-                }
-        );
+        newCommentLike.setCommentId(commentId);
+        return commentLikeRepository.save(newCommentLike);
     }
+    public void unlike(Integer id){
+        commentLikeRepository.deleteById(id);
+    }
+
 }
