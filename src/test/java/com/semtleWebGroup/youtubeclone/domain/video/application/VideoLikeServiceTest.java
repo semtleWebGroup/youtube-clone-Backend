@@ -35,7 +35,7 @@ public class VideoLikeServiceTest extends MockTest {
         videoLikeRepository = Mockito.mock(VideoLikeRepository.class);
         MediaServerSpokesman mediaServerSpokesman = new MediaServerSpokesman();
         videoService = new VideoService(videoRepository, mediaServerSpokesman);
-        videoLikeService = new VideoLikeService(videoLikeRepository, videoService, videoRepository);
+        videoLikeService = new VideoLikeService(videoLikeRepository, videoService);
     }
 
     @Nested
@@ -94,14 +94,14 @@ public class VideoLikeServiceTest extends MockTest {
 
             when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
             when(videoRepository.save(video)).thenReturn(video);
-            when(videoLikeRepository.deleteByVideoAndChannel(video, channel)).thenReturn(videoLike);
 
             // when
             videoLikeService.delete(videoId, channel);
+            VideoLikeResponse videoLikeResponse = videoLikeService.delete(videoId, channel);
 
             // then
-            assertEquals(0, video.getLikeCount());
-            assertFalse(video.isLike(channel));
+            assertEquals(0, videoLikeResponse.getLikeCount());
+            assertTrue(!videoLikeResponse.isLike());
         }
     }
 }

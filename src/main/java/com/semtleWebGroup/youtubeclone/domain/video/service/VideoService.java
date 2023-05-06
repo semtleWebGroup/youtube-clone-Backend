@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.service;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
@@ -12,9 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Blob;
-
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,19 +19,27 @@ public class VideoService {
     private final VideoRepository videoRepository;
     private final MediaServerSpokesman mediaServerSpokesman;
 
+    public void save(Video video) {
+        videoRepository.save(video);
+    }
+
     public Video getVideo(UUID videoId) {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
         return video;
     }
 
-    public VideoResponse upload(VideoUploadDto dto) throws MediaServerException {
+    public VideoResponse upload(VideoUploadDto dto) {
         Video video = Video.builder()
                 .channel(dto.getChannel())
                 .build();
         videoRepository.save(video);
+        try {
+            mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
+        } catch (MediaServerException e) {
+            // TODO
+        }
 
-        mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getVideoId(), dto.getThumbImg());
         return new VideoResponse(video);
     }
 
@@ -66,9 +70,14 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoResponse delete(UUID videoId, Channel channel) throws MediaServerException {
+    public VideoResponse delete(UUID videoId, Channel channel) {
         // TODO: 권한 확인
-        mediaServerSpokesman.deleteVideo(videoId);
+        try {
+            mediaServerSpokesman.deleteVideo(videoId);
+        } catch (MediaServerException e) {
+            // TODO
+        }
+
         Video video = this.getVideo(videoId);
         videoRepository.delete(video);
         return new VideoResponse(video);

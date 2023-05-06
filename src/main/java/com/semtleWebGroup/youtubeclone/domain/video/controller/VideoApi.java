@@ -29,7 +29,7 @@ public class VideoApi {
     public ResponseEntity upload(
             @RequestPart MultipartFile videoFile,
             @RequestPart(required = false) MultipartFile thumbImg,
-            Channel channel
+            @RequestPart Channel channel
     ) throws MediaServerException {
         VideoUploadDto dto = VideoUploadDto.builder()
                 .channel(channel)
@@ -47,7 +47,7 @@ public class VideoApi {
         @PathVariable UUID videoId,
         @RequestPart @Valid VideoRequest data,
         @RequestPart(required=false) MultipartFile thumbImg,
-        Channel channel
+        @RequestPart Channel channel
     ) throws IOException, SQLException {
         Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
         VideoEditDto dto = VideoEditDto.builder()
@@ -64,7 +64,7 @@ public class VideoApi {
     }
 
     @GetMapping("/{videoId}")
-    public ResponseEntity view(@PathVariable UUID videoId, Channel channel) {
+    public ResponseEntity view(@PathVariable UUID videoId, @RequestPart Channel channel) {
         VideoViewResponse videoViewResponse = videoService.view(videoId, channel);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -76,7 +76,7 @@ public class VideoApi {
         @PathVariable UUID videoId,
         @RequestPart @Valid VideoRequest data,
         @RequestPart(required=false) MultipartFile thumbImg,
-        Channel channel
+        @RequestPart Channel channel
     ) throws IOException, SQLException {
         Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
         VideoEditDto dto = VideoEditDto.builder()
@@ -93,7 +93,7 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity delete(@PathVariable UUID videoId, Channel channel) throws MediaServerException {
+    public ResponseEntity delete(@PathVariable UUID videoId, @RequestPart Channel channel) {
         VideoResponse videoResponse = videoService.delete(videoId, channel);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -101,7 +101,7 @@ public class VideoApi {
     }
 
     @PostMapping("/{videoId}/like")
-    public ResponseEntity like(@PathVariable UUID videoId, Channel channel) { // TODO: channel 로그인 정보에서 가져오기
+    public ResponseEntity like(@PathVariable UUID videoId, @RequestPart Channel channel) { // TODO: channel 로그인 정보에서 가져오기
         VideoLikeResponse videoLikeResponse = videoLikeService.add(videoId, channel);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -109,7 +109,7 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}/like")
-    public ResponseEntity dislike(@PathVariable UUID videoId, Channel channel) { // TODO: channel 로그인 정보에서 가져오기
+    public ResponseEntity dislike(@PathVariable UUID videoId, @RequestPart Channel channel) { // TODO: channel 로그인 정보에서 가져오기
         VideoLikeResponse videoLikeResponse = videoLikeService.delete(videoId, channel);
         return ResponseEntity
                 .status(HttpStatus.OK)

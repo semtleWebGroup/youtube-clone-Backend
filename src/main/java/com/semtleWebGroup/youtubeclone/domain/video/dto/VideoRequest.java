@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

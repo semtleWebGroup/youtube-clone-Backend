@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.service;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoLike;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
@@ -18,11 +17,10 @@ import java.util.UUID;
 public class VideoLikeService {
     private final VideoLikeRepository videoLikeRepository;
     private final VideoService videoService;
-    private final VideoRepository videoRepository;
 
     public VideoLikeResponse get(Video video, Channel channel) {
         return VideoLikeResponse.builder()
-                .videoId(video.getVideoId())
+                .videoId(video.getId())
                 .likeCount(video.getLikeCount())
                 .isLike(video.isLike(channel))
                 .build();
@@ -36,7 +34,7 @@ public class VideoLikeService {
                 .video(video)
                 .build();
         video.getLikedChannels().add(channel);
-        videoRepository.save(video);
+        videoService.save(video);
         videoLikeRepository.save(videoLike);
         return this.get(video, channel);
     }
@@ -45,8 +43,8 @@ public class VideoLikeService {
     public VideoLikeResponse delete(UUID videoId, Channel channel) {
         Video video = videoService.getVideo(videoId);
         video.getLikedChannels().remove(channel);
-        videoRepository.save(video);
-        videoLikeRepository.deleteByVideoAndChannel(video, channel);
+        videoService.save(video);
+        videoLikeRepository.deleteByVideoAndChannel(video.getId(), channel.getId());
         return this.get(video, channel);
     }
 }

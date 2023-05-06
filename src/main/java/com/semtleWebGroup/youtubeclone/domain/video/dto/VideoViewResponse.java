@@ -47,7 +47,7 @@ public class VideoViewResponse {
             Boolean isLike
             //ArrayList<String> qualityList // TODO
     ) {
-        this.videoId = video.getVideoId();
+        this.videoId = video.getId();
         this.videoSec = video.getVideoSec();
         this.title = video.getTitle();
         this.createdTime = video.getCreatedTime();

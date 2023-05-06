@@ -23,7 +23,7 @@ public class Video {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
     @Column(name = "video_id",columnDefinition = "BINARY(16)", nullable = false)
-    private UUID videoId;
+    private UUID id;
 
     @Column(length=45)
     private String title;
@@ -45,8 +45,11 @@ public class Video {
 
     private MediaServerSpokesman.EncodingStatus status;
 
-    @OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.REMOVE)
+    @OneToMany(fetch=FetchType.LAZY)
     private Set<Channel> likedChannels = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.REMOVE)
+    private Set<VideoLike> likes = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
