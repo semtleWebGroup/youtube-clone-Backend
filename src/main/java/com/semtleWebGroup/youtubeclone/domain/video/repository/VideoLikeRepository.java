@@ -14,7 +14,5 @@ public interface VideoLikeRepository extends JpaRepository<VideoLike, Long> {
 
     VideoLike findByVideoAndChannel(Video video, Channel channel);
 
-    @Modifying
-    @Query(value = "DELETE FROM video WHERE video_id=:videoId and channel_id=:channelId", nativeQuery = true)
-    void deleteByVideoAndChannel(UUID videoId, Long channelId);
+    void deleteByVideoAndChannel(Video video, Channel channel);
 }

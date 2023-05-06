@@ -22,7 +22,7 @@ public class VideoLike {
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "video_id", nullable = false)
     private Video video;
 

@@ -5,7 +5,6 @@ import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.VideoLike;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoLikeRepository;
-import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +44,7 @@ public class VideoLikeService {
         VideoLike videoLike = videoLikeRepository.findByVideoAndChannel(video, channel);
         video.getLikes().remove(videoLike);
         videoService.save(video);
-        videoLikeRepository.deleteByVideoAndChannel(video.getId(), channel.getId());
+        videoLikeRepository.deleteByVideoAndChannel(video, channel);
         return this.get(video, channel);
     }
 }
