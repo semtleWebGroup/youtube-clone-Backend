@@ -10,7 +10,7 @@
 
 ## 📍 Database ERD
 
-![databaseDiagram](./doc/img/database_diagram.png)
+![databaseDiagram](./doc/img/database.png)
 
 # 👨‍👨‍👧‍👦 협업 규칙
 ## 📍 Commit Naming Convention
