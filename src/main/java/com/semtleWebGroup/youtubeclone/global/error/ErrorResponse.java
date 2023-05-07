@@ -2,8 +2,6 @@ package com.semtleWebGroup.youtubeclone.global.error;
 
 import com.semtleWebGroup.youtubeclone.global.dto.ResponseDto;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
-import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
-import com.semtleWebGroup.youtubeclone.global.error.exception.LocalResourceException;
 import lombok.Getter;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -62,7 +60,4 @@ public class ErrorResponse extends ResponseDto {
         return new ErrorResponse(ErrorCode.ENTITY_NOT_FOUND);
     }
 
-    public static ErrorResponse of(LocalResourceException e) {
-        return new ErrorResponse(e.getErrorCode());
-    }
 }
