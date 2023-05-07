@@ -31,13 +31,13 @@ public class CommentApi {
         return ResponseEntity.status(HttpStatus.OK).body(comment);
     }
 
-    @DeleteMapping(value= "/{commentId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity deleteComment(@PathVariable("commentId")Long commentId){
         commentService.commentDelete(commentId);
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
-    @GetMapping(value = "")
+    @GetMapping("")
     public ResponseEntity list(@RequestParam("videoId") Long videoId) {
 //      List<Comment> CommentList = commentService.getCommentList(videoId);
         List<Comment> CommentList = commentService.getCommentAll(videoId);

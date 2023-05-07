@@ -4,6 +4,8 @@ import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -12,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name="comment")
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,24 +24,20 @@ public class Comment {
 
     @Size(max = 45)
     @NotNull
-    @Column(name = "contents", nullable = false, length = 45)
+    @Column(name = "contents", length = 45)
     private String contents;
 
-    @NotNull
     @CreatedDate
-    @Column(name = "created_time", nullable = false)
+    @Column(name = "created_time")
     private LocalDateTime createdTime;
 
-    @NotNull
     @LastModifiedDate
-    @Column(name = "updated_time", nullable = false)
+    @Column(name = "updated_time")
     private LocalDateTime updatedTime;
 
     @Builder
     public Comment(String contents) {
         this.contents = contents;
-        this.createdTime = LocalDateTime.now();
-        this.updatedTime = LocalDateTime.now();
     }
 
     @ManyToOne
@@ -52,7 +50,6 @@ public class Comment {
 
     public void update(String contents){
         if (contents != null) this.contents=contents;
-        this.updatedTime = LocalDateTime.now();;
     }
 
 //    @OneToMany(fetch = FetchType.LAZY)
