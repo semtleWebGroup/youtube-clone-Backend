@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -42,12 +41,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
     
-    private void expectValid(String token) throws AuthenticationException {
+    private void expectValid(String token) throws Exception {
         if (token == null || token.equalsIgnoreCase("null")||!jwtTokenProvider.validateToken(token)) {
-            throw new TokenExpiredException("Token is null or invalid.",token);
-        }
-        if () {
-            throw new TokenExpiredException("Token is not valid.");
+            //TODO: 예외 구체화
+            throw new Exception("Token is null or invalid.");
         }
         String userEmail = jwtTokenProvider.getUserEmail(token);
         log.info("Authenticated user Email : " + userEmail);
