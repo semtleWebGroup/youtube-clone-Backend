@@ -7,7 +7,7 @@ spring:
       path: /h2-console
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/test
+    url: jdbc:h2:~/test;AUTO_SERVER=true
     username: sa
     password:
   jpa:
@@ -20,7 +20,12 @@ spring:
       password: 1234
 logging:
   level:
-    root: debug
+    root: info
+    org:
+      springframework:
+        web: debug
+        context: debug
+
 
 google:
   redirect:
