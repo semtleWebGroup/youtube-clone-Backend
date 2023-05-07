@@ -1,14 +1,11 @@
 package com.semtleWebGroup.youtubeclone.global.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.semtleWebGroup.youtubeclone.domain.member.service.MemberDetailsService;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -16,17 +13,17 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
 
     private String secretKey = "secretKey";
-
+    public static final String TOKEN_PREFIX = "Bearer ";
+    public static final String HEADER = "Authorization";
     private static final long tokenValidTime = 30 * 60 * 1000L;     // 토큰 유효시간 30분
-
-    private final UserDetailsService userDetailsService;
+    private final MemberDetailsService memberDetailsService;
 
     //secretKey를 Base64로 인코딩
     @PostConstruct
@@ -34,14 +31,19 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
     
-
-    public String createToken(String email, List<String> roles) {
-        //토큰의 subject 선택
+    
+    public String generateToken(String email, String role) {
+        //select the subject of the token
         Claims claims = Jwts.claims().setSubject(email);
-        // 사용자 정의 데이터 추가
-        claims.put("roles", roles);
+        // add custom data
+        claims.put("role", role);
+        
+        Header header =  Jwts.header();
+        header.put("prefix", TOKEN_PREFIX);
+        
         Date now = new Date();
         return Jwts.builder()
+                .setHeader((Map<String, Object>) header)
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
@@ -50,19 +52,25 @@ public class JwtTokenProvider {
     }
     
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserEmail(token));
+        UserDetails userDetails = memberDetailsService.loadUserByUsername(this.getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
-
-    // 토큰에서 회원 email 가져옴
+    
+    /**
+     * description : get user email by parsing token
+     *
+     * @param token
+     * @return string
+     * @author : yeachan
+     */
     public String getUserEmail(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
-
+    
     // 토큰 유효성, 만료일자 확인
-    public boolean validateToken(String jwtToken) {
+    public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;

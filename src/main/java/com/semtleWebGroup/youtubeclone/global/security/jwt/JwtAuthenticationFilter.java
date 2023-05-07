@@ -1,35 +1,52 @@
 package com.semtleWebGroup.youtubeclone.global.security.jwt;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@RequiredArgsConstructor
-public class JwtAuthenticationFilter extends GenericFilterBean {
-
-    private final JwtTokenProvider jwtTokenProvider;
-
+@Slf4j
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        // 헤더에서 토큰 받아오기
-        String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-
-        // 토큰이 유효하다면
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 토큰으로부터 유저 정보를 받아
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String token = parseBearerToken(request);
+            expectValid(request, token);
+            
+        } catch (Exception ex) {
+            logger.error("Could not set user authentication in security context", ex);
+        }
+        filterChain.doFilter(request, response);
+    }
+    
+    private void expectValid(HttpServletRequest request, String token) {
+        if (token != null && !token.equalsIgnoreCase("null") && jwtTokenProvider.validateToken(token)) {
+            String userEmail = jwtTokenProvider.getUserEmail(token);
+            log.info("Authenticated user Email : " + userEmail);
+    
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            // SecurityContext 에 객체 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        
-        chain.doFilter(request, response);
     }
-}
+        
+        private String parseBearerToken (HttpServletRequest request){
+            String bearerToken = request.getHeader("Authorization");
+            if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
+                return bearerToken.substring(7);
+            }
+            return null;
+        }
+    }
