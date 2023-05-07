@@ -10,6 +10,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -52,6 +55,18 @@ public class Comment {
 
     public void update(String contents){
         if (contents != null) this.contents=contents;
+    }
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "comment")
+    private Set<CommentLike> likes = new HashSet<>();
+
+    public int getLikeCount() { return this.likes.size();}
+
+    public Boolean isLike(Channel channel) {
+        if (channel == null) return false;
+        for (CommentLike vl : this.likes)
+            if (vl.getChannel().equals(channel)) return true;
+        return false;
     }
 
 //    @OneToMany(fetch = FetchType.LAZY)

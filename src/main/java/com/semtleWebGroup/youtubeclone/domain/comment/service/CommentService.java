@@ -39,6 +39,7 @@ public class CommentService {
         List<Comment> commentList = commentRepository.findByVideo_VideoId(Idx);  //실패..
         return commentList;
     }
+
     public List<Comment> getCommentAll(Long Idx){
         return commentRepository.findAll();
     }
@@ -49,5 +50,6 @@ public class CommentService {
         ));
         commentRepository.delete(entity);
     }
+
 
 }

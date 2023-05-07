@@ -1,7 +1,10 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.api;
 
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
+import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
+import com.semtleWebGroup.youtubeclone.domain.comment.service.CommentLikeService;
 import com.semtleWebGroup.youtubeclone.domain.comment.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +14,14 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/v1/comments")
+@RequestMapping("/comments")
 public class CommentApi {
     private final CommentService commentService;
 
-    public CommentApi(CommentService commentService) {
+    private final CommentLikeService commentLikeService;
+    public CommentApi(CommentService commentService,  CommentLikeService commentLikeService) {
         this.commentService = commentService;
+        this.commentLikeService = commentLikeService;
     }
 
     @PostMapping("")
@@ -43,4 +48,18 @@ public class CommentApi {
         List<Comment> CommentList = commentService.getCommentAll(videoId);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity like(@PathVariable("commentId")Long commentId, @RequestBody Channel channel) {
+        CommentLikeResponse commentLikeResponse = commentLikeService.LikeAdd(commentId, channel);
+
+        return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
+    }
+
+    @DeleteMapping("/{commentId}/like")
+    public ResponseEntity unlike(@PathVariable("commentId")Long commentId, @RequestBody Channel channel) {
+        CommentLikeResponse commentLikeResponse = commentLikeService.LikeDelete(commentId, channel);
+
+        return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
+    }
+
 }
