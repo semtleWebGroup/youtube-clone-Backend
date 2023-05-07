@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.global.config;
 import com.semtleWebGroup.youtubeclone.domain.member.service.MemberDetailsService;
 import com.semtleWebGroup.youtubeclone.global.error.exception.handler.MemberAccessDeniedHandler;
 import com.semtleWebGroup.youtubeclone.global.error.exception.handler.MemberAuthenticationEntryPoint;
+import com.semtleWebGroup.youtubeclone.global.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
