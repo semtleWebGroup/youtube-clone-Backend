@@ -8,9 +8,12 @@ import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpo
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -81,5 +84,10 @@ public class VideoService {
         Video video = this.getVideo(videoId);
         videoRepository.delete(video);
         return new VideoResponse(video);
+    }
+
+    public VideoPageResponse findAll(Pageable pageable) {
+        Page<Video> videos = videoRepository.findAllByOrderByCreatedTimeDesc(pageable);
+        return new VideoPageResponse(videos);
     }
 }
