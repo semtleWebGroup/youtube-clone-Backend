@@ -6,7 +6,6 @@ import com.semtleWebGroup.youtubeclone.domain.member.dto.SignInRequestDto;
 import com.semtleWebGroup.youtubeclone.domain.member.dto.SignInResponseDto;
 import com.semtleWebGroup.youtubeclone.domain.member.dto.SignUpResponseDto;
 import com.semtleWebGroup.youtubeclone.domain.member.repository.MemberRepository;
-import com.semtleWebGroup.youtubeclone.global.security.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
