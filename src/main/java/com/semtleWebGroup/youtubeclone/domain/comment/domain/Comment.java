@@ -27,10 +27,12 @@ public class Comment {
     @Column(name = "contents", length = 45)
     private String contents;
 
+    @NotNull
     @CreatedDate
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 
+    @NotNull
     @LastModifiedDate
     @Column(name = "updated_time")
     private LocalDateTime updatedTime;
