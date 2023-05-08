@@ -7,7 +7,6 @@ import com.semtleWebGroup.youtubeclone.domain.comment.domain.CommentLike;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentLikeRepository;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
-import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.test_super.MockTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +52,10 @@ class CommentLikeServiceTest extends MockTest {
                     .title("Title")
                     .description("Description")
                     .build();
+            Channel channel3 = Channel.builder()
+                    .title("Title")
+                    .description("Description")
+                    .build();
 
             Long commentId = 1L;
             Comment comment = Comment.builder()
@@ -69,17 +72,20 @@ class CommentLikeServiceTest extends MockTest {
                     .comment(comment)
                     .build();
 
+
             when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
             when(commentRepository.save(comment)).thenReturn(comment);
             when(commentLikeRepository.save(commentLike1)).thenReturn(commentLike1);
             when(commentLikeRepository.save(commentLike2)).thenReturn(commentLike2);
             // when
-            CommentLikeResponse commentLikeResponse;
-            commentLikeResponse = commentLikeService.LikeAdd(commentId, channel1);
-            commentLikeResponse = commentLikeService.LikeAdd(commentId, channel2);
+            commentLikeService.LikeAdd(commentId, channel1);
+            CommentLikeResponse commentLikeResponse = commentLikeService.LikeAdd(commentId, channel2);
+            CommentLikeResponse commentLikeResponse2 = commentLikeService.get(comment, channel3);
             // then
             assertEquals(2, commentLikeResponse.getLikeCount());
             assertTrue(commentLikeResponse.isLike());
+            assertEquals(2, commentLikeResponse2.getLikeCount());
+            assertTrue(!commentLikeResponse2.isLike());
         }
     }
 
@@ -112,11 +118,11 @@ class CommentLikeServiceTest extends MockTest {
             when(commentLikeRepository.findByCommentAndChannel(comment, channel)).thenReturn(commentLike1);
 
             // when
-            CommentLikeResponse videoLikeResponse = commentLikeService.LikeDelete(commentId, channel);
+            CommentLikeResponse commentLikeResponse = commentLikeService.LikeDelete(commentId, channel);
 
             // then
-            assertEquals(0, videoLikeResponse.getLikeCount());
-            assertTrue(!videoLikeResponse.isLike());
+            assertEquals(0, commentLikeResponse.getLikeCount());
+            assertTrue(!commentLikeResponse.isLike());
         }
     }
 }
