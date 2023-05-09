@@ -49,14 +49,16 @@ public class CommentApi {
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @PostMapping("/{commentId}/like")
-    public ResponseEntity like(@PathVariable("commentId")Long commentId, @RequestBody Channel channel) {
+    public ResponseEntity like(@PathVariable("commentId")Long commentId, @RequestPart Channel channel) {
         CommentLikeResponse commentLikeResponse = commentLikeService.LikeAdd(commentId, channel);
 
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }
 
     @DeleteMapping("/{commentId}/like")
-    public ResponseEntity unlike(@PathVariable("commentId")Long commentId, @RequestBody Channel channel) {
+    public ResponseEntity unlike(@PathVariable("commentId")Long commentId, @RequestPart Channel channel) {
+        System.out.println("실행됨");
+        System.out.println(channel);
         CommentLikeResponse commentLikeResponse = commentLikeService.LikeDelete(commentId, channel);
 
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
