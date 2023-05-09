@@ -18,7 +18,7 @@ public class VideoResponse {
     private LocalDateTime updatedTime;
 
     public VideoResponse(Video video) {
-        this.videoId = video.getVideoId();
+        this.videoId = video.getId();
         this.title = video.getTitle();
         this.description = video.getDescription();
         this.createdTime = video.getCreatedTime();

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ public class VideoViewResponse {
     // channel
     private Long channelId;
     private String channelName;
-    private Byte[] channelProfileImg;
+    private byte[] channelProfileImg;
     private int channelSubscriberCount;
 
     // video info
@@ -42,30 +44,36 @@ public class VideoViewResponse {
     @Builder
     public VideoViewResponse(
             Video video,
-            VideoLikeResponse videoLike
+            Boolean isLike
             //ArrayList<String> qualityList // TODO
     ) {
-        this.videoId = video.getVideoId();
+        this.videoId = video.getId();
         this.videoSec = video.getVideoSec();
-
-        this.channelId = video.getChannel().getId();
-        this.channelName = video.getChannel().getTitle();
-//        this.channelProfileImg = video.getChannel().getProfileImg(); // TODO
-        this.channelProfileImg = null;
-//        this.channelSubscriberCount = video.getVideo().getChannel().getSubscriberCount(); // TODO
-        this.channelSubscriberCount = 0;
-
         this.title = video.getTitle();
         this.createdTime = video.getCreatedTime();
         this.description = video.getDescription();
         this.viewCount = video.getViewCount();
 
-        this.likeCount = videoLike.getLikeCount();
-        this.isLike = videoLike.isLike();
+        this.channelId = video.getChannel().getId();
+        this.channelName = video.getChannel().getTitle();
+        this.channelProfileImg = convertBlobToBytes(video.getChannel().getChannelImage());
+        this.channelSubscriberCount = video.getChannel().getSubscribers().size();
+
+        this.likeCount = video.getLikeCount();
+        this.isLike = isLike;
 
         ArrayList<String> qualityList = new ArrayList<String>();
         qualityList.add("1080p");
         qualityList.add("360p");
         this.qualityList = qualityList;
+    }
+
+    private byte[] convertBlobToBytes (Blob blob) {
+        try {
+            if (blob != null) blob.getBytes(1, (int) blob.length());
+        } catch (SQLException e) {
+            throw new RuntimeException(e); // TODO: Handle Exception
+        }
+        return null;
     }
 }
