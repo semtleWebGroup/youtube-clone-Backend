@@ -10,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -21,7 +23,7 @@ public class Video {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
     @Column(name = "video_id",columnDefinition = "BINARY(16)", nullable = false)
-    private UUID videoId;
+    private UUID id;
 
     @Column(length=45)
     private String title;
@@ -42,6 +44,9 @@ public class Video {
     private Long videoSec;
 
     private MediaServerSpokesman.EncodingStatus status;
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
+    private Set<VideoLike> likes = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
@@ -72,5 +77,14 @@ public class Video {
 
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public int getLikeCount() { return this.likes.size(); }
+
+    public Boolean isLike(Channel channel) {
+        if (channel == null) return false;
+        for (VideoLike vl : this.likes)
+            if (vl.getChannel().equals(channel)) return true;
+        return false;
     }
 }

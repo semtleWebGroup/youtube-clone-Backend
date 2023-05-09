@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,9 +16,11 @@ public class VideoEditDto {
     private String title;
     private String description;
     private Blob thumbImg;
+    private Channel channel;
 
     @Builder
-    public VideoEditDto(UUID videoId, String title, String description, Blob thumbImg) {
+    public VideoEditDto(Channel channel, UUID videoId, String title, String description, Blob thumbImg) {
+        this.channel = channel;
         this.videoId = videoId;
         this.title = title;
         this.description = description;
