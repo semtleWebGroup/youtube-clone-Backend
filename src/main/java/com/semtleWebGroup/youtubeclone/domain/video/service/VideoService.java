@@ -1,6 +1,7 @@
 package com.semtleWebGroup.youtubeclone.domain.video.service;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
@@ -8,53 +9,50 @@ import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpo
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.sql.Blob;
+
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class VideoService {
     private final VideoRepository videoRepository;
+    private final VideoLikeService videoLikeService;
     private final MediaServerSpokesman mediaServerSpokesman;
+    private final ChannelRepository channelRepository; // Upload를 위해 임시 사용
 
-    public void save(Video video) {
-        videoRepository.save(video);
-    }
-
-    public Video getVideo(UUID videoId) {
+    private Video getVideo(UUID videoId) {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
         return video;
     }
 
-    public VideoResponse upload(VideoUploadDto dto) {
+    public VideoResponse upload(VideoUploadDto dto) throws MediaServerException {
+        // TODO: 채널 받게끔 수정
+        Channel channel = new Channel("title", "description");
+        channelRepository.save(channel);
+
         Video video = Video.builder()
-                .channel(dto.getChannel())
+                .channel(channel)
                 .build();
         videoRepository.save(video);
-        try {
-            mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
-        } catch (MediaServerException e) {
-            // TODO
-        }
 
+        mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getVideoId(), dto.getThumbImg());
         return new VideoResponse(video);
     }
 
     @Transactional
-    public VideoViewResponse view(UUID videoId, Channel channel) {
+    public VideoViewResponse view(UUID videoId) {
         Video video = this.getVideo(videoId);
         video.incrementViewCount();
         videoRepository.save(video);
 
         VideoViewResponse videoViewResponse = VideoViewResponse.builder()
             .video(video)
-            .isLike(video.isLike(channel))
+            .videoLike(videoLikeService.get(video.getVideoId()))
 //                .qualityList(mediaServerSpokesman.getQualityList(video.getVideoId())) // TODO
             .build();
         return videoViewResponse;
@@ -63,7 +61,6 @@ public class VideoService {
     @Transactional
     public VideoResponse edit(VideoEditDto dto) {
         Video video = this.getVideo(dto.getVideoId());
-        // TODO: 권한 확인
         if (dto.getThumbImg() == null)
             video.update(dto.getTitle(), dto.getDescription());
         else
@@ -73,21 +70,11 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoResponse delete(UUID videoId, Channel channel) {
-        // TODO: 권한 확인
-        try {
-            mediaServerSpokesman.deleteVideo(videoId);
-        } catch (MediaServerException e) {
-            // TODO
-        }
-
+    public VideoResponse delete(UUID videoId) throws MediaServerException {
+        mediaServerSpokesman.deleteVideo(videoId);
+        videoLikeService.delete(videoId);
         Video video = this.getVideo(videoId);
         videoRepository.delete(video);
         return new VideoResponse(video);
-    }
-
-    public VideoPageResponse findAll(Pageable pageable) {
-        Page<Video> videos = videoRepository.findAllByOrderByCreatedTimeDesc(pageable);
-        return new VideoPageResponse(videos);
     }
 }

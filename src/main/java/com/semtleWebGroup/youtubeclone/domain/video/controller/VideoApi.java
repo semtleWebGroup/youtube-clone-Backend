@@ -1,6 +1,5 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
-import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
@@ -28,11 +27,9 @@ public class VideoApi {
     @PostMapping("")
     public ResponseEntity upload(
             @RequestPart MultipartFile videoFile,
-            @RequestPart(required = false) MultipartFile thumbImg,
-            @RequestPart Channel channel
+            @RequestPart(required = false) MultipartFile thumbImg
     ) throws MediaServerException {
         VideoUploadDto dto = VideoUploadDto.builder()
-                .channel(channel)
                 .videoFile(videoFile)
                 .thumbImg(thumbImg)
                 .build();
@@ -46,12 +43,10 @@ public class VideoApi {
     public ResponseEntity create(
         @PathVariable UUID videoId,
         @RequestPart @Valid VideoRequest data,
-        @RequestPart(required=false) MultipartFile thumbImg,
-        @RequestPart Channel channel
+        @RequestPart(required=false) MultipartFile thumbImg
     ) throws IOException, SQLException {
         Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
         VideoEditDto dto = VideoEditDto.builder()
-            .channel(channel)
             .videoId(videoId)
             .title(data.getTitle())
             .description(data.getDescription())
@@ -64,8 +59,8 @@ public class VideoApi {
     }
 
     @GetMapping("/{videoId}")
-    public ResponseEntity view(@PathVariable UUID videoId, @RequestPart Channel channel) {
-        VideoViewResponse videoViewResponse = videoService.view(videoId, channel);
+    public ResponseEntity view(@PathVariable UUID videoId) {
+        VideoViewResponse videoViewResponse = videoService.view(videoId);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(videoViewResponse);
@@ -75,12 +70,10 @@ public class VideoApi {
     public ResponseEntity update(
         @PathVariable UUID videoId,
         @RequestPart @Valid VideoRequest data,
-        @RequestPart(required=false) MultipartFile thumbImg,
-        @RequestPart Channel channel
+        @RequestPart(required=false) MultipartFile thumbImg
     ) throws IOException, SQLException {
         Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
         VideoEditDto dto = VideoEditDto.builder()
-            .channel(channel)
             .videoId(videoId)
             .title(data.getTitle())
             .description(data.getDescription())
@@ -93,27 +86,29 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity delete(@PathVariable UUID videoId, @RequestPart Channel channel) {
-        VideoResponse videoResponse = videoService.delete(videoId, channel);
+    public ResponseEntity delete(@PathVariable UUID videoId) throws MediaServerException {
+        VideoResponse videoResponse = videoService.delete(videoId);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(videoResponse);
     }
 
     @PostMapping("/{videoId}/like")
-    public ResponseEntity like(@PathVariable UUID videoId, @RequestPart Channel channel) { // TODO: channel 로그인 정보에서 가져오기
-        VideoLikeResponse videoLikeResponse = videoLikeService.add(videoId, channel);
+    public ResponseEntity like(@PathVariable Long videoId) {
+        // TODO: like table에 등록 후 like 수 반환.
+        VideoLikeResponse like = new VideoLikeResponse(true, 1);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(videoLikeResponse);
+                .body(like);
     }
 
     @DeleteMapping("/{videoId}/like")
-    public ResponseEntity dislike(@PathVariable UUID videoId, @RequestPart Channel channel) { // TODO: channel 로그인 정보에서 가져오기
-        VideoLikeResponse videoLikeResponse = videoLikeService.delete(videoId, channel);
+    public ResponseEntity dislike(@PathVariable Long videoId) {
+        // TODO: like table에서 삭제 후 like 수 반환.
+        VideoLikeResponse like = new VideoLikeResponse(false, 0);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(videoLikeResponse);
+                .body(like);
     }
 
 }

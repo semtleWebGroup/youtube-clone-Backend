@@ -1,8 +1,8 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,6 +26,10 @@ public class Channel {
     private String title;
     @Column(length = 70)
     private String description;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToMany
     // 자기 참조로 M:N관계

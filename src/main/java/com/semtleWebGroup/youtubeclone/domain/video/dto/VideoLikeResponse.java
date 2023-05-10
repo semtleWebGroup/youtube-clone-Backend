@@ -15,8 +15,7 @@ public class VideoLikeResponse {
     private int likeCount;
 
     @Builder
-    public VideoLikeResponse(UUID videoId, boolean isLike, int likeCount) {
-        this.videoId = videoId;
+    public VideoLikeResponse(boolean isLike, int likeCount) {
         this.isLike = isLike;
         this.likeCount = likeCount;
     }

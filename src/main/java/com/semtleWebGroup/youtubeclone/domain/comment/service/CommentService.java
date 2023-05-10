@@ -35,10 +35,10 @@ public class CommentService {
         return entity;
     }
 
-//    public List<Comment> getCommentList(UUID Idx){
-//        List<Comment> commentList = commentRepository.findByVideo_VideoId(Idx);  //실패..
-//        return commentList;
-//    }
+    public List<Comment> getCommentList(UUID Idx){
+        List<Comment> commentList = commentRepository.findByVideo_VideoId(Idx);  //실패..
+        return commentList;
+    }
     public List<Comment> getCommentAll(Long Idx){
         return commentRepository.findAll();
     }

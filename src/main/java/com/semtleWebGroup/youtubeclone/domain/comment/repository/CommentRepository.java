@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    //List<Comment> findByVideo_VideoId(UUID idx);
+    List<Comment> findByVideo_VideoId(UUID idx);
 }
