@@ -19,6 +19,8 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class Video {
+    public enum VideoStatus{DISPATCH, PRIVATE, PUBLIC};
+
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
@@ -31,8 +33,6 @@ public class Video {
     @Column(length=45)
     private String description;
 
-    private Blob thumbImg;
-
     @CreatedDate
     private LocalDateTime createdTime;
 
@@ -43,7 +43,7 @@ public class Video {
 
     private Long videoSec;
 
-    private MediaServerSpokesman.EncodingStatus status;
+    private VideoStatus status;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
@@ -58,11 +58,6 @@ public class Video {
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
         this.channel = channel;
-    }
-
-    public void update(String title, String description, Blob thumbImg) {
-        this.update(title, description);
-        this.thumbImg = thumbImg;
     }
 
     public void update(String title, String description) {

@@ -1,18 +1,16 @@
 spring:
   mvc:
     static-path-pattern: /webapp/**
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/test
-    username: sa
-    password:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://144.24.72.106:3306/youtube_clone?serverTimezone=UTC
+    username: root
+    password: '0000'
   jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true
 logging:
   level:

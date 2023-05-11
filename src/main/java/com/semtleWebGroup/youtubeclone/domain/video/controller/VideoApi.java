@@ -46,16 +46,16 @@ public class VideoApi {
     public ResponseEntity create(
         @PathVariable UUID videoId,
         @RequestPart @Valid VideoRequest data,
-        @RequestPart(required=false) MultipartFile thumbImg,
+//        @RequestPart(required=false) MultipartFile thumbImg,
         @RequestPart Channel channel
     ) throws IOException, SQLException {
-        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
+//        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
         VideoEditDto dto = VideoEditDto.builder()
             .channel(channel)
             .videoId(videoId)
             .title(data.getTitle())
             .description(data.getDescription())
-            .thumbImg(blobImg)
+//            .thumbImg(blobImg)
             .build();
         VideoResponse videoResponse = videoService.edit(dto);
         return ResponseEntity
@@ -75,16 +75,16 @@ public class VideoApi {
     public ResponseEntity update(
         @PathVariable UUID videoId,
         @RequestPart @Valid VideoRequest data,
-        @RequestPart(required=false) MultipartFile thumbImg,
+//        @RequestPart(required=false) MultipartFile thumbImg,
         @RequestPart Channel channel
     ) throws IOException, SQLException {
-        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
+//        Blob blobImg = (thumbImg == null) ? null : new SerialBlob(thumbImg.getBytes());
         VideoEditDto dto = VideoEditDto.builder()
             .channel(channel)
             .videoId(videoId)
             .title(data.getTitle())
             .description(data.getDescription())
-            .thumbImg(blobImg)
+//            .thumbImg(blobImg)
             .build();
         VideoResponse videoResponse = videoService.edit(dto);
         return ResponseEntity

@@ -64,10 +64,7 @@ public class VideoService {
     public VideoResponse edit(VideoEditDto dto) {
         Video video = this.getVideo(dto.getVideoId());
         // TODO: 권한 확인
-        if (dto.getThumbImg() == null)
-            video.update(dto.getTitle(), dto.getDescription());
-        else
-            video.update(dto.getTitle(), dto.getDescription(), dto.getThumbImg());
+        video.update(dto.getTitle(), dto.getDescription());
         videoRepository.save(video);
         return new VideoResponse(video);
     }

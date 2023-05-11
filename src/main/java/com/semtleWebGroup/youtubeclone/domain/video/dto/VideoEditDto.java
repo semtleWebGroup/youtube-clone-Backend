@@ -15,15 +15,15 @@ public class VideoEditDto {
     private UUID videoId;
     private String title;
     private String description;
-    private Blob thumbImg;
+//    private Blob thumbImg;
     private Channel channel;
 
     @Builder
-    public VideoEditDto(Channel channel, UUID videoId, String title, String description, Blob thumbImg) {
+    public VideoEditDto(Channel channel, UUID videoId, String title, String description) {//, Blob thumbImg) {
         this.channel = channel;
         this.videoId = videoId;
         this.title = title;
         this.description = description;
-        this.thumbImg = thumbImg;
+//        this.thumbImg = thumbImg;
     }
 }
