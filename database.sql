@@ -82,7 +82,8 @@ CREATE TABLE IF NOT EXISTS `youtube_clone`.`video` (
   `updated_time` DATETIME NOT NULL,
   `view_count` INT NOT NULL,
   `channel_id` BIGINT(20) NOT NULL,
-  `status` ENUM('public', 'private', 'draft') NOT NULL,
+  `video_sec` BIGINT DEFAULT 0,
+  `status` ENUM('PUBLIC', 'PRIVATE', 'DRAFT') NOT NULL,
   PRIMARY KEY (`video_id`),
   INDEX `fk_video_info_channel1_idx` (`channel_id` ASC) VISIBLE,
   CONSTRAINT `fk_video_info_channel1`
