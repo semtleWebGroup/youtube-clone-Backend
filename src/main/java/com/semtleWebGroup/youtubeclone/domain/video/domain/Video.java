@@ -19,7 +19,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class Video {
-    public enum VideoStatus{DISPATCH, PRIVATE, PUBLIC};
+    public enum VideoStatus{PUBLIC, PRIVATE, DRAFT};
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -43,7 +43,7 @@ public class Video {
 
     private Long videoSec;
 
-    private VideoStatus status;
+    private VideoStatus status = VideoStatus.PUBLIC;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
