@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -36,7 +35,7 @@ public class VideoListResponse {
         this.id = video.getId();
         this.title = video.getTitle();
 //        this.thumbImg = convertBlobToBytes(video.getThumbImg());
-        this.channelImg = convertBlobToBytes(video.getChannel().getChannelImage());
+        this.channelImg = convertBlobToBytes(video.getChannel().getProfileImg());
         this.channelName = video.getChannel().getTitle();
         this.viewCount = video.getViewCount();
         this.videoSec = video.getVideoSec();

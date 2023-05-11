@@ -52,7 +52,7 @@ class ChannelServiceTest extends MockTest {
                     .title(request.getChannelProfile().getTitle())
                     .description(request.getChannelProfile().getDescription())
                     .build();
-            createdChannel.setChannelImage(new SerialBlob(image.getBytes()));
+            createdChannel.setProfileImg(new SerialBlob(image.getBytes()));
 
             when(channelRepository.save(any(Channel.class))).thenReturn(createdChannel);
 
@@ -62,7 +62,7 @@ class ChannelServiceTest extends MockTest {
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
             assertEquals(createdChannel.getDescription(), channel.getDescription());
-            assertEquals(new SerialBlob(image.getBytes()), channel.getChannelImage());
+            assertEquals(new SerialBlob(image.getBytes()), channel.getProfileImg());
         }
 
         @Test
@@ -87,7 +87,7 @@ class ChannelServiceTest extends MockTest {
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
             assertEquals(createdChannel.getDescription(), channel.getDescription());
-            assertNull(channel.getChannelImage());
+            assertNull(channel.getProfileImg());
         }
     }
 
@@ -155,7 +155,7 @@ class ChannelServiceTest extends MockTest {
             // then
             assertEquals(dto.getChannelProfile().getTitle(), updatedChannel.getTitle());
             assertEquals(dto.getChannelProfile().getDescription(), updatedChannel.getDescription());
-            assertEquals(new SerialBlob(dto.getProfile_img().getBytes()), updatedChannel.getChannelImage());
+            assertEquals(new SerialBlob(dto.getProfile_img().getBytes()), updatedChannel.getProfileImg());
         }
 
         @Test

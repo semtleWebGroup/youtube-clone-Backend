@@ -56,7 +56,7 @@ public class VideoViewResponse {
 
         this.channelId = video.getChannel().getId();
         this.channelName = video.getChannel().getTitle();
-        this.channelProfileImg = convertBlobToBytes(video.getChannel().getChannelImage());
+        this.channelProfileImg = convertBlobToBytes(video.getChannel().getProfileImg());
         this.channelSubscriberCount = video.getChannel().getSubscribers().size();
 
         this.likeCount = video.getLikeCount();

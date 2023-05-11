@@ -43,6 +43,7 @@ public class Video {
 
     private Long videoSec;
 
+    @Enumerated(EnumType.STRING)
     private VideoStatus status = VideoStatus.PUBLIC;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
@@ -58,6 +59,8 @@ public class Video {
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
         this.channel = channel;
+        this.title = "";
+        this.description = "";
     }
 
     public void update(String title, String description) {

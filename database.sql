@@ -52,18 +52,18 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `youtube_clone`.`subscribe` (
   `subscribe_id` BIGINT(20) NOT NULL,
-  `subscriber` BIGINT(20) NOT NULL,
-  `channel` BIGINT(20) NOT NULL,
+  `subscriber_id` BIGINT(20) NOT NULL,
+  `channel_id` BIGINT(20) NOT NULL,
   PRIMARY KEY (`subscribe_id`),
-  INDEX `fk_subscribe_channel1_idx` (`subscriber` ASC) VISIBLE,
-  INDEX `fk_subscribe_channel2_idx` (`channel` ASC) VISIBLE,
+  INDEX `fk_subscribe_channel1_idx` (`subscriber_id` ASC) VISIBLE,
+  INDEX `fk_subscribe_channel2_idx` (`channel_id` ASC) VISIBLE,
   CONSTRAINT `fk_subscribe_channel1`
-    FOREIGN KEY (`subscriber`)
+    FOREIGN KEY (`subscriber_id`)
     REFERENCES `youtube_clone`.`channel` (`channel_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_subscribe_channel2`
-    FOREIGN KEY (`channel`)
+    FOREIGN KEY (`channel_id`)
     REFERENCES `youtube_clone`.`channel` (`channel_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

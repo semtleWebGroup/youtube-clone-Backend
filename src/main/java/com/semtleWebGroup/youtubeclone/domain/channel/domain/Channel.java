@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
@@ -29,7 +28,7 @@ public class Channel {
 
     @ManyToMany
     // 자기 참조로 M:N관계
-    @JoinTable(name = "subscription",
+    @JoinTable(name = "subscribe",
     joinColumns = @JoinColumn(name = "channel_id"), // 엔티티와 매핑될 외래키 지정
     inverseJoinColumns = @JoinColumn(name = "subscriber_id")    // 매핑될 다른 엔티티의 외래키 지정
     )
@@ -41,7 +40,7 @@ public class Channel {
     private Set<Channel> subscribers = new HashSet<>();
 
     @Lob
-    private Blob channelImage;
+    private Blob profileImg;
 
 
     @Builder
@@ -50,8 +49,8 @@ public class Channel {
         this.description = description;
     }
 
-    public void setChannelImage(Blob imageFile) {
-        this.channelImage = imageFile;
+    public void setProfileImg(Blob imageFile) {
+        this.profileImg = imageFile;
     }
 
 

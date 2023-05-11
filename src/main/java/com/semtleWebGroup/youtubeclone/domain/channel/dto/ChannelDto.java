@@ -1,14 +1,11 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.dto;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.Base64;
 
 @Getter
 @Setter
@@ -23,7 +20,7 @@ public class ChannelDto {
         this.id = channel.getId();
         this.title = channel.getTitle();
         this.description = channel.getDescription();
-        declareChannelImage(channel.getChannelImage());
+        declareChannelImage(channel.getProfileImg());
     }
 
     public void declareChannelImage(Blob channelImage) {

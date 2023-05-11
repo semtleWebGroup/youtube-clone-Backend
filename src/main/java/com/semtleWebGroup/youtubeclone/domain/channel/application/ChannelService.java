@@ -10,15 +10,10 @@ import org.springframework.stereotype.Service;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.transaction.Transactional;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +38,7 @@ public class ChannelService {
     private static void saveChannelImgFromDto(ChannelRequest dto, Channel newChannel){
         try {
             Blob blob = new SerialBlob(dto.getProfile_img().getBytes());
-            newChannel.setChannelImage(blob);
+            newChannel.setProfileImg(blob);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
