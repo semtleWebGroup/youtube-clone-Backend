@@ -13,8 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * package :  com.semtleWebGroup.youtubeclone.domain.member.service
@@ -48,7 +48,7 @@ public class MemberSignService{
         return signUpResponseDto;
     }
     
-    public SignInResponseDto signIn(SignInRequestDto dto) throws RuntimeException {
+    public SignInResponseDto signIn(SignInRequestDto dto) throws RuntimeException, IOException {
         Optional<Member> optionalMember = memberRepository.findByEmail(dto.getEmail());
         SignInResponseDto signInResultDto= SignInResponseDto.builder().build();
         if (optionalMember.isPresent()) {
@@ -58,10 +58,9 @@ public class MemberSignService{
                 return signInResultDto;
             }
             String memberToken = jwtTokenProvider.generateMemberToken(member);
-            Set<String> channelTokens = jwtTokenProvider.generateChannelTokens(memberToken);
+            
             signInResultDto = SignInResponseDto.builder()
                     .memberToken(memberToken)
-                    .channelTokens(channelTokens)
                     .build();
             setSuccessResult(signInResultDto);
             return signInResultDto;
