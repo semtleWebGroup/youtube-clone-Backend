@@ -12,7 +12,6 @@ import java.io.Serializable;
  */
 @Data
 public class SignUpRequestDto implements Serializable {
-    private final Integer id;
     @Size(max = 45)
     @NotNull
     private final String email;
