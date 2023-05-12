@@ -1,6 +1,7 @@
 
 package com.semtleWebGroup.youtubeclone.domain.member.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +20,7 @@ import java.util.*;
 @NoArgsConstructor
 @Table(name = "member")
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +45,10 @@ public class Member implements UserDetails {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Channel> channels = new LinkedHashSet<>();
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role;//얘는 필요한가?
+    
+    @Transient
+    private List<MemberGrantedAuthority> authorities;
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -75,5 +80,16 @@ public class Member implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "email = " + email + ", " +
+                "name = " + name + ", " +
+                "password = " + password + ", " +
+                "role = " + role + ", " +
+                "authorities = " + authorities + ")";
     }
 }
