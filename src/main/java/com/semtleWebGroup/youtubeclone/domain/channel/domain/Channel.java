@@ -49,12 +49,17 @@ public class Channel {
 
 
     @Builder
-    public Channel(String title, String description,Member member){
+    public Channel(String title, String description){
         this.title = title;
         this.description = description;
-        this.member=member;
     }
-
+    
+//    @Builder
+//    public Channel(String title, String description,Member member){
+//        this.title = title;
+//        this.description = description;
+//        this.member=member;
+//    }
     public void setChannelImage(Blob imageFile) {
         this.channelImage = imageFile;
     }

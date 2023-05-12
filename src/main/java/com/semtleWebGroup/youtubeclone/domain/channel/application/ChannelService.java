@@ -6,7 +6,6 @@ import com.semtleWebGroup.youtubeclone.domain.channel.exception.TitleDuplicateEx
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
-import com.semtleWebGroup.youtubeclone.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -26,7 +25,7 @@ import java.util.List;
 public class ChannelService {
     private final ChannelRepository channelRepository;
 
-    private final JwtTokenProvider jwtTokenProvider;
+//    private final JwtTokenProvider jwtTokenProvider;
     @Transactional
     public Channel addChannel(ChannelRequest dto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -34,7 +33,7 @@ public class ChannelService {
         log.info("authentication 내의 memberId: {}",principal.getId());
         
         Channel newChannel = Channel.builder()
-                .member(principal)
+//                .member(principal)
                 .title(dto.getChannelProfile().getTitle())
                 .description(dto.getChannelProfile().getDescription())
                 .build();
