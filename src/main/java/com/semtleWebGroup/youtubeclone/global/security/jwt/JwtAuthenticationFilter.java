@@ -42,9 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     
     private void expectValid(String token) throws Exception {
-        if (token == null || token.equalsIgnoreCase("null")||!jwtTokenProvider.validateToken(token)) {
+        if (token == null || token.equalsIgnoreCase("null")) {
             //TODO:예외 구체화
-            throw new Exception("Token is null or invalid.");
+            throw new Exception("Token is null.");
+        }
+        if(!jwtTokenProvider.validateToken(token)){
+            throw new Exception("Token is invalid.");
         }
         Authentication authentication;
         if (jwtTokenProvider.isChannelToken(token)) {
