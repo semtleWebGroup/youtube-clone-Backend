@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 
 @RestController
 @RequestMapping( "/members")
@@ -21,7 +23,7 @@ public class MemberController {
     private MemberSignService memberSignService;
     
     @PostMapping("")
-    public ResponseEntity<?> signIn(@RequestBody SignInRequestDto signInRequestDto){
+    public ResponseEntity<?> signIn(@RequestBody SignInRequestDto signInRequestDto) throws IOException {
         log.info("로그인");
         SignInResponseDto dto = memberSignService.signIn(signInRequestDto);
         if(dto.getSuccess())
