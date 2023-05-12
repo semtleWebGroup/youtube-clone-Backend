@@ -4,8 +4,13 @@ import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import com.semtleWebGroup.youtubeclone.domain.channel.exception.TitleDuplicateException;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import com.semtleWebGroup.youtubeclone.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -15,23 +20,30 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChannelService {
     private final ChannelRepository channelRepository;
 
+    private final JwtTokenProvider jwtTokenProvider;
     @Transactional
     public Channel addChannel(ChannelRequest dto){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member principal = (Member) authentication.getPrincipal();
+        log.info("authentication 내의 memberId: {}",principal.getId());
+        
         Channel newChannel = Channel.builder()
+                .member(principal)
                 .title(dto.getChannelProfile().getTitle())
                 .description(dto.getChannelProfile().getDescription())
                 .build();
         if (dto.getProfile_img() != null){
             saveChannelImgFromDto(dto, newChannel);
         }
-
-        channelRepository.save(newChannel);
-
+    
+        Channel savedChannel = channelRepository.save(newChannel);
+        
         return newChannel;
     }
 
