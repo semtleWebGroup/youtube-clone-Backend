@@ -1,8 +1,11 @@
 package com.semtleWebGroup.youtubeclone.global.security.jwt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.semtleWebGroup.youtubeclone.domain.channel.application.ChannelAuthentication;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
-import com.semtleWebGroup.youtubeclone.domain.member.domain.Role;
 import com.semtleWebGroup.youtubeclone.domain.member.service.MemberDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -10,27 +13,32 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.*;
 
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class JwtTokenProvider {
-
+    
     private String secretKey = "secretKey";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER = "Authorization";
     private static final long tokenValidTime = 30 * 60 * 1000L;     // 토큰 유효시간 30분
     private final MemberDetailsService memberDetailsService;
-
+    
+    private ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ChannelRepository channelRepository;
+    
+    
     //secretKey를 Base64로 인코딩
     @PostConstruct
     protected void init() {
@@ -39,11 +47,11 @@ public class JwtTokenProvider {
     
     
     public String generateMemberToken(Member member) {
-        Map<String, Object> header =  new HashMap<>();
+        Map<String, Object> header = new HashMap<>();
         header.put("prefix", TOKEN_PREFIX);
         
         Map<String, Object> payloads = new HashMap<>();
-        payloads.put("member",member);
+        payloads.put("member", member);
         
         Date now = new Date();
         return Jwts.builder()
@@ -55,42 +63,40 @@ public class JwtTokenProvider {
                 .compact();
     }
     
-    public Set<String> generateChannelTokens(String token) {
-        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-        Member member = (Member) claims.get("member");
-        Set<Channel> channels = member.getChannels();
-
-        Set<String> tokens=new LinkedHashSet<>();
-        for (Channel channel : channels) {
-            Date now = new Date();
-            Map<String, Object> header =  new HashMap<>();
-            header.put("prefix", TOKEN_PREFIX);
-            
-            Map<String, Object> payloads = new HashMap<>();
-            payloads.put("title",channel.getTitle());
-            payloads.put("channelId",channel.getId());
-            
-            tokens.add(Jwts.builder()
-                    .setHeader(header)
-                    .setClaims(payloads)
-                    .setIssuedAt(now)
-                    .setExpiration(new Date(now.getTime() + tokenValidTime))
-                    .signWith(SignatureAlgorithm.HS256, secretKey)
-                    .compact());
-        }
-        return tokens;
+    public String generateChannelToken(String memberToken,Channel channel) throws IOException {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(memberToken).getBody();
+        Object memberObj = claims.get("member");
+        String memberJson = mapper.writeValueAsString(memberObj);
+        Member member = mapper.readValue(memberJson, Member.class);
+        
+        Date now = new Date();
+        Map<String, Object> header = new HashMap<>();
+        header.put("prefix", TOKEN_PREFIX);
+        
+        Map<String, Object> payloads = new HashMap<>();
+        payloads.put("memberId",member.getId());
+        payloads.put("channel", channel);
+        
+        return  Jwts.builder()
+                .setHeader(header)
+                .setClaims(payloads)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + tokenValidTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
     
-    public Authentication getMemberAuthentication(String token) {
+    public Authentication getMemberAuthentication(String token) throws JsonProcessingException {
         UserDetails userDetails = memberDetailsService.loadUserByUsername(this.getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
     
-    public Authentication getChannelAuthentication(String channelToken) {
+    public Authentication getChannelAuthentication(String channelToken) throws JsonProcessingException {
         Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(channelToken).getBody();
-        Channel channel = (Channel) claims.get("channel");
-        //principal을 id로 넣어도 되나..?
-        return new PreAuthenticatedAuthenticationToken(channel.getId(), channel, AuthorityUtils.createAuthorityList(Role.User.getRoleName()));
+        Object channelObj = claims.get("channel");
+        String channelJson = mapper.writeValueAsString(channelObj);
+        Channel channel = mapper.readValue(channelJson, Channel.class);
+        return new ChannelAuthentication(channel);
     }
     
     /**
@@ -100,10 +106,15 @@ public class JwtTokenProvider {
      * @return string
      * @author : yeachan
      */
-    public String getUserEmail(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    public String getUserEmail(String token) throws JsonProcessingException {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        Object memberObj = claims.get("member");
+        String memberJson = mapper.writeValueAsString(memberObj);
+        Member member = mapper.readValue(memberJson, Member.class);
+        log.info("토큰에서 가져온 이메일 :{}", member.getEmail());
+        return member.getEmail();
     }
-    
+
 //    public Channel getChannel(String token){
 //        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
 //        return (Channel) claims.get("channel");
