@@ -33,7 +33,7 @@ public class CommentViewResponse {
         this.contents = comment.getContents();
         this.createdTime = comment.getCreatedTime();
         this.updatedTime = comment.getUpdatedTime();
-        //commentLike 정보
+        //commentLike -> 현재 유튜브 사용자가 보는 comment 정보
         this.likeCount = comment.getLikeCount();
         this.isLike = isLike;
         //comment 작성자의 정보

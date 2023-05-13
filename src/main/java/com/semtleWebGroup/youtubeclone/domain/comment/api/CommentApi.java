@@ -39,7 +39,7 @@ public class CommentApi {
 
     @PatchMapping("/{commentId}")
     public ResponseEntity editComment(@PathVariable("commentId")Long commentId, @RequestBody CommentRequest dto){
-        final Comment comment = commentService.updateComment(commentId, dto);
+        Comment comment = commentService.updateComment(commentId, dto);
         return ResponseEntity.status(HttpStatus.OK).body(comment);
     }
 
@@ -52,7 +52,6 @@ public class CommentApi {
     @GetMapping("")
     public ResponseEntity list(@RequestParam("videoId") UUID videoId, @RequestPart Channel channel) {
         List<CommentViewResponse> CommentList = commentService.getCommentList(videoId, channel);
-        //List<Comment> CommentList = commentService.getCommentAll(videoId);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @PostMapping("/{commentId}/like")
@@ -64,8 +63,6 @@ public class CommentApi {
 
     @DeleteMapping("/{commentId}/like")
     public ResponseEntity unlike(@PathVariable("commentId")Long commentId, @RequestPart Channel channel) {
-        System.out.println("실행됨");
-        System.out.println(channel);
         CommentLikeResponse commentLikeResponse = commentLikeService.LikeDelete(commentId, channel);
 
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
