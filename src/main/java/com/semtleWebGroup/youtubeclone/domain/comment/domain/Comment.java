@@ -66,8 +66,8 @@ public class Comment {
 
     public Boolean isLike(Channel channel) {
         if (channel == null) return false;
-        for (CommentLike vl : this.likes)
-            if (vl.getChannel().equals(channel)) return true;
+        for (CommentLike commentLike : this.likes)
+            if (commentLike.getChannel().equals(channel)) return true;
         return false;
     }
 

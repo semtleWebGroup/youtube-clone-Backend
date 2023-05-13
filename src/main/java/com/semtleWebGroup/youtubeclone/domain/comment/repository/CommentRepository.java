@@ -8,5 +8,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByVideo_Id(UUID idx);
+    List<Comment> findByVideo_Id(UUID idx);  //외래키인 video 검색해야함
 }

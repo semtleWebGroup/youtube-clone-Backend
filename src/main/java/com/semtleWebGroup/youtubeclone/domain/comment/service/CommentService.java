@@ -44,11 +44,6 @@ public class CommentService {
 
     public List<CommentViewResponse> getCommentList(UUID video_Idx, Channel channel){
         List<Comment> commentList = commentRepository.findByVideo_Id(video_Idx);
-        if(commentList.size() == 0){
-            throw new EntityNotFoundException(
-                    String.format("%d is no comment.", video_Idx)
-            );
-        }
         List<CommentViewResponse>  commentViewResponseList = new ArrayList<>();
         ListIterator<Comment> iterator = commentList.listIterator();
         while(iterator.hasNext()){
