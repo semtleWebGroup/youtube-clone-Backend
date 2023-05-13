@@ -1,26 +1,31 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.service;
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
+import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentViewResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.UUID;
 
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
-    public CommentService(CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
-    }
-
-    public Comment write(CommentRequest dto){
+    public Comment write(CommentRequest dto, Channel channel, Video video){
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
+                .video(video)
+                .channel(channel)
                 .build();
 
         return commentRepository.save(newComment);
@@ -35,10 +40,20 @@ public class CommentService {
         return entity;
     }
 
-//    public List<Comment> getCommentList(UUID Idx){
-//        List<Comment> commentList = commentRepository.findByVideo_VideoId(Idx);  //실패..
-//        return commentList;
-//    }
+    public List<CommentViewResponse> getCommentList(UUID video_Idx, Channel channel){
+        List<Comment> commentList = commentRepository.findByVideo_Id(video_Idx);
+        List<CommentViewResponse>  commentViewResponseList = new ArrayList<>();
+        ListIterator<Comment> iterator = commentList.listIterator();
+        while(iterator.hasNext()){
+            Comment comment = iterator.next();
+            CommentViewResponse commentViewResponse = CommentViewResponse.builder()
+                    .comment(comment)
+                    .isLike(comment.isLike(channel))
+                    .build();
+            commentViewResponseList.add(commentViewResponse);
+        }
+        return commentViewResponseList;
+    }
     public List<Comment> getCommentAll(Long Idx){
         return commentRepository.findAll();
     }
@@ -49,5 +64,6 @@ public class CommentService {
         ));
         commentRepository.delete(entity);
     }
+
 
 }
