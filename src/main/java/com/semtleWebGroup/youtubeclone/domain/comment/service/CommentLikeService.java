@@ -7,19 +7,16 @@ import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentLikeResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentLikeRepository;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CommentLikeService {
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
-
-    public CommentLikeService(CommentRepository commentRepository, CommentLikeRepository commentLikeRepository) {
-        this.commentRepository = commentRepository;
-        this.commentLikeRepository = commentLikeRepository;
-    }
 
     public CommentLikeResponse get(Comment comment, Channel channel) {
         return CommentLikeResponse.builder()
@@ -29,7 +26,7 @@ public class CommentLikeService {
                 .build();
     }
 
-    public CommentLikeResponse LikeAdd(Long commentId, Channel channel) {
+    public CommentLikeResponse likeAdd(Long commentId, Channel channel) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new EntityNotFoundException("comment is not found."));
         CommentLike commentLike = CommentLike.builder()
@@ -42,7 +39,7 @@ public class CommentLikeService {
         return this.get(comment, channel);
     }
 
-    public CommentLikeResponse LikeDelete(Long commentId, Channel channel) {
+    public CommentLikeResponse likeDelete(Long commentId, Channel channel) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new EntityNotFoundException("comment is not found."));
         CommentLike commentLike = commentLikeRepository.findByCommentAndChannel(comment, channel);

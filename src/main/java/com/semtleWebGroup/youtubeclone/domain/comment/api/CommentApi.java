@@ -9,6 +9,7 @@ import com.semtleWebGroup.youtubeclone.domain.comment.service.CommentLikeService
 import com.semtleWebGroup.youtubeclone.domain.comment.service.CommentService;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,17 +19,12 @@ import java.util.UUID;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/comments")
 public class CommentApi {
     private final CommentService commentService;
     private final VideoService videoService; //임시사용
-
     private final CommentLikeService commentLikeService;
-    public CommentApi(CommentService commentService,  CommentLikeService commentLikeService, VideoService videoService) {
-        this.commentService = commentService;
-        this.commentLikeService = commentLikeService;
-        this.videoService = videoService;
-    }
 
     @PostMapping("/{videoId}")
     public ResponseEntity create(@RequestPart CommentRequest dto,  @RequestPart Channel channel,  @PathVariable UUID videoId){
@@ -56,14 +52,14 @@ public class CommentApi {
     }
     @PostMapping("/{commentId}/like")
     public ResponseEntity like(@PathVariable("commentId")Long commentId, @RequestPart Channel channel) {
-        CommentLikeResponse commentLikeResponse = commentLikeService.LikeAdd(commentId, channel);
+        CommentLikeResponse commentLikeResponse = commentLikeService.likeAdd(commentId, channel);
         
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }
 
     @DeleteMapping("/{commentId}/like")
     public ResponseEntity unlike(@PathVariable("commentId")Long commentId, @RequestPart Channel channel) {
-        CommentLikeResponse commentLikeResponse = commentLikeService.LikeDelete(commentId, channel);
+        CommentLikeResponse commentLikeResponse = commentLikeService.likeDelete(commentId, channel);
 
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }

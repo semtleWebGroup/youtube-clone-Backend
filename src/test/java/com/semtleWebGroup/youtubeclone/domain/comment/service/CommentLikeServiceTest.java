@@ -76,8 +76,8 @@ class CommentLikeServiceTest extends MockTest {
             when(commentLikeRepository.save(commentLike1)).thenReturn(commentLike1);
             when(commentLikeRepository.save(commentLike2)).thenReturn(commentLike2);
             // when
-            commentLikeService.LikeAdd(commentId, channel1);
-            CommentLikeResponse commentLikeResponse = commentLikeService.LikeAdd(commentId, channel2);
+            commentLikeService.likeAdd(commentId, channel1);
+            CommentLikeResponse commentLikeResponse = commentLikeService.likeAdd(commentId, channel2);
             CommentLikeResponse commentLikeResponse2 = commentLikeService.get(comment, channel3);
             // then
             assertEquals(2, commentLikeResponse.getLikeCount());
@@ -116,7 +116,7 @@ class CommentLikeServiceTest extends MockTest {
             when(commentLikeRepository.findByCommentAndChannel(comment, channel)).thenReturn(commentLike1);
 
             // when
-            CommentLikeResponse commentLikeResponse = commentLikeService.LikeDelete(commentId, channel);
+            CommentLikeResponse commentLikeResponse = commentLikeService.likeDelete(commentId, channel);
 
             // then
             assertEquals(0, commentLikeResponse.getLikeCount());

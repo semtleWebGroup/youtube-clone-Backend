@@ -6,6 +6,7 @@ import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentViewResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +18,9 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
-    public CommentService(CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
-    }
-
     public Comment write(CommentRequest dto, Channel channel, Video video){
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
