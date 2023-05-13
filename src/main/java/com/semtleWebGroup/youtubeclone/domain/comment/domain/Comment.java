@@ -41,8 +41,10 @@ public class Comment {
     private LocalDateTime updatedTime;
 
     @Builder
-    public Comment(String contents) {
+    public Comment(String contents, Video video, Channel channel) {
         this.contents = contents;
+        this.video = video;
+        this.channel = channel;
     }
 
     @ManyToOne

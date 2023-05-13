@@ -22,10 +22,8 @@ import static org.mockito.Mockito.when;
 class CommentLikeServiceTest extends MockTest {
     private static CommentLikeRepository commentLikeRepository;
     private static CommentLikeService commentLikeService;
-
     private static CommentRepository commentRepository;
     private static CommentService commentService;
-
     private static ChannelRepository channelRepository;
 
     @BeforeAll
