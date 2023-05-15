@@ -17,9 +17,8 @@ import java.util.UUID;
 public class VideoListResponse {
 
     private UUID id;
-    private String title;
 
-    private byte[] thumbImg;
+    private String title;
 
     private byte[] channelImg;
 
@@ -35,7 +34,6 @@ public class VideoListResponse {
     public VideoListResponse(Video video) {
         this.id = video.getId();
         this.title = video.getTitle();
-        this.thumbImg = convertBlobToBytes(video.getThumbImg());
         this.channelImg = convertBlobToBytes(video.getChannel().getChannelImage());
         this.channelName = video.getChannel().getTitle();
         this.viewCount = video.getViewCount();
