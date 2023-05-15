@@ -22,7 +22,7 @@ import java.util.Set;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id", nullable = false)
+    @Column(name = "comment_id" , nullable = false)
     private Long id;
 
     @Size(max = 45)
@@ -40,18 +40,11 @@ public class Comment {
     @Column(name = "updated_time")
     private LocalDateTime updatedTime;
 
-    @Builder
-    public Comment(String contents, Video video, Channel channel) {
-        this.contents = contents;
-        this.video = video;
-        this.channel = channel;
-    }
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "video_id")
     private Video video;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
@@ -71,9 +64,17 @@ public class Comment {
         return false;
     }
 
-//    @OneToMany(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "comment_id")
-//    private Integer root_comment_id;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "rootComment_id")
+    private Comment rootComment;
+
+    @Builder
+    public Comment(String contents, Video video, Channel channel, Comment rootComment) {
+        this.contents = contents;
+        this.video = video;
+        this.channel = channel;
+        this.rootComment = rootComment;
+    }
 }
 
 
