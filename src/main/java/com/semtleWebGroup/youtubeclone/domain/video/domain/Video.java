@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,6 +18,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class Video {
+    public enum VideoStatus{PUBLIC, PRIVATE, DRAFT};
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
@@ -26,12 +26,10 @@ public class Video {
     private UUID id;
 
     @Column(length=45)
-    private String title;
+    private String title = "";
 
     @Column(length=45)
-    private String description;
-
-    private Blob thumbImg;
+    private String description = "";
 
     @CreatedDate
     private LocalDateTime createdTime;
@@ -39,11 +37,12 @@ public class Video {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    private int viewCount;
+    private int viewCount = 0;
 
-    private Long videoSec;
+    private Long videoSec = 0L;
 
-    private MediaServerSpokesman.EncodingStatus status;
+    @Enumerated(EnumType.STRING)
+    private VideoStatus status = VideoStatus.DRAFT;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
@@ -54,15 +53,9 @@ public class Video {
 
     @Builder
     public Video(Channel channel) {
-        this.viewCount = 0;
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
         this.channel = channel;
-    }
-
-    public void update(String title, String description, Blob thumbImg) {
-        this.update(title, description);
-        this.thumbImg = thumbImg;
     }
 
     public void update(String title, String description) {
