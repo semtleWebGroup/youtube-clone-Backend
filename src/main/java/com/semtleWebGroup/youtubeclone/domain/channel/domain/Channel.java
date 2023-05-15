@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.channel.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.*;
 
 import javax.persistence.*;
@@ -43,6 +44,8 @@ public class Channel {
     @Lob
     private Blob channelImage;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Video> videos = new HashSet<>();
 
     @Builder
     public Channel(String title, String description){
@@ -67,5 +70,17 @@ public class Channel {
 
     public void setSubscribers(Set<Channel> subscribers) {
         this.subscribers = subscribers;
+    }
+
+    // Helper method to add a video to the channel
+    public void addVideo(Video video) {
+        videos.add(video);
+//        video.setChannel(this); TODO video에서 channel을 추가하는 메소드
+    }
+
+    // Helper method to remove a video from the channel
+    public void removeVideo(Video video) {
+        videos.remove(video);
+//        video.setChannel(null); TODO video에서 channel을 삭제하는 메소드
     }
 }
