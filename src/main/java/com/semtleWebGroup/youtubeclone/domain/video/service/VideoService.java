@@ -23,7 +23,7 @@ public class VideoService {
     private final MediaServerSpokesman mediaServerSpokesman;
 
     private void checkAuthority(Video video, Channel channel) {
-        if (video.getChannel().getId() != channel.getId())
+        if (channel == null || video.getChannel().getId() != channel.getId())
             throw new ForbiddenException(ErrorCode.ACCESS_DENIED);
     }
 
@@ -50,6 +50,12 @@ public class VideoService {
     @Transactional
     public VideoViewResponse view(UUID videoId, Channel channel) {
         Video video = this.getVideo(videoId);
+
+        // 비디오가 PUBLIC이 아니면서 권한도 없으면 에러
+        if (video.getStatus() != Video.VideoStatus.PUBLIC) {
+            checkAuthority(video, channel);
+        }
+
         video.incrementViewCount();
         videoRepository.save(video);
 
@@ -83,6 +89,7 @@ public class VideoService {
 
     public VideoPageResponse findAll(Pageable pageable) {
         Page<Video> videos = videoRepository.findAllByOrderByCreatedTimeDesc(pageable);
+//        Page<Video> videos = videoRepository.findByStatusOrderByCreatedTimeDesc(pageable, Video.VideoStatus.PUBLIC); // TODO: Enum으로 찾는 방법 ..
         return new VideoPageResponse(videos);
     }
 }

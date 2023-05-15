@@ -42,7 +42,7 @@ public class Video {
     private Long videoSec = 0L;
 
     @Enumerated(EnumType.STRING)
-    private VideoStatus status = VideoStatus.DRAFT;
+    private VideoStatus status = VideoStatus.PUBLIC; // 추후 디폴트 값은 DRAFT로 변경하고, PUBLIC/PRIVATE로 전환하는 기능 추가 필요.
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
