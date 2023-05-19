@@ -2,17 +2,21 @@ package com.semtleWebGroup.youtubeclone.domain.video.service;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoEditDto;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoResponse;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUploadDto;
+import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoViewResponse;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Blob;
 
 import java.util.UUID;
 
@@ -32,7 +36,9 @@ public class VideoService {
 
     public VideoResponse upload(VideoUploadDto dto) throws MediaServerException {
         // TODO: 채널 받게끔 수정
-        Channel channel = new Channel("title", "description");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = (Member) authentication.getPrincipal();
+        Channel channel = new Channel("title", "description",member);
         channelRepository.save(channel);
 
         Video video = Video.builder()

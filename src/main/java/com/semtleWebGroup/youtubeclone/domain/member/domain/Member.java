@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.*;
 
 @Getter
@@ -21,7 +22,7 @@ import java.util.*;
 @Table(name = "member")
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Member implements UserDetails {
+public class Member implements UserDetails, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", nullable = false)
@@ -47,8 +48,26 @@ public class Member implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;//얘는 필요한가?
     
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    
     @Transient
     private List<MemberGrantedAuthority> authorities;
+    
+    
+    private Long currentChannelId;
+    
+    @PrePersist
+    public void setCreatedAt() {
+        try {
+            this.createdAt = new Date();
+            Channel channel = channels.stream().findFirst().orElse(null);
+            this.currentChannelId= Objects.requireNonNull(channel).getId();
+        }
+        catch (NullPointerException e){
+            this.createdAt = new Date();
+        }
+    }
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -80,16 +99,5 @@ public class Member implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-    
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "email = " + email + ", " +
-                "name = " + name + ", " +
-                "password = " + password + ", " +
-                "role = " + role + ", " +
-                "authorities = " + authorities + ")";
     }
 }
