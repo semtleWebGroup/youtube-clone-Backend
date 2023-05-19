@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.sql.Blob;
+import java.time.LocalTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static java.time.LocalTime.now;
 
 @Entity
 @Table(name = "channel")
@@ -48,14 +53,14 @@ public class Channel {
     private Blob channelImage;
     
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalTime createdAt;
     
     @Transient
     private Collection<GrantedAuthority> authorities;
     
     @PrePersist
     public void setCreatedAt() {
-        this.createdAt = new Date();
+        this.createdAt = now();
     }
 
     @Builder
