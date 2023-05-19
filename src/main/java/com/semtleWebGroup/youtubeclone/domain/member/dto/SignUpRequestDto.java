@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.member.dto;
 import com.semtleWebGroup.youtubeclone.domain.member.domain.Role;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.io.Serializable;
  */
 @Data
 public class SignUpRequestDto implements Serializable {
+    @Email
     @Size(max = 45)
     @NotNull
     private final String email;

@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -28,6 +29,7 @@ public class Member implements UserDetails, Serializable {
     @Column(name = "member_id", nullable = false)
     private Integer id;
     
+    @Email
     @Size(max = 45)
     @NotNull
     @Column(name = "email", nullable = false, length = 45)

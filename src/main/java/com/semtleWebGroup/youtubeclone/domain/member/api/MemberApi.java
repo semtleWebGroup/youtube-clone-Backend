@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.IOException;
 
 
@@ -29,7 +30,7 @@ public class MemberApi {
     
     
     @PostMapping("")
-    public ResponseEntity<?> signIn(@RequestBody SignInRequestDto signInRequestDto) throws IOException {
+    public ResponseEntity<?> signIn(@Valid @RequestBody SignInRequestDto signInRequestDto) throws IOException {
         log.debug("로그인");
         SignInResponseDto dto = memberSignService.signIn(signInRequestDto);
         if (dto.getSuccess())
@@ -51,7 +52,7 @@ public class MemberApi {
     
     @Transactional
     @PostMapping("/session")
-    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDto memberDto) {
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequestDto memberDto) {
         try {
             log.info("Register: {}", memberDto.toString());
             Member member = Member.builder()
