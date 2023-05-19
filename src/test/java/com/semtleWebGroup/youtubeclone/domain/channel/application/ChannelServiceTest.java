@@ -4,6 +4,7 @@ import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import com.semtleWebGroup.youtubeclone.domain.member.repository.MemberRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import com.semtleWebGroup.youtubeclone.global.security.jwt.JwtTokenProvider;
@@ -14,6 +15,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,17 +38,21 @@ class ChannelServiceTest extends MockTest {
     private static MemberRepository memberRepository;
     
     private static JwtTokenProvider jwtTokenProvider;
-
+    
     @BeforeAll
     public static void setMockChannelRepository() {
         channelRepository = Mockito.mock(ChannelRepository.class);
-        channelService = new ChannelService(memberRepository,channelRepository,jwtTokenProvider);
+        memberRepository = Mockito.mock(MemberRepository.class);
+        jwtTokenProvider = Mockito.mock(JwtTokenProvider.class); // Add this line to mock the JwtTokenProvider
+        channelService = new ChannelService(memberRepository, channelRepository, jwtTokenProvider);
     }
+
 
     @Nested
     @DisplayName("createChannel 메서드")
     class createChannel{
         @Test
+        @WithMockUser
         @DisplayName("addChannel 테스트 - 이미지 파일이 있을 경우")
         void testAddChannelWithImage() throws IOException, SQLException {
             // given
@@ -54,6 +62,11 @@ class ChannelServiceTest extends MockTest {
             request.getChannelProfile().setTitle("Test Channel");
             request.getChannelProfile().setDescription("Test Channel Description");
             request.setProfile_img(image);
+            Authentication authentication = mock(Authentication.class);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            
+            Member principal = new Member();
+            when(authentication.getPrincipal()).thenReturn(principal);
 
             Channel createdChannel = Channel.builder()
                     .title(request.getChannelProfile().getTitle())
@@ -80,6 +93,11 @@ class ChannelServiceTest extends MockTest {
             request.setChannelProfile(new ChannelProfile());
             request.getChannelProfile().setTitle("Test Channel");
             request.getChannelProfile().setDescription("Test Channel Description");
+            Authentication authentication = mock(Authentication.class);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            
+            Member principal = new Member();
+            when(authentication.getPrincipal()).thenReturn(principal);
 
             Channel createdChannel = Channel.builder()
                     .title(request.getChannelProfile().getTitle())
