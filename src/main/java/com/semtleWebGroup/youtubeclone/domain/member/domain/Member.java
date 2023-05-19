@@ -54,14 +54,15 @@ public class Member implements UserDetails, Serializable {
     @Transient
     private List<MemberGrantedAuthority> authorities;
     
-    
     private Long currentChannelId;
     
     @PrePersist
-    public void setCreatedAt() {
+    public void setTimeAndDefaultChannel() {
         try {
             this.createdAt = new Date();
-            Channel channel = channels.stream().findFirst().orElse(null);
+            Channel channel = channels.stream()
+                    .max(Comparator.comparing(Channel::getCreatedAt))
+                    .orElse(null);
             this.currentChannelId= Objects.requireNonNull(channel).getId();
         }
         catch (NullPointerException e){
