@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.global.security.jwt;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.member.domain.BlacklistedToken;
 import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import com.semtleWebGroup.youtubeclone.domain.member.repository.BlacklistedTokenRepository;
 import com.semtleWebGroup.youtubeclone.domain.member.repository.MemberRepository;
@@ -10,7 +9,6 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -108,9 +106,9 @@ public class JwtTokenProvider {
         }
     }
     
-    public void blacklistToken(String token) throws OptimisticLockingFailureException {
-        BlacklistedToken blacklistedToken = BlacklistedToken.of(token);
-        blacklistedTokenRepository.save(blacklistedToken);
-    }
+//    public void blacklistToken(String token) throws OptimisticLockingFailureException {
+//        BlacklistedToken blacklistedToken = BlacklistedToken.of(token);
+//        blacklistedTokenRepository.save(blacklistedToken);
+//    }
     
 }

@@ -73,7 +73,7 @@ public class MemberSignService{
     
     public void signOut(HttpServletRequest request) {
         try{
-            jwtTokenProvider.blacklistToken(jwtTokenProvider.parseBearerToken(request));
+//            jwtTokenProvider.blacklistToken(jwtTokenProvider.parseBearerToken(request));
             SecurityContextHolder.clearContext();
         }
         catch(OptimisticLockingFailureException e){
