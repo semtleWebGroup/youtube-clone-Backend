@@ -54,6 +54,7 @@ public class MemberSignService{
         SignInResponseDto signInResultDto= SignInResponseDto.builder().build();
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
+            member.setTimeAndDefaultChannel();
             if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
                 setFailResult(signInResultDto);
                 return signInResultDto;
