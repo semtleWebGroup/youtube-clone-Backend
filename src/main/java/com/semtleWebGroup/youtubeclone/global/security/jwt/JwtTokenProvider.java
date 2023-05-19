@@ -48,6 +48,7 @@ public class JwtTokenProvider {
         
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("memberId", member.getId());
+        payloads.put("CurrentChannelId", member.getCurrentChannelId());
         Set<Channel> channels = member.getChannels();
         for (Channel channel: channels) {
             payloads.put(channel.getTitle()+" channelId", channel.getId());
