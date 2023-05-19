@@ -4,7 +4,9 @@ import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.domain.member.repository.MemberRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import com.semtleWebGroup.youtubeclone.global.security.jwt.JwtTokenProvider;
 import com.semtleWebGroup.youtubeclone.test_super.MockTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -29,11 +31,14 @@ class ChannelServiceTest extends MockTest {
     // mock up
     private static ChannelService channelService;
     private static ChannelRepository channelRepository;
+    private static MemberRepository memberRepository;
+    
+    private static JwtTokenProvider jwtTokenProvider;
 
     @BeforeAll
     public static void setMockChannelRepository() {
         channelRepository = Mockito.mock(ChannelRepository.class);
-        channelService = new ChannelService(channelRepository);
+        channelService = new ChannelService(memberRepository,channelRepository,jwtTokenProvider);
     }
 
     @Nested
@@ -59,7 +64,7 @@ class ChannelServiceTest extends MockTest {
             when(channelRepository.save(any(Channel.class))).thenReturn(createdChannel);
 
             // when
-            Channel channel = channelService.addChannel(request);
+            Channel channel = channelService.addChannel(request).getChannel();
 
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
@@ -84,7 +89,7 @@ class ChannelServiceTest extends MockTest {
             when(channelRepository.save(any(Channel.class))).thenReturn(createdChannel);
 
             // when
-            Channel channel = channelService.addChannel(request);
+            Channel channel = channelService.addChannel(request).getChannel();
 
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
