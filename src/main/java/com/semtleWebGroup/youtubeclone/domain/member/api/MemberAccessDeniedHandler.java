@@ -19,8 +19,8 @@ import java.io.IOException;
 public class MemberAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        //TODO: access denied 됐을때 리다이렉트 경로 수정
+
         log.debug("리다이랙트");
-        response.sendRedirect("/");
+        response.sendRedirect("/home");
     }
 }
