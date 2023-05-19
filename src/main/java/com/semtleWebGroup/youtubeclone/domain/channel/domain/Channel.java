@@ -8,12 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.sql.Blob;
-import java.time.LocalTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import static java.time.LocalTime.now;
+import java.util.*;
 
 @Entity
 @Table(name = "channel")
@@ -53,14 +48,14 @@ public class Channel {
     private Blob channelImage;
     
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalTime createdAt;
+    private Date createdAt;
     
     @Transient
     private Collection<GrantedAuthority> authorities;
     
     @PrePersist
     public void setCreatedAt() {
-        this.createdAt = now();
+        this.createdAt = new Date();
     }
 
     @Builder
