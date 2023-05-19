@@ -12,7 +12,7 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
   security:
     user:
@@ -20,12 +20,13 @@ spring:
       password: 1234
 logging:
   level:
-    root: info
+    root: debug
     org:
       springframework:
         web: debug
         context: debug
-
+security:
+  secretkey: secretKey
 
 google:
   redirect:

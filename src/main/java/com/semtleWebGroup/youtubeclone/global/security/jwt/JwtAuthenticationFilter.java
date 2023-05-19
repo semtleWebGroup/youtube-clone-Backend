@@ -1,13 +1,12 @@
 package com.semtleWebGroup.youtubeclone.global.security.jwt;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -15,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -23,48 +23,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider jwtTokenProvider;
     
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String[] excludePath = {"/members", "/members/session", "/home"};
+        String path = request.getRequestURI();
+        return Arrays.stream(excludePath).anyMatch(path::startsWith);
+    }
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         try {
-            String token = parseBearerToken(request);
-            expectValid(token);
+            String token = jwtTokenProvider.parseBearerToken(request);
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                expectValid(token);
+            }
         } catch (TokenExpiredException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token has expired");
         } catch (JwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid token");
-        }
-        catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.error("Could not set user authentication in security context", e);
-        }finally {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("Internal server error");
+        } finally {
             filterChain.doFilter(request, response);
         }
     }
     
-    private void expectValid(String token) throws Exception {
-        if (token == null || token.equalsIgnoreCase("null")) {
-            //TODO:예외 구체화
-            throw new Exception("Token is null.");
+    
+    private void expectValid(String token) {
+        if (!jwtTokenProvider.validateToken(token) || token == null || token.isEmpty()) {
+            throw new JWTVerificationException("Token is invalid.");
         }
-        if(!jwtTokenProvider.validateToken(token)){
-            throw new Exception("Token is invalid.");
-        }
-        Authentication authentication;
-        if (jwtTokenProvider.isChannelToken(token)) {
-            authentication = jwtTokenProvider.getChannelAuthentication(token);
-        } else {
-            authentication = jwtTokenProvider.getMemberAuthentication(token);
-        }
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(jwtTokenProvider.getMemberAuthenticationByToken(token));
     }
     
-    
-    
-    private String parseBearerToken (HttpServletRequest request){
-            String bearerToken = request.getHeader("Authorization");
-            if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
-                return bearerToken.substring(7);
-            }
-            return null;
-        }
-    }
+}
