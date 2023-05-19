@@ -61,7 +61,7 @@ public class Member implements UserDetails, Serializable {
         try {
             this.createdAt = new Date();
             Channel channel = channels.stream()
-                    .max(Comparator.comparing(Channel::getCreatedAt))
+                    .min(Comparator.comparing(Channel::getCreatedAt))
                     .orElse(null);
             this.currentChannelId= Objects.requireNonNull(channel).getId();
         }
