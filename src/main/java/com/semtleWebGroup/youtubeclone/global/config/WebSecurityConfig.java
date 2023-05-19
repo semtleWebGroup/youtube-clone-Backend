@@ -15,12 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * package :  com.semtleWebGroup.youtubeclone.global.security.config
- * fileName : WebSecurityConfig
- * author :  ShinYeaChan
- * date : 2023-04-07
- */
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -39,6 +33,7 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .cors()
+                
                 .and()
                 .csrf()
                     .disable()
@@ -55,8 +50,14 @@ public class WebSecurityConfig {
                 .and()
                 .authorizeRequests()
                 
-                .antMatchers("/members", "/members/session").permitAll()
+                .antMatchers("/members", "/members/session","/home").permitAll()
                 .anyRequest().authenticated()
+        
+                .and()
+                .logout()
+                .logoutSuccessUrl("/home").permitAll()
+                .deleteCookies("JSESSIONID")
+                .invalidateHttpSession(true)
                 
                 .and()
                 .exceptionHandling()
