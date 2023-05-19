@@ -46,20 +46,24 @@ public class Channel {
 
     @Lob
     private Blob channelImage;
-
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    
+    @Transient
+    private Collection<GrantedAuthority> authorities;
+    
+    @PrePersist
+    public void setCreatedAt() {
+        this.createdAt = new Date();
+    }
 
     @Builder
-    public Channel(String title, String description){
+    public Channel(String title, String description,Member member){
         this.title = title;
         this.description = description;
+        this.member=member;
     }
-    
-//    @Builder
-//    public Channel(String title, String description,Member member){
-//        this.title = title;
-//        this.description = description;
-//        this.member=member;
-//    }
     public void setChannelImage(Blob imageFile) {
         this.channelImage = imageFile;
     }
