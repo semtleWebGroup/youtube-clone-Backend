@@ -37,10 +37,6 @@ public class ChannelService {
 //    private final JwtTokenProvider jwtTokenProvider;
     @Transactional
     public ChannelResponse addChannel(ChannelRequest dto){
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        Member principal = (Member) authentication.getPrincipal();
-//        log.info("authentication 내의 memberId: {}",principal.getId());
-        
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Member member = (Member) authentication.getPrincipal();
             log.info("authentication 내의 memberId: {}", member.getId());
