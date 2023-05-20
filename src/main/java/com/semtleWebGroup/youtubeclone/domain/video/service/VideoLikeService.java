@@ -16,15 +16,15 @@ import java.util.UUID;
 public class VideoLikeService {
     private final VideoLikeRepository videoLikeRepository;
     private final VideoService videoService;
-
+    
     public VideoLikeResponse get(Video video, Channel channel) {
         return VideoLikeResponse.builder()
-                .videoId(video.getId())
+                .videoId(video.getVideoId())
                 .likeCount(video.getLikeCount())
                 .isLike(video.isLike(channel))
                 .build();
     }
-
+    
     @Transactional
     public VideoLikeResponse add(UUID videoId, Channel channel) {
         Video video = videoService.getVideo(videoId);
@@ -37,7 +37,7 @@ public class VideoLikeService {
         videoService.save(video);
         return this.get(video, channel);
     }
-
+    
     @Transactional
     public VideoLikeResponse delete(UUID videoId, Channel channel) {
         Video video = videoService.getVideo(videoId);

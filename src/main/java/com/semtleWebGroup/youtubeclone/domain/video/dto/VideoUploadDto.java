@@ -12,9 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class VideoUploadDto {
     private MultipartFile videoFile;
     private MultipartFile thumbImg;
-
+    
     private Channel channel;
-
+    
     @Builder
     public VideoUploadDto(Channel channel, MultipartFile videoFile, MultipartFile thumbImg) {
         this.channel = channel;

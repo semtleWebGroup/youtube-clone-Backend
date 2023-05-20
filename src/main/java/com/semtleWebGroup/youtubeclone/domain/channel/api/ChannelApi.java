@@ -6,8 +6,8 @@ import com.semtleWebGroup.youtubeclone.domain.channel.application.SubscribeServi
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
+import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/channels")
 @RequiredArgsConstructor
-@Slf4j
 public class ChannelApi {
     private final ChannelService channelService;
     private final SubscribeService subscribeService;
@@ -28,11 +27,17 @@ public class ChannelApi {
      * @return 현재는 entity 자체를 반환. 프론트 사용 데이터 보고 overfetching 줄일 예정
      */
     @PostMapping("")
-    public ResponseEntity create(@ModelAttribute ChannelRequest dto){
-        Channel channel = channelService.addChannel(dto);
-        ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    public ResponseEntity create(@ModelAttribute ChannelRequest dto) {
+        try {
+            ChannelResponse channelResponse = channelService.addChannel(dto);
+            Channel channel = channelResponse.getChannel();
+            ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
+            
+            return ResponseEntity.status(HttpStatus.CREATED).header("Authentication", channelResponse.getRefreshedToken()).body(res);
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**

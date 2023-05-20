@@ -15,9 +15,9 @@ public class VideoPageResponse {
     private int totalPages;
     private int number; // page number
     private int numberOfElements;
-
+    
     private List<VideoListResponse> videos = new ArrayList<>();
-
+    
     public VideoPageResponse(Page<Video> videoPage) {
         this.totalPages = videoPage.getTotalPages();
         this.number = videoPage.getNumber();

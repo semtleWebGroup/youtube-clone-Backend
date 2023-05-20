@@ -13,7 +13,7 @@ public class VideoLikeResponse {
     private UUID videoId;
     private boolean isLike;
     private int likeCount;
-
+    
     @Builder
     public VideoLikeResponse(UUID videoId, boolean isLike, int likeCount) {
         this.videoId = videoId;

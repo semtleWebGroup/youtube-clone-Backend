@@ -1,14 +1,14 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.semtleWebGroup.youtubeclone.domain.member.domain.Member;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.sql.Blob;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "channel")
@@ -26,6 +26,10 @@ public class Channel {
     private String title;
     @Column(length = 70)
     private String description;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToMany
     // 자기 참조로 M:N관계
@@ -42,14 +46,24 @@ public class Channel {
 
     @Lob
     private Blob channelImage;
-
-
-    @Builder
-    public Channel(String title, String description){
-        this.title = title;
-        this.description = description;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    
+    @Transient
+    private Collection<GrantedAuthority> authorities;
+    
+    @PrePersist
+    public void setCreatedAt() {
+        this.createdAt = new Date();
     }
 
+    @Builder
+    public Channel(String title, String description,Member member){
+        this.title = title;
+        this.description = description;
+        this.member=member;
+    }
     public void setChannelImage(Blob imageFile) {
         this.channelImage = imageFile;
     }
