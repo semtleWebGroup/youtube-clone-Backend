@@ -24,7 +24,7 @@ public class Video {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
     @Column(name = "video_id",columnDefinition = "BINARY(16)", nullable = false)
-    private UUID id;
+    private UUID videoId;
     
     @Column(length=45)
     private String title = "";
