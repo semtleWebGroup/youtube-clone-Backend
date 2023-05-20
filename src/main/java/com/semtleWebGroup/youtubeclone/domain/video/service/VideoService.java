@@ -21,22 +21,22 @@ import java.util.UUID;
 public class VideoService {
     private final VideoRepository videoRepository;
     private final MediaServerSpokesman mediaServerSpokesman;
-
+    
     private void checkAuthority(Video video, Channel channel) {
         if (channel == null || video.getChannel().getId() != channel.getId())
             throw new ForbiddenException(ErrorCode.ACCESS_DENIED);
     }
-
+    
     public Video getVideo(UUID videoId) {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(()-> new EntityNotFoundException("Video is not found."));
         return video;
     }
-
+    
     public void save(Video video) {
         videoRepository.save(video);
     }
-
+    
     @Transactional
     public VideoResponse upload(VideoUploadDto dto) {
         Video video = Video.builder()
@@ -46,27 +46,27 @@ public class VideoService {
         mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
         return new VideoResponse(video);
     }
-
+    
     @Transactional
     public VideoViewResponse view(UUID videoId, Channel channel) {
         Video video = this.getVideo(videoId);
-
+        
         // 비디오가 PUBLIC이 아니면서 권한도 없으면 에러
         if (video.getStatus() != Video.VideoStatus.PUBLIC) {
             checkAuthority(video, channel);
         }
-
+        
         video.incrementViewCount();
         videoRepository.save(video);
-
+        
         VideoViewResponse videoViewResponse = VideoViewResponse.builder()
-            .video(video)
-            .isLike(video.isLike(channel))
+                .video(video)
+                .isLike(video.isLike(channel))
 //                .qualityList(mediaServerSpokesman.getQualityList(video.getVideoId())) // TODO
-            .build();
+                .build();
         return videoViewResponse;
     }
-
+    
     @Transactional
     public VideoResponse edit(VideoEditDto dto) {
         Video video = this.getVideo(dto.getVideoId());
@@ -75,18 +75,18 @@ public class VideoService {
         videoRepository.save(video);
         return new VideoResponse(video);
     }
-
+    
     @Transactional
     public VideoResponse delete(UUID videoId, Channel channel) {
         Video video = this.getVideo(videoId);
         checkAuthority(video, channel);
-
+        
         mediaServerSpokesman.deleteVideo(videoId);
-
+        
         videoRepository.delete(video);
         return new VideoResponse(video);
     }
-
+    
     public VideoPageResponse findAll(Pageable pageable) {
         Page<Video> videos = videoRepository.findAllByOrderByCreatedTimeDesc(pageable);
 //        Page<Video> videos = videoRepository.findByStatusOrderByCreatedTimeDesc(pageable, Video.VideoStatus.PUBLIC); // TODO: Enum으로 찾는 방법 ..

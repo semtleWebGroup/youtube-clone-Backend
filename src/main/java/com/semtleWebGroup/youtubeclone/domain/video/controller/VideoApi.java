@@ -22,29 +22,29 @@ import java.util.UUID;
 public class VideoApi {
     private final VideoService videoService;
     private final VideoLikeService videoLikeService;
-
+    
     private void checkImgFileExtension(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".")+1);
         String[] validExtensions = {"jpg", "png"};
-
+        
         for (String validExtension: validExtensions) {
             if (extension.equals(validExtension)) return;
         }
         throw new BadRequestException(FieldError.of("thumbImg", fileName, "Only jpg and png are available."));
     }
-
+    
     private void checkVideoFileExtension(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".")+1);
         String[] validExtensions = {"mp4", "avi"};
-
+        
         for (String validExtension: validExtensions) {
             if (extension.equalsIgnoreCase(validExtension)) return;
         }
         throw new BadRequestException(FieldError.of("videoFile", fileName, "Only mp4 and avi are available."));
     }
-
+    
     @PostMapping("")
     public ResponseEntity upload(
             @RequestPart MultipartFile videoFile,
@@ -53,7 +53,7 @@ public class VideoApi {
     ) {
         if (!thumbImg.isEmpty()) this.checkImgFileExtension(thumbImg);
         this.checkVideoFileExtension(videoFile);
-
+        
         VideoUploadDto dto = VideoUploadDto.builder()
                 .channel(channel)
                 .videoFile(videoFile)
@@ -61,62 +61,62 @@ public class VideoApi {
                 .build();
         VideoResponse videoResponse = videoService.upload(dto);
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(videoResponse);
+                .status(HttpStatus.CREATED)
+                .body(videoResponse);
     }
-
+    
     @PostMapping("/{videoId}")
     public ResponseEntity create(
-        @PathVariable UUID videoId,
-        @RequestPart @Valid VideoRequest data,
-        @RequestPart Channel channel
+            @PathVariable UUID videoId,
+            @RequestPart @Valid VideoRequest data,
+            @RequestPart Channel channel
     ) {
         VideoEditDto dto = VideoEditDto.builder()
-            .channel(channel)
-            .videoId(videoId)
-            .title(data.getTitle())
-            .description(data.getDescription())
-            .build();
+                .channel(channel)
+                .videoId(videoId)
+                .title(data.getTitle())
+                .description(data.getDescription())
+                .build();
         VideoResponse videoResponse = videoService.edit(dto);
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(videoResponse);
+                .status(HttpStatus.CREATED)
+                .body(videoResponse);
     }
-
+    
     @GetMapping("/{videoId}")
     public ResponseEntity view(@PathVariable UUID videoId, @RequestPart Channel channel) {
         VideoViewResponse videoViewResponse = videoService.view(videoId, channel);
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(videoViewResponse);
+                .status(HttpStatus.OK)
+                .body(videoViewResponse);
     }
-
+    
     @PatchMapping("/{videoId}")
     public ResponseEntity update(
-        @PathVariable UUID videoId,
-        @RequestPart @Valid VideoRequest data,
-        @RequestPart Channel channel
+            @PathVariable UUID videoId,
+            @RequestPart @Valid VideoRequest data,
+            @RequestPart Channel channel
     ) {
         VideoEditDto dto = VideoEditDto.builder()
-            .channel(channel)
-            .videoId(videoId)
-            .title(data.getTitle())
-            .description(data.getDescription())
-            .build();
+                .channel(channel)
+                .videoId(videoId)
+                .title(data.getTitle())
+                .description(data.getDescription())
+                .build();
         VideoResponse videoResponse = videoService.edit(dto);
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(videoResponse);
+                .status(HttpStatus.OK)
+                .body(videoResponse);
     }
-
+    
     @DeleteMapping("/{videoId}")
     public ResponseEntity delete(@PathVariable UUID videoId, @RequestPart Channel channel) {
         VideoResponse videoResponse = videoService.delete(videoId, channel);
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(videoResponse);
+                .status(HttpStatus.OK)
+                .body(videoResponse);
     }
-
+    
     @PostMapping("/{videoId}/like")
     public ResponseEntity like(@PathVariable UUID videoId, @RequestPart Channel channel) {
         VideoLikeResponse videoLikeResponse = videoLikeService.add(videoId, channel);
@@ -124,7 +124,7 @@ public class VideoApi {
                 .status(HttpStatus.OK)
                 .body(videoLikeResponse);
     }
-
+    
     @DeleteMapping("/{videoId}/like")
     public ResponseEntity dislike(@PathVariable UUID videoId, @RequestPart Channel channel) {
         VideoLikeResponse videoLikeResponse = videoLikeService.delete(videoId, channel);
@@ -132,5 +132,5 @@ public class VideoApi {
                 .status(HttpStatus.OK)
                 .body(videoLikeResponse);
     }
-
+    
 }

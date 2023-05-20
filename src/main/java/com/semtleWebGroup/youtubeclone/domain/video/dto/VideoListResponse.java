@@ -15,21 +15,21 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class VideoListResponse {
-
+    
     private UUID id;
-
+    
     private String title;
-
+    
     private byte[] channelImg;
-
+    
     private String channelName;
-
+    
     private int viewCount;
-
+    
     private Long videoSec;
-
+    
     private LocalDateTime createdTime;
-
+    
     @Builder
     public VideoListResponse(Video video) {
         this.id = video.getId();
@@ -40,7 +40,7 @@ public class VideoListResponse {
         this.videoSec = video.getVideoSec();
         this.createdTime = video.getCreatedTime();
     }
-
+    
     private byte[] convertBlobToBytes (Blob blob) {
         try {
             if (blob != null) blob.getBytes(1, (int) blob.length());

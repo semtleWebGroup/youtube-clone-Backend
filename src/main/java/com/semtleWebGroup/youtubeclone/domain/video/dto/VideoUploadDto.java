@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.dto;
 
+import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class VideoUploadDto {
     private MultipartFile videoFile;
     private MultipartFile thumbImg;
-
+    
+    private Channel channel;
+    
     @Builder
-    public VideoUploadDto(MultipartFile videoFile, MultipartFile thumbImg) {
+    public VideoUploadDto(Channel channel, MultipartFile videoFile, MultipartFile thumbImg) {
+        this.channel = channel;
         this.videoFile = videoFile;
         this.thumbImg = thumbImg;
     }
