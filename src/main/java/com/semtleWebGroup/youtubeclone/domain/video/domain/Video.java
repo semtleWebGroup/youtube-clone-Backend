@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,6 +16,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class Video {
+    public enum VideoStatus{PUBLIC, PRIVATE, DRAFT};
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
@@ -24,12 +24,10 @@ public class Video {
     private UUID videoId;
 
     @Column(length=45)
-    private String title;
+    private String title = "";
 
     @Column(length=45)
-    private String description;
-
-    private Blob thumbImg;
+    private String description = "";
 
     @CreatedDate
     private LocalDateTime createdTime;
@@ -37,11 +35,12 @@ public class Video {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    private int viewCount;
+    private int viewCount = 0;
 
-    private Long videoSec;
+    private Long videoSec = 0L;
 
-    private MediaServerSpokesman.EncodingStatus status;
+    @Enumerated(EnumType.STRING)
+    private VideoStatus status = VideoStatus.PUBLIC; // 추후 디폴트 값은 DRAFT로 변경하고, PUBLIC/PRIVATE로 전환하는 기능 추가 필요.
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
@@ -49,15 +48,9 @@ public class Video {
 
     @Builder
     public Video(Channel channel) {
-        this.viewCount = 0;
         this.createdTime = LocalDateTime.now();
         this.updatedTime = LocalDateTime.now();
         this.channel = channel;
-    }
-
-    public void update(String title, String description, Blob thumbImg) {
-        this.update(title, description);
-        this.thumbImg = thumbImg;
     }
 
     public void update(String title, String description) {
