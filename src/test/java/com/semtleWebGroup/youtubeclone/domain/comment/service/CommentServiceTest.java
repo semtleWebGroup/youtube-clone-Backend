@@ -48,6 +48,28 @@ class CommentServiceTest extends MockTest {
         Comment findComment = commentRepository.findById(comment.getId()).get();
         assertEquals(entity.getContent(), findComment.getContents());
     }
+    @Test
+    void 답글등록() {
+        CommentRequest entity1 = new CommentRequest();
+        entity1.setContent("댓글");
+        CommentRequest entity2 = new CommentRequest();
+        entity2.setContent("답글");
+
+        Channel channel = Channel.builder()
+                .title("Title")
+                .description("Description")
+                .build();
+        Video video = Video.builder()
+                .channel(channel)
+                .build();
+        Comment comment = commentService.write(entity1, channel, video);
+
+        //When
+        Comment replyComment = commentService.replyWrite(entity2, channel, video, comment.getId());
+        //Then
+        Comment findComment = commentRepository.findById(replyComment.getId()).get();
+        assertEquals(entity2.getContent(), findComment.getContents());
+    }
 
     @Test
     void 업데이트() {
@@ -105,6 +127,44 @@ class CommentServiceTest extends MockTest {
         List<CommentViewResponse> CommentList = commentService.getCommentList(video1.getId(), channel);
         //then
         assertThat(CommentList.size()).isEqualTo(2);
+
+    }
+
+    @Test
+    void 답글목록() {
+        CommentRequest entity1 = new CommentRequest();
+        entity1.setContent("댓글1");
+        CommentRequest entity2 = new CommentRequest();
+        entity2.setContent("댓글2");
+        CommentRequest entity3 = new CommentRequest();
+        entity3.setContent("답글");
+
+        Channel channel = Channel.builder()
+                .title("Title")
+                .description("Description")
+                .build();
+        channelRepository.save(channel);
+        Video video1 = Video.builder()
+                .channel(channel)
+                .build();
+
+        Video video2 = Video.builder()
+                .channel(channel)
+                .build();
+        videoRepository.save(video1);
+        videoRepository.save(video2);
+
+        //하나의 비디오에 한명이 다른 댓글 달기
+        Comment comment1 = commentService.write(entity1, channel, video1);
+        Comment comment2 = commentService.write(entity2, channel, video1);
+        //다른 댓글에 답글 달기
+        Comment replyComment1 = commentService.replyWrite(entity3, channel, video1, comment1.getId());
+        Comment replyComment2 = commentService.replyWrite(entity3, channel, video1, comment2.getId());
+
+        //when
+        List<CommentViewResponse> CommentList = commentService.getReplyList(comment1.getId(), channel);
+        //then
+        assertThat(CommentList.size()).isEqualTo(1);
 
     }
 

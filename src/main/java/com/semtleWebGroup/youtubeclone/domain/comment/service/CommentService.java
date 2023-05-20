@@ -31,6 +31,21 @@ public class CommentService {
         return commentRepository.save(newComment);
     }
 
+    public Comment replyWrite(CommentRequest dto, Channel channel, Video video, Long rootCommentId){
+        Comment rootComment = commentRepository.findById(rootCommentId).orElseThrow(()->new EntityNotFoundException(
+                String.format("%d is not found.", rootCommentId)
+        ));
+
+        Comment newComment = Comment.builder()
+                .contents(dto.getContent())
+                .video(video)
+                .channel(channel)
+                .rootComment(rootComment)
+                .build();
+
+        return commentRepository.save(newComment);
+    }
+
     public Comment updateComment(Long idx, CommentRequest dto) {
         Comment entity = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", idx)
@@ -46,6 +61,9 @@ public class CommentService {
         ListIterator<Comment> iterator = commentList.listIterator();
         while(iterator.hasNext()){
             Comment comment = iterator.next();
+            if(comment.getRootComment() != null){
+                continue;
+            }
             CommentViewResponse commentViewResponse = CommentViewResponse.builder()
                     .comment(comment)
                     .isLike(comment.isLike(channel))
@@ -54,8 +72,20 @@ public class CommentService {
         }
         return commentViewResponseList;
     }
-    public List<Comment> getCommentAll(Long Idx){
-        return commentRepository.findAll();
+
+    public List<CommentViewResponse> getReplyList(Long comment_Idx, Channel channel){
+        List<Comment> commentList = commentRepository.findByRootComment_Id(comment_Idx);
+        List<CommentViewResponse>  commentViewResponseList = new ArrayList<>();
+        ListIterator<Comment> iterator = commentList.listIterator();
+        while(iterator.hasNext()){
+            Comment comment = iterator.next();
+            CommentViewResponse commentViewResponse = CommentViewResponse.builder()
+                    .comment(comment)
+                    .isLike(comment.isLike(channel))
+                    .build();
+            commentViewResponseList.add(commentViewResponse);
+        }
+        return commentViewResponseList;
     }
 
     public void commentDelete(Long idx){
@@ -64,6 +94,5 @@ public class CommentService {
         ));
         commentRepository.delete(entity);
     }
-
 
 }

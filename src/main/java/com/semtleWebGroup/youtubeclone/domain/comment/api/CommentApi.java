@@ -50,6 +50,11 @@ public class CommentApi {
         List<CommentViewResponse> CommentList = commentService.getCommentList(videoId, channel);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
+    @GetMapping("/reply")
+    public ResponseEntity replyList(@RequestParam("commentId") Long commentId, @RequestPart Channel channel) {
+        List<CommentViewResponse> CommentList = commentService.getReplyList(commentId, channel);
+        return ResponseEntity.status(HttpStatus.OK).body(CommentList);
+    }
     @PostMapping("/{commentId}/like")
     public ResponseEntity like(@PathVariable("commentId")Long commentId, @RequestPart Channel channel) {
         CommentLikeResponse commentLikeResponse = commentLikeService.likeAdd(commentId, channel);
@@ -63,5 +68,10 @@ public class CommentApi {
 
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }
-
+    @PostMapping("/{videoId}/{commentId}")
+    public ResponseEntity replyCreate(@PathVariable("videoId")UUID videoId,  @PathVariable("commentId")Long rootCommentId ,@RequestPart CommentRequest dto,  @RequestPart Channel channel){
+        Video video = videoService.getVideo(videoId);
+        Comment comment = commentService.replyWrite(dto, channel , video, rootCommentId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
+    }
 }
