@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video_media.service;
 
+import com.semtleWebGroup.youtubeclone.global.error.FieldError;
 import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerException;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.lang.Nullable;

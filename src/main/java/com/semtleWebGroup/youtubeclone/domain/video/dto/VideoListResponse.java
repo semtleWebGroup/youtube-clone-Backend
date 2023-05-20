@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @Getter
 public class VideoListResponse {
 
-    private Long id;
-    private String title;
 
-    private byte[] thumbnail;
+    private UUID id;
+
+    private String title;
 
     private byte[] channelImg;
 
@@ -29,10 +29,23 @@ public class VideoListResponse {
     private LocalDateTime createdTime;
 
     @Builder
-    public VideoListResponse(String title, String channelName, int viewCount, int videoSec) {
-        this.title = title;
-        this.channelName = channelName;
-        this.viewCount = viewCount;
-        this.videoSec = videoSec;
+
+    public VideoListResponse(Video video) {
+        this.id = video.getId();
+        this.title = video.getTitle();
+        this.channelImg = convertBlobToBytes(video.getChannel().getChannelImage());
+        this.channelName = video.getChannel().getTitle();
+        this.viewCount = video.getViewCount();
+        this.videoSec = video.getVideoSec();
+        this.createdTime = video.getCreatedTime();
+    }
+
+    private byte[] convertBlobToBytes (Blob blob) {
+        try {
+            if (blob != null) blob.getBytes(1, (int) blob.length());
+        } catch (SQLException e) {
+            throw new RuntimeException(e); // TODO: Handle Exception
+        }
+        return null;
     }
 }

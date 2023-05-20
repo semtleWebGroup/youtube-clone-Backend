@@ -9,4 +9,8 @@ import java.util.UUID;
 
 public interface VideoRepository extends JpaRepository<Video, UUID> {
     List<Video> findByTitleContaining(String key);
+
+    Page<Video> findAllByOrderByCreatedTimeDesc(Pageable pageable);
+
+    Page<Video> findByStatusOrderByCreatedTimeDesc(Pageable pageable, Video.VideoStatus status);
 }
