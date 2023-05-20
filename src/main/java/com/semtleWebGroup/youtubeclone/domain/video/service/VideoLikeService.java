@@ -19,7 +19,7 @@ public class VideoLikeService {
     
     public VideoLikeResponse get(Video video, Channel channel) {
         return VideoLikeResponse.builder()
-                .videoId(video.getId())
+                .videoId(video.getVideoId())
                 .likeCount(video.getLikeCount())
                 .isLike(video.isLike(channel))
                 .build();

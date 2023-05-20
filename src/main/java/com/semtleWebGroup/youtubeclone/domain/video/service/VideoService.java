@@ -43,7 +43,7 @@ public class VideoService {
                 .channel(dto.getChannel())
                 .build();
         videoRepository.save(video);
-        mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
+        mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getVideoId(), dto.getThumbImg());
         return new VideoResponse(video);
     }
     
