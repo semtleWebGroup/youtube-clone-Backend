@@ -19,7 +19,7 @@ public class CommentLikeService {
     private final CommentLikeRepository commentLikeRepository;
 
     public CommentLikeResponse get(Comment comment, Channel channel) {
-        return CommentLikeResponse.builder()
+        return CommentLikeResponse.builder()   //스태틱 팩토리 메소드 공부해서 바꿔보기
                 .commentId(comment.getId())
                 .likeCount(comment.getLikeCount())
                 .isLike(comment.isLike(channel))

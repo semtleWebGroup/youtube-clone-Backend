@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Entity
 @Getter
-@Setter
+@Setter //빼기
 @Table(name="comment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
@@ -65,7 +65,7 @@ public class Comment {
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "rootComment_id")
+    @JoinColumn(name = "rootComment_id")    //이거 _ 고치기
     private Comment rootComment;
 
     @Builder

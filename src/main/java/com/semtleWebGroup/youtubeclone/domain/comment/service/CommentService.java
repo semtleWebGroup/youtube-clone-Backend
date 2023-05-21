@@ -17,7 +17,7 @@ import java.util.UUID;
 
 
 @Service
-@Transactional
+@Transactional  //필요한 곳에만 사용하기
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;

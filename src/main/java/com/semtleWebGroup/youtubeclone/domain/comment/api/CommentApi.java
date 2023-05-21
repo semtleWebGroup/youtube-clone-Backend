@@ -46,7 +46,7 @@ public class CommentApi {
     }
 
     @GetMapping("")
-    public ResponseEntity list(@RequestParam("videoId") UUID videoId, @RequestPart Channel channel) {
+    public ResponseEntity list(@RequestParam("videoId") UUID videoId, @RequestPart Channel channel) {   //Pageable 사용해서 몇개만 들고오기
         List<CommentViewResponse> CommentList = commentService.getCommentList(videoId, channel);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
@@ -68,7 +68,7 @@ public class CommentApi {
 
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }
-    @PostMapping("/{videoId}/{commentId}")
+    @PostMapping("/{videoId}/{commentId}")  //이거 commentId 로만 구현하기
     public ResponseEntity replyCreate(@PathVariable("videoId")UUID videoId,  @PathVariable("commentId")Long rootCommentId ,@RequestPart CommentRequest dto,  @RequestPart Channel channel){
         Video video = videoService.getVideo(videoId);
         Comment comment = commentService.replyWrite(dto, channel , video, rootCommentId);

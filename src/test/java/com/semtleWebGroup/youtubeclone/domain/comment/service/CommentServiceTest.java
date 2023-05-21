@@ -27,7 +27,7 @@ class CommentServiceTest extends MockTest {
     CommentRepository commentRepository;
     @Autowired
     VideoRepository videoRepository;
-    @Autowired
+    @Autowired //이거 안쓰고 위에서 뭐 써주면 됨
     ChannelRepository channelRepository;
 
     @Test
