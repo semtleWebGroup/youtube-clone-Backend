@@ -8,10 +8,11 @@ import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentViewResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
-import com.semtleWebGroup.youtubeclone.test_super.MockTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,14 +21,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
-class CommentServiceTest extends MockTest {
-    @Autowired
+class CommentServiceTest{
+    @Autowired  //테스트코드에서는 @RequiredArgsConstructor 사용 불가
     CommentService commentService;
     @Autowired
     CommentRepository commentRepository;
     @Autowired
     VideoRepository videoRepository;
-    @Autowired //이거 안쓰고 위에서 뭐 써주면 됨
+    @Autowired
     ChannelRepository channelRepository;
 
     @Test
@@ -65,7 +66,7 @@ class CommentServiceTest extends MockTest {
         Comment comment = commentService.write(entity1, channel, video);
 
         //When
-        Comment replyComment = commentService.replyWrite(entity2, channel, video, comment.getId());
+        Comment replyComment = commentService.replyWrite(entity2, channel, comment.getId());
         //Then
         Comment findComment = commentRepository.findById(replyComment.getId()).get();
         assertEquals(entity2.getContent(), findComment.getContents());
@@ -122,9 +123,10 @@ class CommentServiceTest extends MockTest {
         //다른 비디오에 댓글 달기
         Comment comment3 = commentService.write(entity1, channel, video2);
         // -> 댓글을 3개를 남겼으나 첫번째 비디오에 2개를 남기고 두번째 비디오에 1개를 남김
-        
+
         //when
-        List<CommentViewResponse> CommentList = commentService.getCommentList(video1.getId(), channel);
+        Pageable pageable = PageRequest.of(0, 5);
+        List<CommentViewResponse> CommentList = commentService.getCommentList(video1.getId(), channel, pageable);
         //then
         assertThat(CommentList.size()).isEqualTo(2);
 
@@ -158,11 +160,12 @@ class CommentServiceTest extends MockTest {
         Comment comment1 = commentService.write(entity1, channel, video1);
         Comment comment2 = commentService.write(entity2, channel, video1);
         //다른 댓글에 답글 달기
-        Comment replyComment1 = commentService.replyWrite(entity3, channel, video1, comment1.getId());
-        Comment replyComment2 = commentService.replyWrite(entity3, channel, video1, comment2.getId());
+        Comment replyComment1 = commentService.replyWrite(entity3, channel, comment1.getId());
+        Comment replyComment2 = commentService.replyWrite(entity3, channel, comment2.getId());
 
         //when
-        List<CommentViewResponse> CommentList = commentService.getReplyList(comment1.getId(), channel);
+        Pageable pageable = PageRequest.of(0, 5);
+        List<CommentViewResponse> CommentList = commentService.getReplyList(comment1.getId(), channel, pageable);
         //then
         assertThat(CommentList.size()).isEqualTo(1);
 

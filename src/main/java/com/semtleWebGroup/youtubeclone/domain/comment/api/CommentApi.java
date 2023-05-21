@@ -10,6 +10,7 @@ import com.semtleWebGroup.youtubeclone.domain.comment.service.CommentService;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,13 +47,13 @@ public class CommentApi {
     }
 
     @GetMapping("")
-    public ResponseEntity list(@RequestParam("videoId") UUID videoId, @RequestPart Channel channel) {   //Pageable 사용해서 몇개만 들고오기
-        List<CommentViewResponse> CommentList = commentService.getCommentList(videoId, channel);
+    public ResponseEntity list(@RequestParam("videoId") UUID videoId, @RequestPart Channel channel, Pageable pageable) {
+        List<CommentViewResponse> CommentList = commentService.getCommentList(videoId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @GetMapping("/reply")
-    public ResponseEntity replyList(@RequestParam("commentId") Long commentId, @RequestPart Channel channel) {
-        List<CommentViewResponse> CommentList = commentService.getReplyList(commentId, channel);
+    public ResponseEntity replyList(@RequestParam("commentId") Long commentId, @RequestPart Channel channel, Pageable pageable) {
+        List<CommentViewResponse> CommentList = commentService.getReplyList(commentId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @PostMapping("/{commentId}/like")
@@ -68,10 +69,9 @@ public class CommentApi {
 
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }
-    @PostMapping("/{videoId}/{commentId}")  //이거 commentId 로만 구현하기
-    public ResponseEntity replyCreate(@PathVariable("videoId")UUID videoId,  @PathVariable("commentId")Long rootCommentId ,@RequestPart CommentRequest dto,  @RequestPart Channel channel){
-        Video video = videoService.getVideo(videoId);
-        Comment comment = commentService.replyWrite(dto, channel , video, rootCommentId);
+    @PostMapping("/reply/{commentId}")
+    public ResponseEntity replyCreate(@PathVariable("commentId")Long rootCommentId ,@RequestPart CommentRequest dto,  @RequestPart Channel channel){
+        Comment comment = commentService.replyWrite(dto, channel , rootCommentId);
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 }

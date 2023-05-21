@@ -7,6 +7,7 @@ import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentReposito
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,10 @@ import java.util.UUID;
 
 
 @Service
-@Transactional  //필요한 곳에만 사용하기
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+    @Transactional
     public Comment write(CommentRequest dto, Channel channel, Video video){
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
@@ -30,12 +31,12 @@ public class CommentService {
 
         return commentRepository.save(newComment);
     }
-
-    public Comment replyWrite(CommentRequest dto, Channel channel, Video video, Long rootCommentId){
+    @Transactional
+    public Comment replyWrite(CommentRequest dto, Channel channel, Long rootCommentId){
         Comment rootComment = commentRepository.findById(rootCommentId).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", rootCommentId)
         ));
-
+        Video video = rootComment.getVideo();
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .video(video)
@@ -45,7 +46,7 @@ public class CommentService {
 
         return commentRepository.save(newComment);
     }
-
+    @Transactional
     public Comment updateComment(Long idx, CommentRequest dto) {
         Comment entity = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", idx)
@@ -55,8 +56,8 @@ public class CommentService {
         return entity;
     }
 
-    public List<CommentViewResponse> getCommentList(UUID video_Idx, Channel channel){
-        List<Comment> commentList = commentRepository.findByVideo_Id(video_Idx);
+    public List<CommentViewResponse> getCommentList(UUID video_Idx, Channel channel, Pageable pageable){
+        List<Comment> commentList = commentRepository.findByVideo_Id(video_Idx, pageable);
         List<CommentViewResponse>  commentViewResponseList = new ArrayList<>();
         ListIterator<Comment> iterator = commentList.listIterator();
         while(iterator.hasNext()){
@@ -73,8 +74,8 @@ public class CommentService {
         return commentViewResponseList;
     }
 
-    public List<CommentViewResponse> getReplyList(Long comment_Idx, Channel channel){
-        List<Comment> commentList = commentRepository.findByRootComment_Id(comment_Idx);
+    public List<CommentViewResponse> getReplyList(Long comment_Idx, Channel channel, Pageable pageable){
+        List<Comment> commentList = commentRepository.findByRootComment_Id(comment_Idx, pageable);
         List<CommentViewResponse>  commentViewResponseList = new ArrayList<>();
         ListIterator<Comment> iterator = commentList.listIterator();
         while(iterator.hasNext()){
@@ -87,7 +88,7 @@ public class CommentService {
         }
         return commentViewResponseList;
     }
-
+    @Transactional
     public void commentDelete(Long idx){
         Comment entity = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", idx)
