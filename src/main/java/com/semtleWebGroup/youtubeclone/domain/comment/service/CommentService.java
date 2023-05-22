@@ -4,16 +4,14 @@ import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
+import com.semtleWebGroup.youtubeclone.global.error.FieldError;
+import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 
 
@@ -36,6 +34,11 @@ public class CommentService {
         Comment rootComment = commentRepository.findById(rootCommentId).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", rootCommentId)
         ));
+        if (rootComment.getRootComment() != null)
+        {
+            String rootCommentIdString = rootCommentId.toString();
+            throw new BadRequestException(FieldError.of("rootComment", rootCommentIdString, "Cannot reply to replies"));
+        }
         Video video = rootComment.getVideo();
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
