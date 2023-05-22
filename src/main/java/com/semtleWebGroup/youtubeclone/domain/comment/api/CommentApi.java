@@ -12,10 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import javax.validation.Valid;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -27,20 +25,20 @@ public class CommentApi {
     private final CommentLikeService commentLikeService;
 
     @PostMapping("/{videoId}")
-    public ResponseEntity create(@RequestPart CommentRequest dto,  @RequestPart Channel channel,  @PathVariable UUID videoId){
+    public ResponseEntity create(@PathVariable UUID videoId, @Valid @RequestPart CommentRequest dto, @RequestPart Channel channel){
         Video video = videoService.getVideo(videoId);
         CommentResponse comment = commentService.write(dto, channel , video);
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
     @PostMapping("/reply/{commentId}")
-    public ResponseEntity replyCreate(@PathVariable("commentId")Long rootCommentId ,@RequestPart CommentRequest dto,  @RequestPart Channel channel){
+    public ResponseEntity replyCreate(@PathVariable("commentId")Long rootCommentId ,@Valid @RequestPart CommentRequest dto,  @RequestPart Channel channel){
         CommentResponse comment = commentService.replyWrite(dto, channel , rootCommentId);
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity editComment(@PathVariable("commentId")Long commentId, @RequestBody CommentRequest dto){
+    public ResponseEntity editComment(@PathVariable("commentId")Long commentId, @Valid @RequestBody CommentRequest dto){
         CommentResponse comment = commentService.updateComment(commentId, dto);
         return ResponseEntity.status(HttpStatus.OK).body(comment);
     }
