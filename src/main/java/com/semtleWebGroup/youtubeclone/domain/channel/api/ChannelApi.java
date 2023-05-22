@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class ChannelApi {
      * @return 현재는 entity 자체를 반환. 프론트 사용 데이터 보고 overfetching 줄일 예정
      */
     @PostMapping("")
-    public ResponseEntity create(@ModelAttribute ChannelRequest dto){
+    public ResponseEntity create(@Valid @ModelAttribute ChannelRequest dto){
         Channel channel = channelService.addChannel(dto);
         ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
 
@@ -147,7 +148,7 @@ public class ChannelApi {
      */
     @PatchMapping("/{channelId}")
     public ResponseEntity editChannel(@PathVariable("channelId")Long channelId,
-                                      @ModelAttribute ChannelRequest dto){
+                                      @Valid @ModelAttribute ChannelRequest dto){
         final Channel channel = channelService.updateChannel(channelId, dto);
         ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
 
