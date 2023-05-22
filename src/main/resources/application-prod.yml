@@ -17,4 +17,4 @@ logging:
     root: error
 # 미디어 서버와 통신하기 위한 url : ex) http://localhost:8080
 media-server:
-  url: {media-server-url}
+  url: ${media-server-url}
