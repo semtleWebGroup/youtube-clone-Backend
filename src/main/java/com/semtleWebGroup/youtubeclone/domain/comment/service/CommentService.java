@@ -1,13 +1,12 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.service;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentResponse;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentViewResponse;
+import com.semtleWebGroup.youtubeclone.domain.comment.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,37 +56,14 @@ public class CommentService {
         return new CommentResponse(entity);
     }
 
-    public List<CommentViewResponse> getCommentList(UUID video_Idx, Channel channel, Pageable pageable){
-        List<Comment> commentList = commentRepository.findByVideo_Id(video_Idx, pageable);
-        List<CommentViewResponse>  commentViewResponseList = new ArrayList<>();
-        ListIterator<Comment> iterator = commentList.listIterator();
-        while(iterator.hasNext()){
-            Comment comment = iterator.next();
-            if(comment.getRootComment() != null){
-                continue;
-            }
-            CommentViewResponse commentViewResponse = CommentViewResponse.builder()
-                    .comment(comment)
-                    .isLike(comment.isLike(channel))
-                    .build();
-            commentViewResponseList.add(commentViewResponse);
-        }
-        return commentViewResponseList;
+    public CommentPageResponse getCommentList(UUID video_Idx, Channel channel, Pageable pageable){
+        Page<Comment> commentList = commentRepository.findByVideo_Id(video_Idx, pageable);
+        return new CommentPageResponse(commentList, channel);
     }
 
-    public List<CommentViewResponse> getReplyList(Long comment_Idx, Channel channel, Pageable pageable){
-        List<Comment> commentList = commentRepository.findByRootComment_Id(comment_Idx, pageable);
-        List<CommentViewResponse>  commentViewResponseList = new ArrayList<>();
-        ListIterator<Comment> iterator = commentList.listIterator();
-        while(iterator.hasNext()){
-            Comment comment = iterator.next();
-            CommentViewResponse commentViewResponse = CommentViewResponse.builder()
-                    .comment(comment)
-                    .isLike(comment.isLike(channel))
-                    .build();
-            commentViewResponseList.add(commentViewResponse);
-        }
-        return commentViewResponseList;
+    public CommentReplyPageResponse getReplyList(Long comment_Idx, Channel channel, Pageable pageable){
+        Page<Comment> commentList = commentRepository.findByRootComment_Id(comment_Idx, pageable);
+        return new CommentReplyPageResponse(commentList,channel);
     }
     @Transactional
     public void commentDelete(Long idx){

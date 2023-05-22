@@ -1,10 +1,7 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.api;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentLikeResponse;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentResponse;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentViewResponse;
+import com.semtleWebGroup.youtubeclone.domain.comment.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.comment.service.CommentLikeService;
 import com.semtleWebGroup.youtubeclone.domain.comment.service.CommentService;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
@@ -56,12 +53,12 @@ public class CommentApi {
 
     @GetMapping("")
     public ResponseEntity list(@RequestParam("videoId") UUID videoId, @RequestPart Channel channel, Pageable pageable) {
-        List<CommentViewResponse> CommentList = commentService.getCommentList(videoId, channel, pageable);
+        CommentPageResponse CommentList = commentService.getCommentList(videoId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @GetMapping("/reply")
     public ResponseEntity replyList(@RequestParam("commentId") Long commentId, @RequestPart Channel channel, Pageable pageable) {
-        List<CommentViewResponse> CommentList = commentService.getReplyList(commentId, channel, pageable);
+        CommentReplyPageResponse CommentList = commentService.getReplyList(commentId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @PostMapping("/{commentId}/like")

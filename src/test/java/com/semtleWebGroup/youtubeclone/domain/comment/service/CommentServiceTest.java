@@ -3,9 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.comment.service;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentResponse;
-import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentViewResponse;
+import com.semtleWebGroup.youtubeclone.domain.comment.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
@@ -127,9 +125,9 @@ class CommentServiceTest{
 
         //when
         Pageable pageable = PageRequest.of(0, 5);
-        List<CommentViewResponse> CommentList = commentService.getCommentList(video1.getId(), channel, pageable);
+        CommentPageResponse CommentList = commentService.getCommentList(video1.getId(), channel, pageable);
         //then
-        assertThat(CommentList.size()).isEqualTo(2);
+        assertThat(CommentList.getComments().size()).isEqualTo(2);
 
     }
 
@@ -166,9 +164,9 @@ class CommentServiceTest{
 
         //when
         Pageable pageable = PageRequest.of(0, 5);
-        List<CommentViewResponse> CommentList = commentService.getReplyList(comment1.getId(), channel, pageable);
+        CommentReplyPageResponse CommentList = commentService.getReplyList(comment1.getId(), channel, pageable);
         //then
-        assertThat(CommentList.size()).isEqualTo(1);
+        assertThat(CommentList.getComments().size()).isEqualTo(1);
 
     }
 
