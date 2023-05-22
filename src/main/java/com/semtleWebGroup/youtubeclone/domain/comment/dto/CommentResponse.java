@@ -4,7 +4,6 @@ import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -15,14 +14,20 @@ public class CommentResponse {
     private String contents;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
-    private Comment rootComment;
+    private Long rootCommentId;
 
     public CommentResponse(Comment comment) {
         this.id = comment.getId();
         this.contents = comment.getContents();
         this.createdTime = comment.getCreatedTime();
         this.updatedTime = comment.getUpdatedTime();
-        this.rootComment = comment.getRootComment();
+        this.rootCommentId = getRootCommentId(comment.getRootComment());
+    }
+    public Long getRootCommentId(Comment rootComment) {
+        if (rootComment != null) {
+            return rootComment.getId();
+        }
+        return null;
     }
 
 }
