@@ -2,6 +2,7 @@ package com.semtleWebGroup.youtubeclone.domain.comment.service;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentRequest;
+import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentViewResponse;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
@@ -22,17 +23,17 @@ import java.util.UUID;
 public class CommentService {
     private final CommentRepository commentRepository;
     @Transactional
-    public Comment write(CommentRequest dto, Channel channel, Video video){
+    public CommentResponse write(CommentRequest dto, Channel channel, Video video){
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .video(video)
                 .channel(channel)
                 .build();
-
-        return commentRepository.save(newComment);
+        commentRepository.save(newComment);
+        return new CommentResponse(newComment);
     }
     @Transactional
-    public Comment replyWrite(CommentRequest dto, Channel channel, Long rootCommentId){
+    public CommentResponse replyWrite(CommentRequest dto, Channel channel, Long rootCommentId){
         Comment rootComment = commentRepository.findById(rootCommentId).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", rootCommentId)
         ));
@@ -43,17 +44,17 @@ public class CommentService {
                 .channel(channel)
                 .rootComment(rootComment)
                 .build();
-
-        return commentRepository.save(newComment);
+        commentRepository.save(newComment);
+        return new CommentResponse(newComment);
     }
     @Transactional
-    public Comment updateComment(Long idx, CommentRequest dto) {
+    public CommentResponse updateComment(Long idx, CommentRequest dto) {
         Comment entity = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", idx)
         ));
         entity.update(dto.getContent());
         commentRepository.save(entity);
-        return entity;
+        return new CommentResponse(entity);
     }
 
     public List<CommentViewResponse> getCommentList(UUID video_Idx, Channel channel, Pageable pageable){
@@ -95,5 +96,4 @@ public class CommentService {
         ));
         commentRepository.delete(entity);
     }
-
 }
