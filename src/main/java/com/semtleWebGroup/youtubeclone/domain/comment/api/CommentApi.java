@@ -56,7 +56,7 @@ public class CommentApi {
     }
     @GetMapping("/reply")
     public ResponseEntity replyList(@RequestParam("commentId") Long commentId, @RequestPart Channel channel, Pageable pageable) {
-        CommentReplyPageResponse CommentList = commentService.getReplyList(commentId, channel, pageable);
+        CommentPageResponse CommentList = commentService.getReplyList(commentId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @PostMapping("/{commentId}/like")

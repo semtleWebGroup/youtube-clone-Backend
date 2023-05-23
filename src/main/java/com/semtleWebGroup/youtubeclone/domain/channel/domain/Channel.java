@@ -49,7 +49,7 @@ public class Channel {
     private Set<Video> videos = new HashSet<>();
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Video> videoLikeLists = new HashSet<>();
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.REMOVE)    //cascade = CascadeType.ALL 사용시 오류 발생...
     private Set<Comment> comments = new HashSet<>();
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> commentsLikeLists = new HashSet<>();

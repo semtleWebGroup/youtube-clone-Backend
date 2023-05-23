@@ -18,26 +18,13 @@ public class CommentPageResponse {
     private int numberOfElements;
     private List<CommentViewResponse> comments = new ArrayList<>();
 
-    public CommentPageResponse(Page<Comment> comment, Channel channel) {
-        this.totalPages = comment.getTotalPages();
-        this.pageNumber = comment.getNumber();
-        this.numberOfElements = comment.getNumberOfElements();
-        this.comments = getCommentViewList(comment.getContent(), channel);
-    }
-    public List<CommentViewResponse> getCommentViewList(List<Comment> comments, Channel channel) {
-        List<CommentViewResponse> tempComments = new ArrayList<>();
-            ListIterator<Comment> iterator = comments.listIterator();
-            while(iterator.hasNext()){
-                Comment comment = iterator.next();
-                if(comment.getRootComment() != null){
-                    continue;
-                }
-                CommentViewResponse commentViewResponse = CommentViewResponse.builder()
-                    .comment(comment)
-                    .isLike(comment.isLike(channel))
-                    .build();
-            tempComments.add(commentViewResponse);
+    public CommentPageResponse(Page<Comment> comments, Channel channel) {
+        this.totalPages = comments.getTotalPages();
+        this.pageNumber = comments.getNumber();
+        this.numberOfElements = comments.getNumberOfElements();
+        for (Comment comment: comments.getContent()) {
+            CommentViewResponse commentViewResponse = new CommentViewResponse(comment,comment.isLike(channel));
+            this.comments.add(commentViewResponse);
         }
-        return tempComments;
     }
 }
