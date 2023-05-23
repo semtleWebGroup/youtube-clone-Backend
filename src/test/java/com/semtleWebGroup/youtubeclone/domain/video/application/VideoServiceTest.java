@@ -7,6 +7,8 @@ import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoUploadDto;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
+import com.semtleWebGroup.youtubeclone.domain.video_media.service.MockedMediaServerSpokesman;
+import com.semtleWebGroup.youtubeclone.domain.video_media.service.ProdMediaServerSpokesman;
 import com.semtleWebGroup.youtubeclone.test_super.MockTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +29,7 @@ public class VideoServiceTest extends MockTest {
     @BeforeAll
     public static void set() {
         videoRepository = Mockito.mock(VideoRepository.class);
-        mediaServerSpokesman = Mockito.mock(MediaServerSpokesman.class);
+        mediaServerSpokesman = Mockito.mock(MockedMediaServerSpokesman.class);
         videoService = new VideoService(videoRepository, mediaServerSpokesman);
     }
 

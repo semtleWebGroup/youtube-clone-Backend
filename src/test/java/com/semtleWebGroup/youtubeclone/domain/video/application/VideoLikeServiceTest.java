@@ -10,6 +10,8 @@ import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
+import com.semtleWebGroup.youtubeclone.domain.video_media.service.MockedMediaServerSpokesman;
+import com.semtleWebGroup.youtubeclone.domain.video_media.service.ProdMediaServerSpokesman;
 import com.semtleWebGroup.youtubeclone.test_super.MockTest;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -33,7 +35,7 @@ public class VideoLikeServiceTest extends MockTest {
         channelRepository = Mockito.mock(ChannelRepository.class);
         videoRepository = Mockito.mock(VideoRepository.class);
         videoLikeRepository = Mockito.mock(VideoLikeRepository.class);
-        MediaServerSpokesman mediaServerSpokesman = new MediaServerSpokesman();
+        MediaServerSpokesman mediaServerSpokesman = new MockedMediaServerSpokesman();
         videoService = new VideoService(videoRepository, mediaServerSpokesman);
         videoLikeService = new VideoLikeService(videoLikeRepository, videoService);
     }
