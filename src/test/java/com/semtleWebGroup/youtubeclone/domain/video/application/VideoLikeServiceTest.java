@@ -88,7 +88,7 @@ public class VideoLikeServiceTest extends MockTest {
                     .build();
             channel.addVideo(video);
             video.likeVideo(videoLike);
-            channel.addVideo(video);
+            channel.likeVideo(video);
             assertEquals(1, channel.getVideoLikeLists().size());
             assertEquals(1, video.getLikes().size());
 
