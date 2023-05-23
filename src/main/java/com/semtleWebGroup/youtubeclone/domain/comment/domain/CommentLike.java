@@ -26,9 +26,11 @@ public class CommentLike {
     private Comment comment;
 
     @Builder
-    public CommentLike(Channel channel, Comment comment) {
+    public CommentLike(Channel channel) {
         this.channel = channel;
-        this.comment = comment;
     }
 
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
 }

@@ -70,11 +70,26 @@ public class Comment {
     private Comment rootComment;
 
     @Builder
-    public Comment(String contents, Video video, Channel channel, Comment rootComment) {
+    public Comment(String contents, Comment rootComment) {
         this.contents = contents;
-        this.video = video;
-        this.channel = channel;
         this.rootComment = rootComment;
+    }
+
+    public void setVideo(Video video) {
+        this.video = video;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public void likeComment(CommentLike like) {
+        this.likes.add(like);
+        like.setComment(this);
+    }
+
+    public void unLikeComment(CommentLike like) {
+        this.likes.remove(like);
     }
 }
 

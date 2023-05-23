@@ -23,9 +23,9 @@ public class CommentService {
     public CommentResponse write(CommentRequest dto, Channel channel, Video video){
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
-                .video(video)
-                .channel(channel)
                 .build();
+        channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력 
+        video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
         commentRepository.save(newComment);
         return new CommentResponse(newComment);
     }
@@ -42,10 +42,10 @@ public class CommentService {
         Video video = rootComment.getVideo();
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
-                .video(video)
-                .channel(channel)
                 .rootComment(rootComment)
                 .build();
+        channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력
+        video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
         commentRepository.save(newComment);
         return new CommentResponse(newComment);
     }
@@ -70,9 +70,13 @@ public class CommentService {
     }
     @Transactional
     public void commentDelete(Long idx){
-        Comment entity = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
+        Comment comment = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", idx)
         ));
-        commentRepository.delete(entity);
+        Channel channel = comment.getChannel(); //흠.. 매개변수로 받는게 맞을까?
+        Video video = comment.getVideo(); //흠.. 매개변수로 받는게 맞을까?
+        channel.deleteComment(comment);  //채널에서 댓글 정보 삭제
+        video.deleteComment(comment);   //비디오에서 댓글 정보 삭제
+        commentRepository.delete(comment);  //댓글 삭제
     }
 }

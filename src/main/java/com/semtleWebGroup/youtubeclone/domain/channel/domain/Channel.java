@@ -110,21 +110,18 @@ public class Channel {
 
     public void addComment(Comment comment){
         comments.add(comment);
-//        comment.setChannel(this); TODO comment에서 channel을 추가하는 메소드
+        comment.setChannel(this);
     }
 
     public void deleteComment(Comment comment) {
         comments.remove(comment);
-//        comment.setLikedChannel(null); TODO comment에서 채널을 제거하는 메소드
     }
 
     public void likeComment(Comment comment) {
         commentsLikeLists.add(comment);
-//        comment.setLikedChannel(this); TODO comment에서 좋아요 한 채널을 추가하는 메소드
     }
 
     public void unLikeComment(Comment comment) {
         commentsLikeLists.remove(comment);
-//        comment.setLikedChannel(null); TODO comment에서 좋아요 한 채널을 제거하는 메소드
     }
 }

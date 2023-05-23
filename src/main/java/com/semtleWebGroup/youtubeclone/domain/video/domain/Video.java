@@ -100,7 +100,7 @@ public class Video {
 
     public void addComment(Comment comment) {
         this.comments.add(comment);
-//        comment.setVideo(this);
+        comment.setVideo(this);
     }
 
     public void deleteComment(Comment comment) {

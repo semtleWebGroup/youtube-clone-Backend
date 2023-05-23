@@ -18,7 +18,7 @@ public class CommentLikeService {
     private final CommentLikeRepository commentLikeRepository;
 
     public CommentLikeResponse get(Comment comment, Channel channel) {
-        return CommentLikeResponse.builder()   //스태틱 팩토리 메소드 공부해서 바꿔보기
+        return CommentLikeResponse.builder()
                 .commentId(comment.getId())
                 .likeCount(comment.getLikeCount())
                 .isLike(comment.isLike(channel))
@@ -29,12 +29,11 @@ public class CommentLikeService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new EntityNotFoundException("comment is not found."));
         CommentLike commentLike = CommentLike.builder()
-                .channel(channel)
-                .comment(comment)
+                .channel(channel)          //좋아요에 채널 정보 추가
                 .build();
+        channel.likeComment(comment);     //채널에 좋아요한 댓글 추가
+        comment.likeComment(commentLike);  //댓글에 좋아요 정보 추가 , 좋아요에도 댓글 정보 추가
         commentLikeRepository.save(commentLike);
-        comment.getLikes().add(commentLike);
-        commentRepository.save(comment);
         return this.get(comment, channel);
     }
     @Transactional
@@ -42,9 +41,9 @@ public class CommentLikeService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new EntityNotFoundException("comment is not found."));
         CommentLike commentLike = commentLikeRepository.findByCommentAndChannel(comment, channel);
-        comment.getLikes().remove(commentLike);
-        commentRepository.save(comment);
-        commentLikeRepository.deleteByCommentAndChannel(comment, channel);
+        comment.unLikeComment(commentLike);  //댓글에서 좋아요 정보 삭제
+        channel.unLikeComment(comment);    //채널에서 좋아요 정보 삭제
+        commentLikeRepository.deleteByCommentAndChannel(comment, channel);   //좋아요 정보 삭제
         return this.get(comment, channel);
     }
 }
