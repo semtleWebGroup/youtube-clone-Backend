@@ -1,15 +1,14 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.video_media.dto.response.GetEncodingStatusResponse;
-import com.semtleWebGroup.youtubeclone.domain.video_media.service.ProdMediaServerSpokesman;
+import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
+
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,6 +48,9 @@ public class Video {
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
 
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
+    private Set<Comment> comments = new HashSet<>();
+
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
@@ -81,5 +83,27 @@ public class Video {
         for (VideoLike vl : this.likes)
             if (vl.getChannel().equals(channel)) return true;
         return false;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public void likeVideo(VideoLike like) {
+        this.likes.add(like);
+        like.setVideo(this);
+    }
+
+    public void unLikeVideo(VideoLike like) {
+        this.likes.remove(like);
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+//        comment.setVideo(this);
+    }
+
+    public void deleteComment(Comment comment) {
+        this.comments.remove(comment);
     }
 }

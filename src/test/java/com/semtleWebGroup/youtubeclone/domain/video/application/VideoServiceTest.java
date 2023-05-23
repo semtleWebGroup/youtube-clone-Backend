@@ -18,6 +18,9 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -49,9 +52,7 @@ public class VideoServiceTest extends MockTest {
                     .thumbImg(thumbImg)
                     .build();
 
-            Video createdVideo = Video.builder()
-                    .channel(channel)
-                    .build();
+            Video createdVideo = new Video();
 
             when(videoRepository.save(any(Video.class))).thenReturn(createdVideo);
 
@@ -60,6 +61,29 @@ public class VideoServiceTest extends MockTest {
 
             // then
             assertEquals(createdVideo.getId(), videoResponse.getVideoId());
+            assertEquals(1, channel.getVideos().size()); // channel에 video가 들어가는지 확인
+        }
+    }
+
+    @Nested
+    @DisplayName("delete 메서드")
+    class delete {
+        @Test
+        @DisplayName("delete 테스트 - 성공")
+        void delete() {
+            // given
+            Video video = new Video();
+            Channel channel = new Channel("Title", "Description");
+            channel.addVideo(video);
+            assertEquals(1, channel.getVideos().size());
+
+            when(videoRepository.findById(video.getId())).thenReturn(Optional.of(video));
+
+            // when
+            VideoResponse videoResponse = videoService.delete(video.getId(), channel);
+
+            // then
+            assertEquals(0, channel.getVideos().size());
         }
     }
 

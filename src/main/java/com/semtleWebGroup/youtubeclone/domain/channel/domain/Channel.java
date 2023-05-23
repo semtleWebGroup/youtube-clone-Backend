@@ -83,22 +83,28 @@ public class Channel {
     // channel에서 video를 추가하는 메소드
     public void addVideo(Video video) {
         videos.add(video);
-//        video.setChannel(this); TODO video에서 channel을 추가하는 메소드
+        video.setChannel(this);
     }
 
     // channel에서 video를 삭제하는 메소드
     public void removeVideo(Video video) {
         videos.remove(video);
-//        video.setChannel(null); TODO video에서 channel을 삭제하는 메소드
+
+        // video 엔티티를 지울 때만 호출되기 때문에 이 줄은 없애도 될 것 같습니다.. ?!
+//        video.setChannel(null);
     }
 
     public void likeVideo(Video video){
         videoLikeLists.add(video);
+        // videoLike가 아니라 videoLikeList에서 video를 저장하기 때문에 video에서 channel을 지정할 필요는 없을 것 같습니다.
+        // 추후 videoLike를 저장하게 된다면 ..? videoLike.setChannel()이 필요할 것 같습니다.
 //        video.setChannel(this); TODO video에서 channel을 추가하는 메소드
     }
 
     public void unLikeVideo(Video video){
         videoLikeLists.remove(video);
+
+        // 여기도 없애도 될 것 같습니다.
 //        video.setChannel(null); TODO video에서 channel을 추가하는 메소드
     }
 

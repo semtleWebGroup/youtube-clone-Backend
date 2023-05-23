@@ -39,9 +39,9 @@ public class VideoService {
 
     @Transactional
     public VideoResponse upload(VideoUploadDto dto) {
-        Video video = Video.builder()
-                .channel(dto.getChannel())
-                .build();
+        Video video = new Video();
+        Channel channel = dto.getChannel();
+        channel.addVideo(video);    // channel에 video 추가 & video에 channel 추가
         videoRepository.save(video);
         mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
         return new VideoResponse(video);
@@ -80,8 +80,10 @@ public class VideoService {
     public VideoResponse delete(UUID videoId, Channel channel) {
         Video video = this.getVideo(videoId);
         checkAuthority(video, channel);
-
+        // media 관련 제거
         mediaServerSpokesman.deleteVideo(videoId);
+        // 채널에서 제거
+        channel.removeVideo(video);
 
         videoRepository.delete(video);
         return new VideoResponse(video);

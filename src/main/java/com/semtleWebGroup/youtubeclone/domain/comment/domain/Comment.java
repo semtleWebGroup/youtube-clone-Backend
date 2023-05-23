@@ -1,4 +1,5 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.*;
@@ -39,6 +40,7 @@ public class Comment {
     @Column(name = "updated_time")
     private LocalDateTime updatedTime;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "video_id")
     private Video video;

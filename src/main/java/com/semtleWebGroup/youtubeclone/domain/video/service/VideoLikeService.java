@@ -30,11 +30,11 @@ public class VideoLikeService {
         Video video = videoService.getVideo(videoId);
         VideoLike videoLike = VideoLike.builder()
                 .channel(channel)
-                .video(video)
                 .build();
+
+        channel.likeVideo(video);   // channel에 좋아요한 video 추가
+        video.likeVideo(videoLike); // video에 like 추가 & like에 video 추가
         videoLikeRepository.save(videoLike);
-        video.getLikes().add(videoLike);
-        videoService.save(video);
         return this.get(video, channel);
     }
 
@@ -42,8 +42,8 @@ public class VideoLikeService {
     public VideoLikeResponse delete(UUID videoId, Channel channel) {
         Video video = videoService.getVideo(videoId);
         VideoLike videoLike = videoLikeRepository.findByVideoAndChannel(video, channel);
-        video.getLikes().remove(videoLike);
-        videoService.save(video);
+        video.unLikeVideo(videoLike);   // video에 like 제거
+        channel.unLikeVideo(video);     // channel에 좋아요한 video 제거
         videoLikeRepository.deleteByVideoAndChannel(video, channel);
         return this.get(video, channel);
     }

@@ -1,5 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +19,12 @@ public class VideoLike {
     @Column(name = "video_like_id", columnDefinition = "BIGINT", nullable = false)
     private Long videoLikeId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "video_id", nullable = false)
     private Video video;
@@ -32,4 +35,11 @@ public class VideoLike {
         this.video = video;
     }
 
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public void setVideo(Video video) {
+        this.video = video;
+    }
 }
