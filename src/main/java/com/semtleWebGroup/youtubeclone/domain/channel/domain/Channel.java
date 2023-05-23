@@ -83,7 +83,7 @@ public class Channel {
     // channel에서 video를 추가하는 메소드
     public void addVideo(Video video) {
         videos.add(video);
-//        video.setChannel(this); TODO video에서 channel을 추가하는 메소드
+        video.setChannel(this);
     }
 
     // channel에서 video를 삭제하는 메소드

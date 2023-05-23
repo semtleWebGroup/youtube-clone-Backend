@@ -2,12 +2,12 @@ package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import lombok.*;
+import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,6 +47,9 @@ public class Video {
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<VideoLike> likes = new HashSet<>();
 
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
+    private Set<Comment> comments = new HashSet<>();
+
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
@@ -83,5 +86,9 @@ public class Video {
 
     public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    public void likeVideo(VideoLike videoLike) {
+
     }
 }

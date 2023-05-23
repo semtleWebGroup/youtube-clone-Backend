@@ -39,9 +39,9 @@ public class VideoService {
 
     @Transactional
     public VideoResponse upload(VideoUploadDto dto) {
-        Video video = Video.builder()
-                .channel(dto.getChannel())
-                .build();
+        Video video = new Video();
+        Channel channel = dto.getChannel();
+        channel.addVideo(video);    // channel에 video 추가 & video에 channel 추가
         videoRepository.save(video);
         mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
         return new VideoResponse(video);
