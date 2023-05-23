@@ -89,7 +89,10 @@ public class Channel {
     // channel에서 video를 삭제하는 메소드
     public void removeVideo(Video video) {
         videos.remove(video);
-//        video.setChannel(null); TODO video에서 channel을 삭제하는 메소드
+
+        // video의 nullable이 true라서 null으로는 set 불가
+        // video 엔티티를 지울 때만 호출되기 때문에 이 줄은 없애도 될 것 같습니다.. ?!
+//        video.setChannel(null);
     }
 
     public void likeVideo(Video video){

@@ -80,8 +80,10 @@ public class VideoService {
     public VideoResponse delete(UUID videoId, Channel channel) {
         Video video = this.getVideo(videoId);
         checkAuthority(video, channel);
-
+        // media 관련 제거
         mediaServerSpokesman.deleteVideo(videoId);
+        // 채널에서 제거
+        channel.removeVideo(video);
 
         videoRepository.delete(video);
         return new VideoResponse(video);
