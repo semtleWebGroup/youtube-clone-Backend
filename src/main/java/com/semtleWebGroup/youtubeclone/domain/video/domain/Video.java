@@ -2,6 +2,7 @@ package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
+
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
