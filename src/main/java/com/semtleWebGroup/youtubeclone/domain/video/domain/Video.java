@@ -80,4 +80,8 @@ public class Video {
             if (vl.getChannel().equals(channel)) return true;
         return false;
     }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
 }
