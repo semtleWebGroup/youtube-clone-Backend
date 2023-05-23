@@ -1,8 +1,8 @@
 package com.semtleWebGroup.youtubeclone.domain.video.domain;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import lombok.*;
-import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -88,7 +88,21 @@ public class Video {
         this.channel = channel;
     }
 
-    public void likeVideo(VideoLike videoLike) {
+    public void likeVideo(VideoLike like) {
+        this.likes.add(like);
+        like.setVideo(this);
+    }
 
+    public void unLikeVideo(VideoLike like) {
+        this.likes.remove(like);
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+//        comment.setVideo(this);
+    }
+
+    public void deleteComment(Comment comment) {
+        this.comments.remove(comment);
     }
 }

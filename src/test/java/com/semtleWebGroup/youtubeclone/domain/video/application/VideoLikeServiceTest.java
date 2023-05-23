@@ -49,25 +49,23 @@ public class VideoLikeServiceTest extends MockTest {
                     .title("Title")
                     .description("Description")
                     .build();
-            UUID videoId = UUID.randomUUID();
             Video video = Video.builder()
                     .channel(channel)
                     .build();
-            VideoLike videoLike = VideoLike.builder()
-                    .channel(channel)
-                    .video(video)
-                    .build();
+            VideoLike videoLike = new VideoLike();
 
-            when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+            when(videoRepository.findById(video.getId())).thenReturn(Optional.of(video));
             when(videoRepository.save(video)).thenReturn(video);
             when(videoLikeRepository.save(videoLike)).thenReturn(videoLike);
 
             // when
-            VideoLikeResponse videoLikeResponse = videoLikeService.add(videoId, channel);
+            VideoLikeResponse videoLikeResponse = videoLikeService.add(video.getId(), channel);
 
             // then
             assertEquals(1, videoLikeResponse.getLikeCount());
             assertTrue(videoLikeResponse.isLike());
+            assertEquals(1, video.getLikes().size());               // video에 like가 들어갔는지 확인
+            assertEquals(1, channel.getVideoLikeLists().size());    // channel에 video가 들어갔는지 확인
         }
     }
 
@@ -82,27 +80,29 @@ public class VideoLikeServiceTest extends MockTest {
                     .title("Title")
                     .description("Description")
                     .build();
-            UUID videoId = UUID.randomUUID();
-            Video video = Video.builder()
-                    .channel(channel)
-                    .build();
+            Video video = new Video();
             VideoLike videoLike = VideoLike.builder()
                     .channel(channel)
-                    .video(video)
                     .build();
-            video.getLikes().add(videoLike);
+            channel.addVideo(video);
+            video.likeVideo(videoLike);
+            channel.addVideo(video);
+            assertEquals(1, channel.getVideoLikeLists().size());
+            assertEquals(1, video.getLikes().size());
 
-            when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+            when(videoRepository.findById(video.getId())).thenReturn(Optional.of(video));
             when(videoRepository.save(video)).thenReturn(video);
             when(videoLikeRepository.findByVideoAndChannel(video, channel)).thenReturn(videoLike);
 
-            // when
-            videoLikeService.delete(videoId, channel);
-            VideoLikeResponse videoLikeResponse = videoLikeService.delete(videoId, channel);
+            // when (1번 삽입 & 2번 제거 테스트)
+            videoLikeService.delete(video.getId(), channel);
+            VideoLikeResponse videoLikeResponse = videoLikeService.delete(video.getId(), channel);
 
             // then
             assertEquals(0, videoLikeResponse.getLikeCount());
             assertTrue(!videoLikeResponse.isLike());
+            assertEquals(0, channel.getVideoLikeLists().size());
+            assertEquals(0, video.getLikes().size());
         }
     }
 }

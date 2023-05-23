@@ -32,4 +32,11 @@ public class VideoLike {
         this.video = video;
     }
 
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public void setVideo(Video video) {
+        this.video = video;
+    }
 }
