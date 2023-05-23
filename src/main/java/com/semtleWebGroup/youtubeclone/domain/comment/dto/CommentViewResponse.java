@@ -45,7 +45,7 @@ public class CommentViewResponse {
         try {
             if (blob != null) blob.getBytes(1, (int) blob.length());
         } catch (SQLException e) {
-            throw new RuntimeException(e); // TODO: Handle Exception
+            throw new RuntimeException(e); // TODO: Handle Exception  
         }
         return null;
     }

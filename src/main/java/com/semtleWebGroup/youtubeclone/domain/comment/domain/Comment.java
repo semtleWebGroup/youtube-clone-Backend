@@ -15,7 +15,6 @@ import java.util.Set;
 
 @Entity
 @Getter
-@Setter
 @Table(name="comment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
@@ -65,7 +64,7 @@ public class Comment {
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "rootComment_id")
+    @JoinColumn(name = "root_comment_id")
     private Comment rootComment;
 
     @Builder

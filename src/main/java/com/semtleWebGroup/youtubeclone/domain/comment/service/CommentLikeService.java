@@ -12,20 +12,19 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CommentLikeService {
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
 
     public CommentLikeResponse get(Comment comment, Channel channel) {
-        return CommentLikeResponse.builder()
+        return CommentLikeResponse.builder()   //스태틱 팩토리 메소드 공부해서 바꿔보기
                 .commentId(comment.getId())
                 .likeCount(comment.getLikeCount())
                 .isLike(comment.isLike(channel))
                 .build();
     }
-
+    @Transactional
     public CommentLikeResponse likeAdd(Long commentId, Channel channel) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new EntityNotFoundException("comment is not found."));
@@ -38,7 +37,7 @@ public class CommentLikeService {
         commentRepository.save(comment);
         return this.get(comment, channel);
     }
-
+    @Transactional
     public CommentLikeResponse likeDelete(Long commentId, Channel channel) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new EntityNotFoundException("comment is not found."));
