@@ -117,11 +117,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,e.getErrorCode().getStatus());
     }
 
-    @ExceptionHandler(LocalResourceException.class)
-    protected ResponseEntity<ErrorResponse> handleLocalResourceException(LocalResourceException e){
+    @ExceptionHandler(MediaServerException.class)
+    protected ResponseEntity<ErrorResponse> handleLocalResourceException(MediaServerException e){
         log.error("handleEntityNotFoundException",e);
-        ErrorResponse response = ErrorResponse.of(e);
-        return new ResponseEntity<>(response,e.getErrorCode().getStatus());
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
