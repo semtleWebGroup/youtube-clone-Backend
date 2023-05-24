@@ -13,8 +13,11 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"C005","Internal Server Error"),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND,"C006","Entity Not Found" ),
 
-    //local file system
-    VIDEO_NOT_EXIST(HttpStatus.NOT_FOUND,"L001","Video File Not Exist");
+    OCCUPIED_EMAIL(HttpStatus.CONFLICT,"C007","Occupied Email");
+
+
+
+
 
 
     private String message;

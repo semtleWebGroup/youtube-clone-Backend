@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.channel.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.semtleWebGroup.youtubeclone.domain.auth.domain.Member;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import lombok.*;
