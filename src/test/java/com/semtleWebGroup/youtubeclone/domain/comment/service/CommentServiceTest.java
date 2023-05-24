@@ -164,7 +164,7 @@ class CommentServiceTest{
 
         //when
         Pageable pageable = PageRequest.of(0, 5);
-        CommentReplyPageResponse CommentList = commentService.getReplyList(comment1.getId(), channel, pageable);
+        CommentPageResponse CommentList = commentService.getReplyList(comment1.getId(), channel, pageable);
         //then
         assertThat(CommentList.getComments().size()).isEqualTo(1);
 
@@ -188,5 +188,26 @@ class CommentServiceTest{
         //then
         List<Comment> result = commentRepository.findAll();
         assertThat(result.size()).isEqualTo(0);
+    }
+    @Test
+    void 답글삭제() {  //부모 댓글 삭제시 자동으로 답글 삭제 테스트
+        CommentRequest entity1 = new CommentRequest();
+        entity1.setContent("테스트");
+        CommentRequest entity2 = new CommentRequest();
+        entity2.setContent("답글");
+        Channel channel = Channel.builder()
+                .title("Title")
+                .description("Description")
+                .build();
+        Video video = Video.builder()
+                .channel(channel)
+                .build();
+        CommentResponse comment = commentService.write(entity1, channel, video);
+        CommentResponse replyComment = commentService.replyWrite(entity2, channel, comment.getId());
+        //when
+        commentService.commentDelete(comment.getId());
+        //then
+        List<Comment> result = commentRepository.findAll();
+        assertThat(result.size()).isEqualTo(0);  //부모댓글을 삭제했으니 답글도 삭제될 것이고 개수가 0개여야함
     }
 }

@@ -64,18 +64,49 @@ public class Comment {
             if (commentLike.getChannel().equals(channel)) return true;
         return false;
     }
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(orphanRemoval = true, mappedBy = "rootComment")
+    private Set<Comment> replyComments = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "root_comment_id")
     private Comment rootComment;
 
+    public void addReplyComment(Comment replyComment) {
+        this.replyComments.add(replyComment);
+        replyComment.setRootComment(this);
+    }
+
+    public void deleteReplyComment(Comment replyComment) {
+        this.replyComments.remove(replyComment);
+    }
+
+    public int getReplyCount() { return this.replyComments.size();}  //리플 개수가 필요한 사람이 있을까 혹시나..
+
     @Builder
-    public Comment(String contents, Video video, Channel channel, Comment rootComment) {
+    public Comment(String contents) {
         this.contents = contents;
+    }
+
+    public void setVideo(Video video) {
         this.video = video;
+    }
+
+    public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    public void setRootComment(Comment rootComment) {
         this.rootComment = rootComment;
     }
+
+    public void likeComment(CommentLike like) {
+        this.likes.add(like);
+        like.setComment(this);
+    }
+
+    public void unLikeComment(CommentLike like) {
+        this.likes.remove(like);
+    }
+
 }
 
 

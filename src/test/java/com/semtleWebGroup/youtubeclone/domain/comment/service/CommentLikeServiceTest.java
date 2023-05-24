@@ -1,7 +1,6 @@
 package com.semtleWebGroup.youtubeclone.domain.comment.service;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.CommentLike;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.CommentLikeResponse;
@@ -23,15 +22,10 @@ class CommentLikeServiceTest extends MockTest {
     private static CommentLikeRepository commentLikeRepository;
     private static CommentLikeService commentLikeService;
     private static CommentRepository commentRepository;
-    private static CommentService commentService;
-    private static ChannelRepository channelRepository;
-
     @BeforeAll
     public static void set() {
-        channelRepository = Mockito.mock(ChannelRepository.class);
         commentRepository = Mockito.mock(CommentRepository.class);
         commentLikeRepository = Mockito.mock(CommentLikeRepository.class);
-        commentService = new CommentService(commentRepository);
         commentLikeService = new CommentLikeService(commentRepository, commentLikeRepository);
     }
 
@@ -55,29 +49,25 @@ class CommentLikeServiceTest extends MockTest {
                     .description("Description")
                     .build();
 
-            Long commentId = 1L;
             Comment comment = Comment.builder()
                     .contents("테스트")
                     .build();
-            //comment.setId(commentId);
 
             CommentLike commentLike1 = CommentLike.builder()
                     .channel(channel1)
-                    .comment(comment)
                     .build();
             CommentLike commentLike2 = CommentLike.builder()
                     .channel(channel2)
-                    .comment(comment)
                     .build();
 
 
-            when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+            when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
             when(commentRepository.save(comment)).thenReturn(comment);
             when(commentLikeRepository.save(commentLike1)).thenReturn(commentLike1);
             when(commentLikeRepository.save(commentLike2)).thenReturn(commentLike2);
             // when
-            commentLikeService.likeAdd(commentId, channel1);
-            CommentLikeResponse commentLikeResponse = commentLikeService.likeAdd(commentId, channel2);
+            commentLikeService.likeAdd(comment.getId(), channel1);
+            CommentLikeResponse commentLikeResponse = commentLikeService.likeAdd(comment.getId(), channel2);
             CommentLikeResponse commentLikeResponse2 = commentLikeService.get(comment, channel3);
             // then
             assertEquals(2, commentLikeResponse.getLikeCount());
@@ -99,24 +89,21 @@ class CommentLikeServiceTest extends MockTest {
                     .description("Description")
                     .build();
 
-            Long commentId = 1L;
             Comment comment = Comment.builder()
                     .contents("테스트")
                     .build();
-            //comment.setId(commentId);
 
             CommentLike commentLike1 = CommentLike.builder()
                     .channel(channel)
-                    .comment(comment)
                     .build();
             comment.getLikes().add(commentLike1);
 
-            when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+            when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
             when(commentRepository.save(comment)).thenReturn(comment);
             when(commentLikeRepository.findByCommentAndChannel(comment, channel)).thenReturn(commentLike1);
 
             // when
-            CommentLikeResponse commentLikeResponse = commentLikeService.likeDelete(commentId, channel);
+            CommentLikeResponse commentLikeResponse = commentLikeService.likeDelete(comment.getId(), channel);
 
             // then
             assertEquals(0, commentLikeResponse.getLikeCount());
