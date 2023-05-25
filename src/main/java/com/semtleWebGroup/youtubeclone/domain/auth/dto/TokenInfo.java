@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.auth.dto;
 import com.semtleWebGroup.youtubeclone.domain.auth.domain.Role;
 import com.semtleWebGroup.youtubeclone.domain.auth.token.AccessToken;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class TokenInfo {
                 map.get(AccessToken.Field.EMAIL),
                 Role.valueOf(map.get(AccessToken.Field.ROLE)),
                 Long.valueOf(map.get(AccessToken.Field.MEMBER_ID)),
-                Long.valueOf(map.get(AccessToken.Field.CHANNEL_ID))
+                (StringUtils.hasText(map.get(AccessToken.Field.CHANNEL_ID))) ? Long.valueOf(map.get(AccessToken.Field.CHANNEL_ID)) : null
         );
     }
 }
