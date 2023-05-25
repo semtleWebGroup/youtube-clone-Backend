@@ -53,18 +53,21 @@ public class Comment {
         if (contents != null) this.contents=contents;
     }
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "comment")
-    private Set<CommentLike> likes = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+            name = "comment_like",
+            joinColumns = @JoinColumn(name = "comment_id"),
+            inverseJoinColumns = @JoinColumn(name = "channel_id")
+    )
+    private Set<Channel> likes = new HashSet<>();
 
     public int getLikeCount() { return this.likes.size();}
 
     public Boolean isLike(Channel channel) {
         if (channel == null) return false;
-        for (CommentLike commentLike : this.likes)
-            if (commentLike.getChannel().equals(channel)) return true;
-        return false;
+        return this.likes.contains(channel);
     }
-    @OneToMany(orphanRemoval = true, mappedBy = "rootComment")
+    @OneToMany(cascade = CascadeType.REMOVE,  mappedBy = "rootComment")
     private Set<Comment> replyComments = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "root_comment_id")
@@ -98,13 +101,12 @@ public class Comment {
         this.rootComment = rootComment;
     }
 
-    public void likeComment(CommentLike like) {
-        this.likes.add(like);
-        like.setComment(this);
+    public void addLike(Channel channel) {
+        this.likes.add(channel);
     }
 
-    public void unLikeComment(CommentLike like) {
-        this.likes.remove(like);
+    public void removeLike(Channel channel) {
+        this.likes.remove(channel);
     }
 
 }

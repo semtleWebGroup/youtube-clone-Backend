@@ -29,7 +29,6 @@ class CommentServiceTest{
     VideoRepository videoRepository;
     @Autowired
     ChannelRepository channelRepository;
-
     @Test
     void 등록() {
         CommentRequest entity = new CommentRequest();
@@ -79,16 +78,17 @@ class CommentServiceTest{
                 .title("Title")
                 .description("Description")
                 .build();
+        channelRepository.save(channel);
         Video video = Video.builder()
                 .channel(channel)
                 .build();
-
+        videoRepository.save(video);
         CommentResponse comment = commentService.write(entity, channel, video);
 
         CommentRequest entity2 = new CommentRequest();
         entity2.setContent("업데이트");
         //When
-        CommentResponse comment2 = commentService.updateComment(comment.getId(), entity2);
+        CommentResponse comment2 = commentService.updateComment(comment.getId(), entity2, channel);
         //Then
         Comment findComment = commentRepository.findById(comment2.getId()).get();
         assertEquals(entity2.getContent(), findComment.getContents());
@@ -178,19 +178,21 @@ class CommentServiceTest{
                 .title("Title")
                 .description("Description")
                 .build();
+        channelRepository.save(channel);
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        videoRepository.save(video);
         CommentResponse comment = commentService.write(entity, channel, video);
 
         //when
-        commentService.commentDelete(comment.getId());
+        commentService.commentDelete(comment.getId(), channel);
         //then
         List<Comment> result = commentRepository.findAll();
         assertThat(result.size()).isEqualTo(0);
     }
     @Test
-    void 답글삭제() {  //부모 댓글 삭제시 자동으로 답글 삭제 테스트
+    void 부모댓글삭제() {  //부모 댓글 삭제시 자동으로 답글 삭제 테스트
         CommentRequest entity1 = new CommentRequest();
         entity1.setContent("테스트");
         CommentRequest entity2 = new CommentRequest();
@@ -199,15 +201,70 @@ class CommentServiceTest{
                 .title("Title")
                 .description("Description")
                 .build();
+        channelRepository.save(channel);
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        videoRepository.save(video);
         CommentResponse comment = commentService.write(entity1, channel, video);
         CommentResponse replyComment = commentService.replyWrite(entity2, channel, comment.getId());
         //when
-        commentService.commentDelete(comment.getId());
+        commentService.commentDelete(comment.getId(), channel);
         //then
+        assertThat(channel.getComments().size()).isEqualTo(0); //부모댓글을 삭제했으니 답글도 삭제될 것이고 개수가 0개여야함
+        assertThat(video.getComments().size()).isEqualTo(0);
         List<Comment> result = commentRepository.findAll();
         assertThat(result.size()).isEqualTo(0);  //부모댓글을 삭제했으니 답글도 삭제될 것이고 개수가 0개여야함
     }
+
+    @Test
+    void 자식댓글삭제() {  //부모 댓글 삭제시 자동으로 답글 삭제 테스트
+        CommentRequest entity1 = new CommentRequest();
+        entity1.setContent("테스트");
+        CommentRequest entity2 = new CommentRequest();
+        entity2.setContent("답글");
+        Channel channel = Channel.builder()
+                .title("Title")
+                .description("Description")
+                .build();
+        channelRepository.save(channel);
+        Video video = Video.builder()
+                .channel(channel)
+                .build();
+        videoRepository.save(video);
+        CommentResponse comment = commentService.write(entity1, channel, video);
+        CommentResponse replyComment = commentService.replyWrite(entity2, channel, comment.getId());
+        //when
+        commentService.commentDelete(replyComment.getId(), channel);
+        //then
+        assertThat(channel.getComments().size()).isEqualTo(1);
+        assertThat(video.getComments().size()).isEqualTo(1);
+        List<Comment> result = commentRepository.findAll();
+        assertThat(result.size()).isEqualTo(1);
+    }
+
+    @Test
+    void 비디오삭제시댓글삭제() {  //부모 댓글 삭제시 자동으로 답글 삭제 테스트
+        CommentRequest entity1 = new CommentRequest();
+        entity1.setContent("테스트");
+        CommentRequest entity2 = new CommentRequest();
+        entity2.setContent("답글");
+        Channel channel = Channel.builder()
+                .title("Title")
+                .description("Description")
+                .build();
+        channelRepository.save(channel);
+        Video video = Video.builder()
+                .channel(channel)
+                .build();
+        videoRepository.save(video);
+        CommentResponse comment = commentService.write(entity1, channel, video);
+        CommentResponse replyComment = commentService.replyWrite(entity2, channel, comment.getId());
+        //when
+        videoRepository.delete(video);
+        //then
+        List<Comment> result = commentRepository.findAll();
+        assertThat(result.size()).isEqualTo(0);
+    }
+
 }

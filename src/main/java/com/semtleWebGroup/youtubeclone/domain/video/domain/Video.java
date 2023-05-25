@@ -104,6 +104,9 @@ public class Video {
     }
 
     public void deleteComment(Comment comment) {
+        for (Comment replyComment: comment.getReplyComments()) {   //부모는 아니지만 명시적인 처리를 위해서
+            this.comments.remove(replyComment);
+        }
         this.comments.remove(comment);
     }
 }
