@@ -5,12 +5,15 @@ import com.semtleWebGroup.youtubeclone.domain.channel.application.ChannelService
 import com.semtleWebGroup.youtubeclone.domain.channel.application.SubscribeService;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
+import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -28,9 +31,10 @@ public class ChannelApi {
      * @param ChannelRequest form-data 형식으로 channelProfile.title, channelProfile.description, profile_img
      * @return 현재는 entity 자체를 반환. 프론트 사용 데이터 보고 overfetching 줄일 예정
      */
-    @PostMapping("")
-    public ResponseEntity create(@Valid @ModelAttribute ChannelRequest dto){
-        Channel channel = channelService.addChannel(dto);
+    @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity create(@Valid @RequestPart ChannelProfile dto,
+                                 @RequestPart(required = false) MultipartFile profileImg){
+        Channel channel = channelService.addChannel(dto,profileImg);
         ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
@@ -146,10 +150,11 @@ public class ChannelApi {
      * @return 현재는 entity 자체를 반환. 프론트 사용 데이터 보고 overfetching 줄일 예정
      * @throws Exception 이미지 첨부 관련 Exception
      */
-    @PatchMapping("/{channelId}")
+    @PatchMapping(value = "/{channelId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity editChannel(@PathVariable("channelId")Long channelId,
-                                      @Valid @ModelAttribute ChannelRequest dto){
-        final Channel channel = channelService.updateChannel(channelId, dto);
+                                      @Valid @RequestPart ChannelProfile dto,
+                                      @RequestPart(required = false) MultipartFile profileImg){
+        final Channel channel = channelService.updateChannel(channelId, dto, profileImg);
         ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
 
 

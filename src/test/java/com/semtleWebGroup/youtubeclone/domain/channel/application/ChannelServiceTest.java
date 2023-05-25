@@ -42,22 +42,20 @@ class ChannelServiceTest extends MockTest {
         void testAddChannelWithImage() throws IOException, SQLException {
             // given
             MultipartFile image = new MockMultipartFile("test.jpg", "test".getBytes());
-            ChannelRequest request = new ChannelRequest();
-            request.setChannelProfile(new ChannelProfile());
-            request.getChannelProfile().setTitle("Test Channel");
-            request.getChannelProfile().setDescription("Test Channel Description");
-            request.setProfile_img(image);
+            ChannelProfile request = new ChannelProfile();
+            request.setTitle("Test Channel");
+            request.setDescription("Test Channel Description");
 
             Channel createdChannel = Channel.builder()
-                    .title(request.getChannelProfile().getTitle())
-                    .description(request.getChannelProfile().getDescription())
+                    .title(request.getTitle())
+                    .description(request.getDescription())
                     .build();
             createdChannel.setChannelImage(new SerialBlob(image.getBytes()));
 
             when(channelRepository.save(any(Channel.class))).thenReturn(createdChannel);
 
             // when
-            Channel channel = channelService.addChannel(request);
+            Channel channel = channelService.addChannel(request, image);
 
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
@@ -69,20 +67,20 @@ class ChannelServiceTest extends MockTest {
         @DisplayName("addChannel 테스트 - 이미지 파일이 없을 경우")
         void testAddChannelWithoutImage(){
             // given
-            ChannelRequest request = new ChannelRequest();
-            request.setChannelProfile(new ChannelProfile());
-            request.getChannelProfile().setTitle("Test Channel");
-            request.getChannelProfile().setDescription("Test Channel Description");
+            ChannelProfile request = new ChannelProfile();
+            MultipartFile image = null;
+            request.setTitle("Test Channel");
+            request.setDescription("Test Channel Description");
 
             Channel createdChannel = Channel.builder()
-                    .title(request.getChannelProfile().getTitle())
-                    .description(request.getChannelProfile().getDescription())
+                    .title(request.getTitle())
+                    .description(request.getDescription())
                     .build();
 
             when(channelRepository.save(any(Channel.class))).thenReturn(createdChannel);
 
             // when
-            Channel channel = channelService.addChannel(request);
+            Channel channel = channelService.addChannel(request, image);
 
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
@@ -140,22 +138,21 @@ class ChannelServiceTest extends MockTest {
                     .description("Old Description")
                     .build();
             MultipartFile image = new MockMultipartFile("test.jpg", "test".getBytes());
-            ChannelRequest dto = new ChannelRequest();
-            dto.setChannelProfile(new ChannelProfile());
-            dto.getChannelProfile().setTitle("New Channel");
-            dto.getChannelProfile().setDescription("New Description");
-            dto.setProfile_img(image);
+            ChannelProfile dto = new ChannelProfile();
+            dto.setTitle("New Channel");
+            dto.setDescription("New Description");
+
 
             when(channelRepository.findById(id)).thenReturn(Optional.of(oldChannel));
             when(channelRepository.save(any(Channel.class))).thenReturn(oldChannel);
 
             // when
-            Channel updatedChannel = channelService.updateChannel(id, dto);
+            Channel updatedChannel = channelService.updateChannel(id, dto, image);
 
             // then
-            assertEquals(dto.getChannelProfile().getTitle(), updatedChannel.getTitle());
-            assertEquals(dto.getChannelProfile().getDescription(), updatedChannel.getDescription());
-            assertEquals(new SerialBlob(dto.getProfile_img().getBytes()), updatedChannel.getChannelImage());
+            assertEquals(dto.getTitle(), updatedChannel.getTitle());
+            assertEquals(dto.getDescription(), updatedChannel.getDescription());
+            assertEquals(new SerialBlob(image.getBytes()), updatedChannel.getChannelImage());
         }
 
         @Test
@@ -164,15 +161,13 @@ class ChannelServiceTest extends MockTest {
             // given
             Long id = 1L;
             MultipartFile image = new MockMultipartFile("test.jpg", "test".getBytes());
-            ChannelRequest dto = new ChannelRequest();
-            dto.setChannelProfile(new ChannelProfile());
-            dto.getChannelProfile().setTitle("Test Channel");
-            dto.getChannelProfile().setDescription("Test Channel Description");
-            dto.setProfile_img(image);
+            ChannelProfile dto = new ChannelProfile();
+            dto.setTitle("Test Channel");
+            dto.setDescription("Test Channel Description");
             when(channelRepository.findById(id)).thenReturn(Optional.empty());
 
             // when, then
-            assertThrows(EntityNotFoundException.class, () -> channelService.updateChannel(id, dto));
+            assertThrows(EntityNotFoundException.class, () -> channelService.updateChannel(id, dto,image));
         }
     }
 
