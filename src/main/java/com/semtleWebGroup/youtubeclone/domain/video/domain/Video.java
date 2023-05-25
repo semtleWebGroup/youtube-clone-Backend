@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.video.domain;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 
+import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,10 +34,10 @@ public class Video {
     private String description = "";
 
     @CreatedDate
-    private LocalDateTime createdTime;
+    private LocalDateTime createdTime = LocalDateTime.now();
 
     @LastModifiedDate
-    private LocalDateTime updatedTime;
+    private LocalDateTime updatedTime = LocalDateTime.now();
 
     private int viewCount = 0;
 
@@ -45,8 +46,13 @@ public class Video {
     @Enumerated(EnumType.STRING)
     private VideoStatus status = VideoStatus.PUBLIC; // 추후 디폴트 값은 DRAFT로 변경하고, PUBLIC/PRIVATE로 전환하는 기능 추가 필요.
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
-    private Set<VideoLike> likes = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+            name = "video_like",
+            joinColumns = @JoinColumn(name = "video_id"),
+            inverseJoinColumns = @JoinColumn(name = "channel_id")
+    )
+    private Set<Channel> likes = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "video")
     private Set<Comment> comments = new HashSet<>();
@@ -80,8 +86,8 @@ public class Video {
 
     public Boolean isLike(Channel channel) {
         if (channel == null) return false;
-        for (VideoLike vl : this.likes)
-            if (vl.getChannel().equals(channel)) return true;
+        for (Channel ch : this.likes)
+            if (ch.getId().equals(channel.getId())) return true;
         return false;
     }
 
@@ -89,13 +95,13 @@ public class Video {
         this.channel = channel;
     }
 
-    public void likeVideo(VideoLike like) {
-        this.likes.add(like);
-        like.setVideo(this);
+    public void addLikeChannel(Channel channel) {
+        this.likes.add(channel);
     }
 
-    public void unLikeVideo(VideoLike like) {
-        this.likes.remove(like);
+    public void removeLikeChannel(Channel channel) {
+        this.likes.remove(channel);
+        // videoLike가 존재하지 않는다고 에러가 아님
     }
 
     public void addComment(Comment comment) {
