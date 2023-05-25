@@ -56,16 +56,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         Map<AccessToken.Field, String> map = accessToken.parseClaims();
 
         //4. check channelId
-        if (!StringUtils.hasText(map.get(AccessToken.Field.CHANNEL_ID))) {
+        boolean channelIdExist = StringUtils.hasText(map.get(AccessToken.Field.CHANNEL_ID));
+        if (!channelIdExist) {
+            // 4-1. if channelId is not exist, check request is /channel and POST
+            if (request.getRequestURI().equals("/channels") && request.getMethod().equals("POST")) {
+                CustomAuthentication customAuthentication = new CustomAuthentication(map);
+                SecurityContextHolder.getContext().setAuthentication(customAuthentication);
+            }
+            // 동작 설명 -> 채널 회원가입 로직이면, 통과, 아니면 401
             filterChain.doFilter(request, response);
             return;
+        } else {
+            // 4-2. if channelId is exist, set authentication
+            CustomAuthentication customAuthentication = new CustomAuthentication(map);
+            SecurityContextHolder.getContext().setAuthentication(customAuthentication);
+            filterChain.doFilter(request, response);
         }
-
-        //5. set Authentication
-        CustomAuthentication customAuthentication = new CustomAuthentication(map);
-        SecurityContextHolder.getContext().setAuthentication(customAuthentication);
-
-        filterChain.doFilter(request, response);
 
     }
 
