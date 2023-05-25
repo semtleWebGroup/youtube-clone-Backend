@@ -1,12 +1,14 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.application;
 
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import com.semtleWebGroup.youtubeclone.domain.channel.exception.TitleDuplicateException;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.transaction.Transactional;
@@ -26,13 +28,13 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
 
     @Transactional
-    public Channel addChannel(ChannelRequest dto){
+    public Channel addChannel(ChannelProfile dto, MultipartFile profileImg){
         Channel newChannel = Channel.builder()
-                .title(dto.getChannelProfile().getTitle())
-                .description(dto.getChannelProfile().getDescription())
+                .title(dto.getTitle())
+                .description(dto.getDescription())
                 .build();
-        if (dto.getProfile_img() != null){
-            saveChannelImgFromDto(dto, newChannel);
+        if (profileImg != null){
+            saveChannelImgFromDto(profileImg, newChannel);
         }
 
         channelRepository.save(newChannel);
@@ -40,9 +42,9 @@ public class ChannelService {
         return newChannel;
     }
 
-    private static void saveChannelImgFromDto(ChannelRequest dto, Channel newChannel){
+    private static void saveChannelImgFromDto(MultipartFile profileImg, Channel newChannel){
         try {
-            Blob blob = new SerialBlob(dto.getProfile_img().getBytes());
+            Blob blob = new SerialBlob(profileImg.getBytes());
             newChannel.setChannelImage(blob);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -60,13 +62,13 @@ public class ChannelService {
     }
 
     @Transactional
-    public Channel updateChannel(Long id, ChannelRequest dto){
+    public Channel updateChannel(Long id, ChannelProfile dto, MultipartFile profileImg){
         Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", id)
         ));
-        oldChannel.update(dto.getChannelProfile().getTitle(), dto.getChannelProfile().getDescription());
+        oldChannel.update(dto.getTitle(), dto.getDescription());
 
-        if (dto.getProfile_img() != null)  saveChannelImgFromDto(dto, oldChannel);
+        if (profileImg != null)  saveChannelImgFromDto(profileImg, oldChannel);
 
         channelRepository.save(oldChannel);
 
