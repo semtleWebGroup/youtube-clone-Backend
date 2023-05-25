@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -136,6 +138,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,errorCode.getStatus());
     }
 
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    protected ResponseEntity<?> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e){
+        log.error("handleHttpMediaTypeNotSupportedException",e);
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    protected ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e){
+        log.error("handleBadCredentialsException",e);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
 
     /**
