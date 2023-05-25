@@ -96,8 +96,9 @@ public class CommentService {
         Video video = comment.getVideo();
         channel.deleteComment(comment);  //채널에서 댓글 정보 삭제
         video.deleteComment(comment);   //비디오에서 댓글 정보 삭제
-        for (Comment replyComment: comment.getReplyComments()) {  //댓글에서 자식들 정보 삭제
-            comment.deleteReplyComment(replyComment);
+        if(comment.getRootComment() != null){
+            Comment rootComment = comment.getRootComment();
+            rootComment.deleteReplyComment(comment); //부모 댓글에서 댓글 정보 삭제
         }
         commentRepository.delete(comment);  //댓글은 부모가 많아서 따로 삭제
     }
