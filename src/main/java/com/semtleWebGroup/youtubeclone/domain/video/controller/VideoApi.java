@@ -1,15 +1,16 @@
 package com.semtleWebGroup.youtubeclone.domain.video.controller;
 
+import com.semtleWebGroup.youtubeclone.domain.auth.dto.TokenInfo;
+import com.semtleWebGroup.youtubeclone.domain.channel.application.ChannelService;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
-import com.semtleWebGroup.youtubeclone.domain.video.service.VideoLikeService;
 import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import com.semtleWebGroup.youtubeclone.global.error.FieldError;
 import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
-import com.semtleWebGroup.youtubeclone.global.error.exception.MediaServerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,7 @@ import java.util.UUID;
 @RequestMapping("/videos")
 public class VideoApi {
     private final VideoService videoService;
-    private final VideoLikeService videoLikeService;
+    private final ChannelService channelService; // token에서 channel 가져오는 용도
 
     private void checkImgFileExtension(MultipartFile file) {
         String fileName = file.getOriginalFilename();
@@ -49,8 +50,12 @@ public class VideoApi {
     public ResponseEntity upload(
             @RequestPart MultipartFile videoFile,
             @RequestPart(required = false) MultipartFile thumbImg,
-            @RequestPart Channel channel
-    ) {
+            @AuthenticationPrincipal TokenInfo principal
+            )
+    {
+        Long channelId = principal.getChannelId();
+        Channel channel = channelService.getChannel(channelId);
+
         if (!thumbImg.isEmpty()) this.checkImgFileExtension(thumbImg);
         this.checkVideoFileExtension(videoFile);
 
@@ -68,9 +73,12 @@ public class VideoApi {
     @PostMapping("/{videoId}")
     public ResponseEntity create(
         @PathVariable UUID videoId,
-        @RequestPart @Valid VideoRequest data,
-        @RequestPart Channel channel
+        @RequestBody @Valid VideoRequest data,
+        @AuthenticationPrincipal TokenInfo principal
     ) {
+        Long channelId = principal.getChannelId();
+        Channel channel = channelService.getChannel(channelId);
+
         VideoEditDto dto = VideoEditDto.builder()
             .channel(channel)
             .videoId(videoId)
@@ -84,7 +92,13 @@ public class VideoApi {
     }
 
     @GetMapping("/{videoId}")
-    public ResponseEntity view(@PathVariable UUID videoId, @RequestPart Channel channel) {
+    public ResponseEntity view(
+            @PathVariable UUID videoId,
+            @AuthenticationPrincipal TokenInfo principal
+    ) {
+        Long channelId = principal.getChannelId();
+        Channel channel = channelService.getChannel(channelId);
+
         VideoViewResponse videoViewResponse = videoService.view(videoId, channel);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -94,9 +108,12 @@ public class VideoApi {
     @PatchMapping("/{videoId}")
     public ResponseEntity update(
         @PathVariable UUID videoId,
-        @RequestPart @Valid VideoRequest data,
-        @RequestPart Channel channel
+        @RequestBody @Valid VideoRequest data,
+        @AuthenticationPrincipal TokenInfo principal
     ) {
+        Long channelId = principal.getChannelId();
+        Channel channel = channelService.getChannel(channelId);
+
         VideoEditDto dto = VideoEditDto.builder()
             .channel(channel)
             .videoId(videoId)
@@ -110,7 +127,13 @@ public class VideoApi {
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity delete(@PathVariable UUID videoId, @RequestPart Channel channel) {
+    public ResponseEntity delete(
+            @PathVariable UUID videoId,
+            @AuthenticationPrincipal TokenInfo principal
+    ) {
+        Long channelId = principal.getChannelId();
+        Channel channel = channelService.getChannel(channelId);
+
         VideoResponse videoResponse = videoService.delete(videoId, channel);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -118,16 +141,28 @@ public class VideoApi {
     }
 
     @PostMapping("/{videoId}/like")
-    public ResponseEntity like(@PathVariable UUID videoId, @RequestPart Channel channel) {
-        VideoLikeResponse videoLikeResponse = videoLikeService.add(videoId, channel);
+    public ResponseEntity like(
+            @PathVariable UUID videoId,
+            @AuthenticationPrincipal TokenInfo principal
+    ) {
+        Long channelId = principal.getChannelId();
+        Channel channel = channelService.getChannel(channelId);
+
+        VideoLikeResponse videoLikeResponse = videoService.like(videoId, channel);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(videoLikeResponse);
     }
 
     @DeleteMapping("/{videoId}/like")
-    public ResponseEntity dislike(@PathVariable UUID videoId, @RequestPart Channel channel) {
-        VideoLikeResponse videoLikeResponse = videoLikeService.delete(videoId, channel);
+    public ResponseEntity dislike(
+            @PathVariable UUID videoId,
+            @AuthenticationPrincipal TokenInfo principal
+    ) {
+        Long channelId = principal.getChannelId();
+        Channel channel = channelService.getChannel(channelId);
+
+        VideoLikeResponse videoLikeResponse = videoService.dislike(videoId, channel);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(videoLikeResponse);

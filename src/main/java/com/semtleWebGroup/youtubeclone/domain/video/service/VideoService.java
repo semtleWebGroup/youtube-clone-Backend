@@ -94,4 +94,26 @@ public class VideoService {
 //        Page<Video> videos = videoRepository.findByStatusOrderByCreatedTimeDesc(pageable, Video.VideoStatus.PUBLIC); // TODO: Enum으로 찾는 방법 ..
         return new VideoPageResponse(videos);
     }
+
+    public VideoLikeResponse like(UUID videoId, Channel channel) {
+        Video video = this.getVideo(videoId);
+        channel.likeVideo(video); // channel의 like set에 video 추가 & video의 like set에 channel 추가
+        videoRepository.save(video);
+        return this.get(video, channel);
+    }
+
+    public VideoLikeResponse dislike(UUID videoId, Channel channel) {
+        Video video = this.getVideo(videoId);
+        channel.unLikeVideo(video); // channel의 like set에서 video 제거 & video의 like set에서 channel 제거
+        videoRepository.save(video);
+        return this.get(video, channel);
+    }
+
+    private VideoLikeResponse get(Video video, Channel channel) {
+        return VideoLikeResponse.builder()
+                .videoId(video.getId())
+                .likeCount(video.getLikeCount())
+                .isLike(video.isLike(channel))
+                .build();
+    }
 }
