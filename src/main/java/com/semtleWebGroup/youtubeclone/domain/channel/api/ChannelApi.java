@@ -1,17 +1,18 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.semtleWebGroup.youtubeclone.domain.auth.token.AccessToken;
 import com.semtleWebGroup.youtubeclone.domain.channel.application.ChannelService;
 import com.semtleWebGroup.youtubeclone.domain.channel.application.SubscribeService;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
-import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
+import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class ChannelApi {
     private final ChannelService channelService;
     private final SubscribeService subscribeService;
+    private final AccessToken.TokenBuilder tokenBuilder;
 
     /**
      * @param ChannelRequest form-data 형식으로 channelProfile.title, channelProfile.description, profile_img
@@ -33,11 +35,23 @@ public class ChannelApi {
      */
     @PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity create(@Valid @RequestPart ChannelProfile dto,
-                                 @RequestPart(required = false) MultipartFile profileImg){
-        Channel channel = channelService.addChannel(dto,profileImg);
-        ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
+                                 @RequestPart(required = false) MultipartFile profileImg,
+                                 @RequestHeader("Authorization") String authorization){
+        //1. valid request
+        boolean isHeaderValid = StringUtils.hasText(authorization) && authorization.startsWith("Bearer ");
+        if (!isHeaderValid) {
+            throw new BadRequestException(Collections.emptyList());
+        }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        //2. 토큰 파싱
+        String tokenValue = authorization.substring(7);
+        AccessToken token = tokenBuilder.build(tokenValue);
+        Map<AccessToken.Field, String> fieldStringMap = token.parseClaims();
+        Long memberId = Long.valueOf(fieldStringMap.get(AccessToken.Field.MEMBER_ID));
+
+        ChannelDto channel = channelService.addChannel(dto,profileImg, memberId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     /**
@@ -46,10 +60,20 @@ public class ChannelApi {
      */
     @PostMapping("/{channelId}/subscribtion")
     public ResponseEntity subscribeChannel(@PathVariable("channelId")Long channelId,
-                                           @RequestBody Map<String, Object> requestBody){
-        ObjectMapper objectMapper = new ObjectMapper();
-        Long myId = objectMapper.convertValue(requestBody.get("myid"), Long.class);
-        subscribeService.subscribe(Long.valueOf(myId), channelId);
+                                           @RequestHeader("Authorization") String authorization){
+        //1. valid request
+        boolean isHeaderValid = StringUtils.hasText(authorization) && authorization.startsWith("Bearer ");
+        if (!isHeaderValid) {
+            throw new BadRequestException(Collections.emptyList());
+        }
+
+        //2. 토큰 파싱
+        String tokenValue = authorization.substring(7);
+        AccessToken token = tokenBuilder.build(tokenValue);
+        Map<AccessToken.Field, String> fieldStringMap = token.parseClaims();
+        Long myId = Long.valueOf(fieldStringMap.get(AccessToken.Field.CHANNEL_ID));
+
+        subscribeService.subscribe(myId, channelId);
 
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
@@ -61,10 +85,9 @@ public class ChannelApi {
      */
     @GetMapping("/{channelId}")
     public ResponseEntity getChannelInfo(@PathVariable("channelId")Long channelId){
-        Channel channel = channelService.getChannel(channelId);
-        ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
+        ChannelDto channel = channelService.getChannel(channelId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+        return ResponseEntity.status(HttpStatus.OK).body(channel);
     }
 
     /**
@@ -83,7 +106,8 @@ public class ChannelApi {
      * @return channelId가 구독한 채널리스트 가져오기
      */
     @GetMapping("/{channelId}/subscribiton")
-    public ResponseEntity getSubscribtionList(@PathVariable("channelId")Long channelId){
+    public ResponseEntity getSubscribtionList(@PathVariable("channelId")Long channelId) {
+
         final Set<Channel> channelList = subscribeService.getSubscribedChannels(channelId);
         List<ChannelDto> response = channelList.stream().map(ChannelDto::new).collect(Collectors.toList());
 
@@ -92,6 +116,7 @@ public class ChannelApi {
 
     @GetMapping("/{channelId}/subscribers")
     public ResponseEntity displayCountOfSubscribers(@PathVariable Long channelId){
+
         Map<String,String> response = new HashMap<>();
         Long count = subscribeService.getCountOfSubscribers(channelId);
         response.put("count",count.toString());
@@ -104,11 +129,23 @@ public class ChannelApi {
      * @param subscriberId 로그인 한 사용자 채널
      * @return
      */
-    @GetMapping("/{channelId}/subscribed/{subscriberId}")
+    @GetMapping("/{channelId}/subscribed")
     public ResponseEntity checkSubscribe(@PathVariable Long channelId,
-                                         @PathVariable Long subscriberId){
+                                         @RequestHeader("Authorization") String authorization){
+        //1. valid request
+        boolean isHeaderValid = StringUtils.hasText(authorization) && authorization.startsWith("Bearer ");
+        if (!isHeaderValid) {
+            throw new BadRequestException(Collections.emptyList());
+        }
+
+        //2. 토큰 파싱
+        String tokenValue = authorization.substring(7);
+        AccessToken token = tokenBuilder.build(tokenValue);
+        Map<AccessToken.Field, String> fieldStringMap = token.parseClaims();
+        Long subscriberId = Long.valueOf(fieldStringMap.get(AccessToken.Field.CHANNEL_ID));
+
         Map<String,String> response = new HashMap<>();
-        if (subscribeService.isSubscribed(channelId,subscriberId)){
+        if (subscribeService.isSubscribed(channelId, subscriberId)){
             response.put("status","true");
         } else {
             response.put("status","false");
@@ -119,15 +156,25 @@ public class ChannelApi {
 
     /**
      * 구독 취소
-     * @param channelId - 구독을 취소할 채널 id, 채널 정보 수정 권한 확인할 토큰 필요. 현재는 myid로 대체
+     * @param channelId - 구독을 취소할 채널 id, 채널 정보 수정 권한 확인할 토큰 필요.
      * @return 성공시 OK 실패시 다른 ErrorCode 예정
      */
     @DeleteMapping("/{channelId}/subscribtion")
     public ResponseEntity cancleSubscribtion(@PathVariable("channelId")Long channelId,
-                                             @RequestBody Map<String, Object> requestBody){
-        ObjectMapper objectMapper = new ObjectMapper();
-        Long myId = objectMapper.convertValue(requestBody.get("myid"), Long.class);
-        subscribeService.unsubscribe(Long.valueOf(myId), channelId);
+                                             @RequestHeader("Authorization") String authorization){
+        //1. valid request
+        boolean isHeaderValid = StringUtils.hasText(authorization) && authorization.startsWith("Bearer ");
+        if (!isHeaderValid) {
+            throw new BadRequestException(Collections.emptyList());
+        }
+
+        //2. 토큰 파싱
+        String tokenValue = authorization.substring(7);
+        AccessToken token = tokenBuilder.build(tokenValue);
+        Map<AccessToken.Field, String> fieldStringMap = token.parseClaims();
+        Long myId = Long.valueOf(fieldStringMap.get(AccessToken.Field.CHANNEL_ID));
+
+        subscribeService.unsubscribe(myId, channelId);
 
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
@@ -138,10 +185,23 @@ public class ChannelApi {
      * @return 성공시 OK 실패시 다른 ErrorCode 예정
      */
     @DeleteMapping("/{channelId}")
-    public ResponseEntity deleteChannel(@PathVariable("channelId")Long channelId){
-        channelService.deleteChannel(channelId);
+    public ResponseEntity deleteChannel(@PathVariable("channelId")Long channelId,
+                                        @RequestHeader("Authorization") String authorization){
+        //1. valid request
+        boolean isHeaderValid = StringUtils.hasText(authorization) && authorization.startsWith("Bearer ");
+        if (!isHeaderValid) {
+            throw new BadRequestException(Collections.emptyList());
+        }
 
-        return ResponseEntity.status(HttpStatus.OK).body("");
+        //2. 토큰 파싱
+        String tokenValue = authorization.substring(7);
+        AccessToken token = tokenBuilder.build(tokenValue);
+        Map<AccessToken.Field, String> fieldStringMap = token.parseClaims();
+        Long memberId = Long.valueOf(fieldStringMap.get(AccessToken.Field.MEMBER_ID));
+
+        channelService.deleteChannel(channelId, memberId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("삭제 성공");
     }
 
     /**
@@ -153,11 +213,23 @@ public class ChannelApi {
     @PatchMapping(value = "/{channelId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity editChannel(@PathVariable("channelId")Long channelId,
                                       @Valid @RequestPart ChannelProfile dto,
-                                      @RequestPart(required = false) MultipartFile profileImg){
-        final Channel channel = channelService.updateChannel(channelId, dto, profileImg);
-        ChannelDto res = Optional.ofNullable(channel).map(ChannelDto::new).orElse(null);
+                                      @RequestPart(required = false) MultipartFile profileImg,
+                                      @RequestHeader("Authorization") String authorization){
+        //1. valid request
+        boolean isHeaderValid = StringUtils.hasText(authorization) && authorization.startsWith("Bearer ");
+        if (!isHeaderValid) {
+            throw new BadRequestException(Collections.emptyList());
+        }
+
+        //2. 토큰 파싱
+        String tokenValue = authorization.substring(7);
+        AccessToken token = tokenBuilder.build(tokenValue);
+        Map<AccessToken.Field, String> fieldStringMap = token.parseClaims();
+        Long memberId = Long.valueOf(fieldStringMap.get(AccessToken.Field.MEMBER_ID));
+
+        final ChannelDto channel = channelService.updateChannel(channelId, dto, profileImg,memberId);
 
 
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+        return ResponseEntity.status(HttpStatus.OK).body(channel);
     }
 }

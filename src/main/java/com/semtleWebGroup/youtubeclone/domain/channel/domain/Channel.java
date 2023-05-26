@@ -55,9 +55,13 @@ public class Channel {
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> commentsLikeLists = new HashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Builder
-    public Channel(String title, String description){
+    public Channel(String title, String description, Member member){
+        this.member = member;
         this.title = title;
         this.description = description;
     }
