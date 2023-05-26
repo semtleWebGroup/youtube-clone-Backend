@@ -10,6 +10,6 @@
 spring:
   profiles:
     active: # dev, test, alpha, prod
-      - dev
+      - prod
     include:
       - common-setting

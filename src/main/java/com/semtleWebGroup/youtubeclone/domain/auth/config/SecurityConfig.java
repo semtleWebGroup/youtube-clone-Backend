@@ -75,8 +75,8 @@ public class SecurityConfig {
                     .description("channel2 des")
                     .build();
 
-            Member member = new Member("test@a.a", passwordEncoder.encode("1234"), Role.ROLE_USER, List.of(channel1, channel2));
-            memberRepository.save(member);
+//            Member member = new Member("test@a.a", passwordEncoder.encode("1234"), Role.ROLE_USER, List.of(channel1, channel2));
+//            memberRepository.save(member);
         };
     }
 }

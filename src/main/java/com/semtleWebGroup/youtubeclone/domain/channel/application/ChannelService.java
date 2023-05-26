@@ -60,6 +60,12 @@ public class ChannelService {
         }
     }
 
+    public Channel getChannelEntity(Long channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(()->new EntityNotFoundException(String.format("%d is not found.", channelId)));
+        return channel;
+    }
+
     public ChannelDto getChannel(Long channelId){
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(()->new EntityNotFoundException(String.format("%d is not found.", channelId)));

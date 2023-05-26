@@ -32,7 +32,7 @@ public class CommentApi {
     public ResponseEntity create(@PathVariable UUID videoId, @Valid @RequestPart CommentRequest dto, @AuthenticationPrincipal TokenInfo principal){
         Video video = videoService.getVideo(videoId);
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         CommentResponse comment = commentService.write(dto, channel , video);
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
@@ -40,7 +40,7 @@ public class CommentApi {
     @PostMapping("/reply/{commentId}")
     public ResponseEntity replyCreate(@PathVariable("commentId")Long rootCommentId ,@Valid @RequestPart CommentRequest dto, @AuthenticationPrincipal TokenInfo principal){
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         CommentResponse comment = commentService.replyWrite(dto, channel , rootCommentId);
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
@@ -48,7 +48,7 @@ public class CommentApi {
     @PatchMapping("/{commentId}")
     public ResponseEntity editComment(@PathVariable("commentId")Long commentId, @Valid @RequestBody CommentRequest dto, @AuthenticationPrincipal TokenInfo principal){
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         CommentResponse comment = commentService.updateComment(commentId, dto, channel);
         return ResponseEntity.status(HttpStatus.OK).body(comment);
     }
@@ -56,7 +56,7 @@ public class CommentApi {
     @DeleteMapping("/{commentId}")
     public ResponseEntity deleteComment(@PathVariable("commentId")Long commentId, @AuthenticationPrincipal TokenInfo principal){
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         commentService.commentDelete(commentId, channel);
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
@@ -64,21 +64,21 @@ public class CommentApi {
     @GetMapping("")
     public ResponseEntity list(@RequestParam("videoId") UUID videoId, @AuthenticationPrincipal TokenInfo principal, Pageable pageable) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         CommentPageResponse CommentList = commentService.getCommentList(videoId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @GetMapping("/reply")
     public ResponseEntity replyList(@RequestParam("commentId") Long commentId, @AuthenticationPrincipal TokenInfo principal, Pageable pageable) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         CommentPageResponse CommentList = commentService.getReplyList(commentId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @PostMapping("/{commentId}/like")
     public ResponseEntity like(@PathVariable("commentId")Long commentId, @AuthenticationPrincipal TokenInfo principal) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         CommentLikeResponse commentLikeResponse = commentLikeService.like(commentId, channel);
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }
@@ -86,7 +86,7 @@ public class CommentApi {
     @DeleteMapping("/{commentId}/like")
     public ResponseEntity unlike(@PathVariable("commentId")Long commentId, @AuthenticationPrincipal TokenInfo principal) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
         CommentLikeResponse commentLikeResponse = commentLikeService.unlike(commentId, channel);
         return ResponseEntity.status(HttpStatus.OK).body(commentLikeResponse);
     }

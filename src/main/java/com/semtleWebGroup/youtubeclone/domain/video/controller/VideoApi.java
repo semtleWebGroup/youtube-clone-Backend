@@ -54,7 +54,7 @@ public class VideoApi {
             )
     {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
 
         if (!thumbImg.isEmpty()) this.checkImgFileExtension(thumbImg);
         this.checkVideoFileExtension(videoFile);
@@ -77,7 +77,7 @@ public class VideoApi {
         @AuthenticationPrincipal TokenInfo principal
     ) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
 
         VideoEditDto dto = VideoEditDto.builder()
             .channel(channel)
@@ -97,7 +97,7 @@ public class VideoApi {
             @AuthenticationPrincipal TokenInfo principal
     ) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
 
         VideoViewResponse videoViewResponse = videoService.view(videoId, channel);
         return ResponseEntity
@@ -112,7 +112,7 @@ public class VideoApi {
         @AuthenticationPrincipal TokenInfo principal
     ) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
 
         VideoEditDto dto = VideoEditDto.builder()
             .channel(channel)
@@ -132,7 +132,7 @@ public class VideoApi {
             @AuthenticationPrincipal TokenInfo principal
     ) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
 
         VideoResponse videoResponse = videoService.delete(videoId, channel);
         return ResponseEntity
@@ -146,7 +146,7 @@ public class VideoApi {
             @AuthenticationPrincipal TokenInfo principal
     ) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
 
         VideoLikeResponse videoLikeResponse = videoService.like(videoId, channel);
         return ResponseEntity
@@ -160,7 +160,7 @@ public class VideoApi {
             @AuthenticationPrincipal TokenInfo principal
     ) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannelEntity(channelId);
 
         VideoLikeResponse videoLikeResponse = videoService.dislike(videoId, channel);
         return ResponseEntity

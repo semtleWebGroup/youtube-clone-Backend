@@ -20,8 +20,8 @@ USE `youtube_clone` ;
 CREATE TABLE IF NOT EXISTS `youtube_clone`.`member` (
   `member_id` BIGINT(20) NOT NULL,
   `email` VARCHAR(100) NOT NULL,
-  `name` NVARCHAR(50) NOT NULL,
-  `provider` VARCHAR(100) NOT NULL,
+  `password` VARCHAR(100) NOT NULL,
+  `role` ENUM('ROLE_USER', 'ROLE_ADMIN'),
   PRIMARY KEY (`member_id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
 ENGINE = InnoDB;
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `youtube_clone`.`channel` (
   `channel_id` BIGINT(20) NOT NULL,
   `title` VARCHAR(100) NOT NULL,
   `description` VARCHAR(255) NULL,
-  `profile_img` BLOB NULL,
+  `channel_image` BLOB NULL,
   `member_id` BIGINT(20) NOT NULL,
   PRIMARY KEY (`channel_id`),
   UNIQUE INDEX `title_UNIQUE` (`title` ASC) VISIBLE,
@@ -50,7 +50,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `youtube_clone`.`subscribe`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `youtube_clone`.`subscribe` (
+CREATE TABLE IF NOT EXISTS `youtube_clone`.`subscription` (
   `subscribe_id` BIGINT(20) NOT NULL,
   `subscriber` BIGINT(20) NOT NULL,
   `channel` BIGINT(20) NOT NULL,
