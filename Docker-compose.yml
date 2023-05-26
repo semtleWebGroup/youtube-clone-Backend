@@ -29,6 +29,6 @@ services: # 컨테이너 설정
     ports:
       - 8080:8080
     environment:
-      - database-url=jdbc:mysql://${DATABASE_URL}/youtube_clone?serverTimezone=UTC
+      - database-url=${DATABASE_URL}
       - database-username=${DATABASE_USERNAME}
       - database-password=${DATABASE_PASSWORD}
