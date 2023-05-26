@@ -54,6 +54,8 @@ public class SecurityConfig {
                         .antMatchers("/auth/**").permitAll()
                         .antMatchers("/home").permitAll()
                         .antMatchers("/search").permitAll()
+                        .antMatchers(HttpMethod.GET,"/video/search").permitAll()
+                        .antMatchers(HttpMethod.GET,"/video/search/**").permitAll()
                         .antMatchers(HttpMethod.GET,"/comments").permitAll()
                         .antMatchers(HttpMethod.GET,"/comments/**").permitAll()
                         .antMatchers(HttpMethod.GET,"/videos/**").permitAll()
