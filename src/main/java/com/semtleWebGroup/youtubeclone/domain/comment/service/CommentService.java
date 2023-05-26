@@ -4,7 +4,8 @@ import com.semtleWebGroup.youtubeclone.domain.comment.domain.Comment;
 import com.semtleWebGroup.youtubeclone.domain.comment.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.comment.repository.CommentRepository;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
-import com.semtleWebGroup.youtubeclone.domain.video.dto.VideoListResponse;
+import com.semtleWebGroup.youtubeclone.domain.video.exception.ForbiddenException;
+import com.semtleWebGroup.youtubeclone.global.error.ErrorCode;
 import com.semtleWebGroup.youtubeclone.global.error.FieldError;
 import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -22,14 +22,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+    private void checkIdentification(Comment comment, Channel channel) {
+        if (channel == null || !comment.getChannel().getId().equals(channel.getId()))
+            throw new ForbiddenException(ErrorCode.ACCESS_DENIED);
+    }
     @Transactional
     public CommentResponse write(CommentRequest dto, Channel channel, Video video){
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .build();
-        channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력 
+        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
+        channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력
         video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
-        commentRepository.save(newComment);
         return new CommentResponse(newComment);
     }
     @Transactional
@@ -46,20 +50,31 @@ public class CommentService {
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .build();
+        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력
         video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
         rootComment.addReplyComment(newComment);
-        commentRepository.save(newComment);
         return new CommentResponse(newComment);
     }
     @Transactional
-    public CommentResponse updateComment(Long idx, CommentRequest dto) {
-        Comment entity = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
+    public CommentResponse updateComment(Long idx, CommentRequest dto, Channel channelLogin) {
+        Comment comment = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", idx)
         ));
-        entity.update(dto.getContent());
-        commentRepository.save(entity);
-        return new CommentResponse(entity);
+        checkIdentification(comment, channelLogin);  //권한확인
+        comment.update(dto.getContent());
+        commentRepository.save(comment);  //댓글은 부모가 2개여서 따로 저장
+        Video video = comment.getVideo();
+        Channel channel = comment.getChannel();
+        for (Comment videoComment: video.getComments()) {  //비디오에 저장된 값도 업데이트
+            if (videoComment.getId().equals(comment.getId()))
+                videoComment.update(dto.getContent());
+        }
+        for (Comment channelComment: channel.getComments()) {  //채널에 저장된 값도 업데이트
+            if (channelComment.getId().equals(comment.getId()))
+                channelComment.update(dto.getContent());
+        }
+        return new CommentResponse(comment);
     }
 
     public CommentPageResponse getCommentList(UUID video_Idx, Channel channel, Pageable pageable){
@@ -72,10 +87,11 @@ public class CommentService {
         return new CommentPageResponse(commentList,channel);
     }
     @Transactional
-    public void commentDelete(Long idx){
+    public void commentDelete(Long idx, Channel channelLogin){
         Comment comment = commentRepository.findById(idx).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", idx)
         ));
+        checkIdentification(comment, channelLogin);  //권한확인
         Channel channel = comment.getChannel();
         Video video = comment.getVideo();
         channel.deleteComment(comment);  //채널에서 댓글 정보 삭제
@@ -84,7 +100,7 @@ public class CommentService {
             Comment rootComment = comment.getRootComment();
             rootComment.deleteReplyComment(comment); //부모 댓글에서 댓글 정보 삭제
         }
-        commentRepository.delete(comment);
+        commentRepository.delete(comment);  //댓글은 부모가 많아서 따로 삭제
     }
 
 }

@@ -50,9 +50,9 @@ public class Channel {
     private Set<Video> videos = new HashSet<>();
     @OneToMany(mappedBy = "channel", orphanRemoval = true)
     private Set<Video> videoLikeLists = new HashSet<>();
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.REMOVE)    //cascade = CascadeType.ALL 사용시 오류 발생...
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.REMOVE)
     private Set<Comment> comments = new HashSet<>();
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.REMOVE)
     private Set<Comment> commentsLikeLists = new HashSet<>();
 
     @ManyToOne
@@ -112,14 +112,20 @@ public class Channel {
     }
 
     public void deleteComment(Comment comment) {
+        for (Comment replyComment: comment.getReplyComments()) {   //부모는 아니지만 명시적인 처리를 위해서
+            comments.remove(replyComment);
+        }
         comments.remove(comment);
+        //comment.setChannel(null);
     }
 
     public void likeComment(Comment comment) {
         commentsLikeLists.add(comment);
+        comment.addLike(this);
     }
 
     public void unLikeComment(Comment comment) {
         commentsLikeLists.remove(comment);
+        comment.removeLike(this);
     }
 }
