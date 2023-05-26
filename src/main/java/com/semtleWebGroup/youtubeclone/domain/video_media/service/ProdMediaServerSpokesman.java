@@ -14,6 +14,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +47,17 @@ public class ProdMediaServerSpokesman implements MediaServerSpokesman {
         VodInitPostRequest httpRequest = VodInitPostRequest.of(videoFile, thumbnailFile);
 
         //미디어 서버와 통신
-        ResponseEntity<VodInitPostResponse> response = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(httpRequest), VodInitPostResponse.class);
+        ResponseEntity<VodInitPostResponse> response;
+        try {
+            response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    httpRequest,
+                    VodInitPostResponse.class);
+        } catch (HttpClientErrorException e){
+            //To-Do 예외처리
+            throw new MediaServerException();
+        }
         log.debug("response from media server: {}", response);
 
         //응답 확인
@@ -71,8 +82,13 @@ public class ProdMediaServerSpokesman implements MediaServerSpokesman {
         Assert.notNull(videoId,"videoId must not be null");
 
         String url = String.format("%s/media/vods/%s/encoding/status", mediaServerUrl, videoId);
-
-        ResponseEntity<GetEncodingStatusResponse> response = restTemplate.exchange(url, HttpMethod.GET, HttpEntity.EMPTY, GetEncodingStatusResponse.class);
+        ResponseEntity<GetEncodingStatusResponse> response;
+        try {
+            response = restTemplate.exchange(url, HttpMethod.GET, HttpEntity.EMPTY, GetEncodingStatusResponse.class);
+        } catch (HttpClientErrorException e){
+            //To-Do 예외처리
+            throw new MediaServerException();
+        }
 
         HttpStatus statusCode = response.getStatusCode();
 
@@ -96,7 +112,13 @@ public class ProdMediaServerSpokesman implements MediaServerSpokesman {
 
         String url = String.format("%s/media/vods/%s", mediaServerUrl, videoId);
 
-        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        ResponseEntity<Void> response;
+        try {
+            response = restTemplate.exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        } catch (HttpClientErrorException e){
+            //To-Do 예외처리
+            throw new MediaServerException();
+        }
 
         HttpStatus statusCode = response.getStatusCode();
 
@@ -121,7 +143,13 @@ public class ProdMediaServerSpokesman implements MediaServerSpokesman {
 
         ThumbnailPatchRequest body = ThumbnailPatchRequest.of(videoId, thumbnailFile);
 
-        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PATCH, body, Void.class);
+        ResponseEntity<Void> response;
+        try {
+            response = restTemplate.exchange(url, HttpMethod.PATCH, body, Void.class);
+        } catch (HttpClientErrorException e){
+            //To-Do 예외처리
+            throw new MediaServerException();
+        }
 
         HttpStatus statusCode = response.getStatusCode();
 
