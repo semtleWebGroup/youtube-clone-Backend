@@ -3,7 +3,7 @@ spring:
     static-path-pattern: /webapp/**
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${database-url}/youtube_clone
+    url: ${database-url}
     username: ${database-username}
     password: ${database-password}
   jpa:
