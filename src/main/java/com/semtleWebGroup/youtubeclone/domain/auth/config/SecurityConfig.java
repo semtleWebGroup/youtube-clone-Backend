@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.auth.config;
 import com.semtleWebGroup.youtubeclone.domain.auth.dao.MemberRepository;
 import com.semtleWebGroup.youtubeclone.domain.auth.domain.Member;
 import com.semtleWebGroup.youtubeclone.domain.auth.domain.Role;
+import com.semtleWebGroup.youtubeclone.domain.auth.dto.TokenInfo;
 import com.semtleWebGroup.youtubeclone.domain.auth.exception.GlobalAuthFailEntryPoint;
 import com.semtleWebGroup.youtubeclone.domain.auth.filter.JwtAuthorizationFilter;
 import com.semtleWebGroup.youtubeclone.domain.auth.token.AccessToken;
@@ -51,6 +52,15 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(req -> req
                         .antMatchers("/auth/**").permitAll()
+                        .antMatchers("/home").permitAll()
+                        .antMatchers("/search").permitAll()
+                        .antMatchers(HttpMethod.GET,"/video/search").permitAll()
+                        .antMatchers(HttpMethod.GET,"/video/search/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/comments").permitAll()
+                        .antMatchers(HttpMethod.GET,"/comments/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/videos/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/channels/**/subscribed").authenticated()
+                        .antMatchers(HttpMethod.GET,"/channels/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling()
@@ -58,8 +68,8 @@ public class SecurityConfig {
                 .and()
                 //jwt authorization
                 .addFilterBefore(new JwtAuthorizationFilter(tokenBuilder), BasicAuthenticationFilter.class)
+                .anonymous(a -> a.principal(TokenInfo.ofAnonymous()))
                 .build();
-
     }
 
 
