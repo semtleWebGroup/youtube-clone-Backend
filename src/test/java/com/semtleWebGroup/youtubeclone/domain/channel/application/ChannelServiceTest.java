@@ -1,8 +1,11 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.application;
 
+import com.semtleWebGroup.youtubeclone.domain.auth.dao.MemberRepository;
+import com.semtleWebGroup.youtubeclone.domain.auth.domain.Member;
+import com.semtleWebGroup.youtubeclone.domain.auth.domain.Role;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
+import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
-import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import com.semtleWebGroup.youtubeclone.test_super.MockTest;
@@ -17,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,11 +32,15 @@ class ChannelServiceTest extends MockTest {
     // mock up
     private static ChannelService channelService;
     private static ChannelRepository channelRepository;
+    private static MemberRepository memberRepository;
+    private static ChannelOwnerCheckService channelOwnerCheckService;
 
     @BeforeAll
     public static void setMockChannelRepository() {
         channelRepository = Mockito.mock(ChannelRepository.class);
-        channelService = new ChannelService(channelRepository);
+        memberRepository = Mockito.mock(MemberRepository.class);
+        channelOwnerCheckService = Mockito.mock(ChannelOwnerCheckService.class);
+        channelService = new ChannelService(channelRepository, memberRepository, channelOwnerCheckService);
     }
 
     @Nested
@@ -42,47 +51,50 @@ class ChannelServiceTest extends MockTest {
         void testAddChannelWithImage() throws IOException, SQLException {
             // given
             MultipartFile image = new MockMultipartFile("test.jpg", "test".getBytes());
-            ChannelRequest request = new ChannelRequest();
-            request.setChannelProfile(new ChannelProfile());
-            request.getChannelProfile().setTitle("Test Channel");
-            request.getChannelProfile().setDescription("Test Channel Description");
-            request.setProfile_img(image);
+            ChannelProfile request = new ChannelProfile();
+            request.setTitle("Test Channel");
+            request.setDescription("Test Channel Description");
 
             Channel createdChannel = Channel.builder()
-                    .title(request.getChannelProfile().getTitle())
-                    .description(request.getChannelProfile().getDescription())
+                    .title(request.getTitle())
+                    .description(request.getDescription())
                     .build();
             createdChannel.setChannelImage(new SerialBlob(image.getBytes()));
+            Member createdMember = new Member("2222@kumoh.ac.kr","1234", Role.ROLE_USER,new ArrayList<>());
 
             when(channelRepository.save(any(Channel.class))).thenReturn(createdChannel);
+            when(memberRepository.findById(1L)).thenReturn(Optional.of(createdMember));
 
             // when
-            Channel channel = channelService.addChannel(request);
+            ChannelDto channel = channelService.addChannel(request, image,1L);
 
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
             assertEquals(createdChannel.getDescription(), channel.getDescription());
-            assertEquals(new SerialBlob(image.getBytes()), channel.getChannelImage());
+            assertTrue(Arrays.equals(new SerialBlob(image.getBytes()).getBytes(1, (int) image.getSize()), channel.getChannelImage()));
         }
 
         @Test
         @DisplayName("addChannel 테스트 - 이미지 파일이 없을 경우")
         void testAddChannelWithoutImage(){
             // given
-            ChannelRequest request = new ChannelRequest();
-            request.setChannelProfile(new ChannelProfile());
-            request.getChannelProfile().setTitle("Test Channel");
-            request.getChannelProfile().setDescription("Test Channel Description");
+            ChannelProfile request = new ChannelProfile();
+            MultipartFile image = null;
+            request.setTitle("Test Channel");
+            request.setDescription("Test Channel Description");
 
+            Member createdMember = new Member("2222@kumoh.ac.kr","1234", Role.ROLE_USER,new ArrayList<>());
             Channel createdChannel = Channel.builder()
-                    .title(request.getChannelProfile().getTitle())
-                    .description(request.getChannelProfile().getDescription())
+                    .member(createdMember)
+                    .title(request.getTitle())
+                    .description(request.getDescription())
                     .build();
 
             when(channelRepository.save(any(Channel.class))).thenReturn(createdChannel);
+            when(memberRepository.findById(1L)).thenReturn(Optional.of(createdMember));
 
             // when
-            Channel channel = channelService.addChannel(request);
+            ChannelDto channel = channelService.addChannel(request, image, 1L);
 
             // then
             assertEquals(createdChannel.getTitle(), channel.getTitle());
@@ -104,10 +116,12 @@ class ChannelServiceTest extends MockTest {
             when(channelRepository.findById(1L)).thenReturn(java.util.Optional.of(channel));
 
             // when
-            Channel resultChannel = channelService.getChannel(1L);
+            ChannelDto resultChannel = channelService.getChannel(1L);
 
             // then
-            assertEquals(channel, resultChannel);
+            assertEquals(channel.getTitle(), resultChannel.getTitle());
+            assertEquals(channel.getDescription(), resultChannel.getDescription());
+            assertEquals(channel.getChannelImage(), resultChannel.getChannelImage());
         }
 
         @Test
@@ -135,27 +149,29 @@ class ChannelServiceTest extends MockTest {
         void updateChannel_Success() throws IOException, SQLException {
             // given
             Long id = 1L;
+            Member createdMember = new Member("2222@kumoh.ac.kr","1234", Role.ROLE_USER,new ArrayList<>());
             Channel oldChannel = Channel.builder()
+                    .member(createdMember)
                     .title("Old Title")
                     .description("Old Description")
                     .build();
             MultipartFile image = new MockMultipartFile("test.jpg", "test".getBytes());
-            ChannelRequest dto = new ChannelRequest();
-            dto.setChannelProfile(new ChannelProfile());
-            dto.getChannelProfile().setTitle("New Channel");
-            dto.getChannelProfile().setDescription("New Description");
-            dto.setProfile_img(image);
+            ChannelProfile dto = new ChannelProfile();
+            dto.setTitle("New Channel");
+            dto.setDescription("New Description");
+
 
             when(channelRepository.findById(id)).thenReturn(Optional.of(oldChannel));
             when(channelRepository.save(any(Channel.class))).thenReturn(oldChannel);
+            when(channelOwnerCheckService.checkChannelOwner(oldChannel,1L)).thenReturn(true);
 
             // when
-            Channel updatedChannel = channelService.updateChannel(id, dto);
+            ChannelDto updatedChannel = channelService.updateChannel(id, dto, image, 1L);
 
             // then
-            assertEquals(dto.getChannelProfile().getTitle(), updatedChannel.getTitle());
-            assertEquals(dto.getChannelProfile().getDescription(), updatedChannel.getDescription());
-            assertEquals(new SerialBlob(dto.getProfile_img().getBytes()), updatedChannel.getChannelImage());
+            assertEquals(dto.getTitle(), updatedChannel.getTitle());
+            assertEquals(dto.getDescription(), updatedChannel.getDescription());
+            assertTrue(Arrays.equals(new SerialBlob(image.getBytes()).getBytes(1, (int) image.getSize()), updatedChannel.getChannelImage()));
         }
 
         @Test
@@ -164,15 +180,13 @@ class ChannelServiceTest extends MockTest {
             // given
             Long id = 1L;
             MultipartFile image = new MockMultipartFile("test.jpg", "test".getBytes());
-            ChannelRequest dto = new ChannelRequest();
-            dto.setChannelProfile(new ChannelProfile());
-            dto.getChannelProfile().setTitle("Test Channel");
-            dto.getChannelProfile().setDescription("Test Channel Description");
-            dto.setProfile_img(image);
+            ChannelProfile dto = new ChannelProfile();
+            dto.setTitle("Test Channel");
+            dto.setDescription("Test Channel Description");
             when(channelRepository.findById(id)).thenReturn(Optional.empty());
 
             // when, then
-            assertThrows(EntityNotFoundException.class, () -> channelService.updateChannel(id, dto));
+            assertThrows(EntityNotFoundException.class, () -> channelService.updateChannel(id, dto,image,1L));
         }
     }
 
@@ -189,9 +203,10 @@ class ChannelServiceTest extends MockTest {
                     .description("Old Description")
                     .build();
             when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
+            when(channelOwnerCheckService.checkChannelOwner(channel,1L)).thenReturn(true);
 
             // when
-            channelService.deleteChannel(channelId);
+            channelService.deleteChannel(channelId,1L);
 
             // then
             verify(channelRepository, times(1)).delete(channel);
@@ -206,7 +221,7 @@ class ChannelServiceTest extends MockTest {
             when(channelRepository.findById(channelId)).thenReturn(Optional.empty());
 
             // when & then
-            assertThrows(EntityNotFoundException.class, () -> channelService.deleteChannel(channelId));
+            assertThrows(EntityNotFoundException.class, () -> channelService.deleteChannel(channelId, 1L));
         }
     }
 }

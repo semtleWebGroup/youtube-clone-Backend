@@ -17,3 +17,6 @@ spring:
 logging:
   level:
     root: debug
+auth:
+  secret-key: secretadsfsdfsdfasdfasdfasdfasdfaasdfasdfasdfasdfasdfasdfaf
+  token-expiration-msec: 864000000

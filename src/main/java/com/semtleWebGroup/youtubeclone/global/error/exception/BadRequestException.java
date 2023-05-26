@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 클라이언트의 잘못된 요청
  */
-public class BadRequestException extends RuntimeException{
+public class BadRequestException extends RuntimeException {
 
     private ErrorCode errorCode;
     private List<FieldError> fieldErrors;

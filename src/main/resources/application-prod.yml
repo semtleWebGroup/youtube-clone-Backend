@@ -1,17 +1,23 @@
 spring:
-  h2: # 수정 필요
-    console:
-      enabled: true
-      path: /h2-console
-  datasource: # 수정 필요
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/test
-    username: sa
-    password:
+  mvc:
+    static-path-pattern: /webapp/**
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${database-url}/youtube_clone
+    username: ${database-username}
+    password: ${database-password}
   jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: none
+    show-sql: true
 logging:
   level:
-    root: error
+    root: debug
+# 미디어 서버와 통신하기 위한 url : ex) http://localhost:8080
+media-server:
+  url: http://129.154.59.47:80
+auth:
+  secret-key: secretadsfsdfsdfasdfasdfasdfasdfaasdfasdfasdfasdfasdfasdfaf
+  token-expiration-msec: 864000000

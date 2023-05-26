@@ -1,48 +1,57 @@
 package com.semtleWebGroup.youtubeclone.domain.channel.application;
 
+import com.semtleWebGroup.youtubeclone.domain.auth.dao.MemberRepository;
+import com.semtleWebGroup.youtubeclone.domain.auth.domain.Member;
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
-import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelRequest;
+import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
+import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
 import com.semtleWebGroup.youtubeclone.domain.channel.exception.TitleDuplicateException;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
+import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.transaction.Transactional;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ChannelService {
     private final ChannelRepository channelRepository;
+    private final MemberRepository memberRepository;
+    private final ChannelOwnerCheckService channelOwnerCheckService; // 테스트 코드 작성을 위해 분리
 
     @Transactional
-    public Channel addChannel(ChannelRequest dto){
+    public ChannelDto addChannel(ChannelProfile dto, MultipartFile profileImg, Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new BadCredentialsException("token claim - memberId is not valid"));
         Channel newChannel = Channel.builder()
-                .title(dto.getChannelProfile().getTitle())
-                .description(dto.getChannelProfile().getDescription())
+                .member(member)
+                .title(dto.getTitle())
+                .description(dto.getDescription())
                 .build();
-        if (dto.getProfile_img() != null){
-            saveChannelImgFromDto(dto, newChannel);
+        if (profileImg != null){
+            saveChannelImgFromDto(profileImg, newChannel);
         }
 
-        channelRepository.save(newChannel);
+        member.getChannels().add(newChannel);
+        Channel createdChannel = channelRepository.save(newChannel);
+        ChannelDto response = Optional.of(createdChannel).map(ChannelDto::new)
+                .orElseThrow(()->new InvalidValueException("dto 매핑 변수가 맞지않음"));
 
-        return newChannel;
+        return response;
     }
 
-    private static void saveChannelImgFromDto(ChannelRequest dto, Channel newChannel){
+    private static void saveChannelImgFromDto(MultipartFile profileImg, Channel newChannel){
         try {
-            Blob blob = new SerialBlob(dto.getProfile_img().getBytes());
+            Blob blob = new SerialBlob(profileImg.getBytes());
             newChannel.setChannelImage(blob);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -51,34 +60,48 @@ public class ChannelService {
         }
     }
 
-    public Channel getChannel(Long id){
-        Channel channel = channelRepository.findById(id).orElseThrow(()->new EntityNotFoundException(
-                String.format("%d is not found.", id)
-        ));
-
+    public Channel getChannelEntity(Long channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(()->new EntityNotFoundException(String.format("%d is not found.", channelId)));
         return channel;
     }
 
+    public ChannelDto getChannel(Long channelId){
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(()->new EntityNotFoundException(String.format("%d is not found.", channelId)));
+        ChannelDto response = Optional.of(channel).map(ChannelDto::new)
+                .orElseThrow(()->new InvalidValueException("dto 매핑 변수가 맞지않음"));
+
+        return response;
+    }
+
     @Transactional
-    public Channel updateChannel(Long id, ChannelRequest dto){
+    public ChannelDto updateChannel(Long id, ChannelProfile dto, MultipartFile profileImg, Long memberId){
         Channel oldChannel = channelRepository.findById(id).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", id)
         ));
-        oldChannel.update(dto.getChannelProfile().getTitle(), dto.getChannelProfile().getDescription());
+        // 채널이 멤버의 소유인지 확인
+        channelOwnerCheckService.checkChannelOwner(oldChannel,memberId);
 
-        if (dto.getProfile_img() != null)  saveChannelImgFromDto(dto, oldChannel);
+        oldChannel.update(dto.getTitle(), dto.getDescription());
 
-        channelRepository.save(oldChannel);
+        if (profileImg != null)  saveChannelImgFromDto(profileImg, oldChannel);
 
-        return oldChannel;
+        Channel updatedChannel = channelRepository.save(oldChannel);
+        ChannelDto response = Optional.of(updatedChannel).map(ChannelDto::new)
+                .orElseThrow(()->new InvalidValueException("dto 매핑 변수가 맞지않음"));
+
+        return response;
     }
 
 
     @Transactional
-    public void deleteChannel(Long channelId){
+    public void deleteChannel(Long channelId, Long memberId){
         Channel oldChannel = channelRepository.findById(channelId).orElseThrow(()->new EntityNotFoundException(
                 String.format("%d is not found.", channelId)
         ));
+        // 채널이 멤버의 소유인지 확인
+        channelOwnerCheckService.checkChannelOwner(oldChannel,memberId);
 
         channelRepository.delete(oldChannel);
     }
