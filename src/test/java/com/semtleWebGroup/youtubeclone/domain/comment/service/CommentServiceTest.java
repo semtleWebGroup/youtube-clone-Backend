@@ -41,6 +41,8 @@ class CommentServiceTest{
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
+        videoRepository.save(video);
         //When
         CommentResponse comment = commentService.write(entity, channel, video);
         //Then
@@ -61,6 +63,8 @@ class CommentServiceTest{
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
+        videoRepository.save(video);
         CommentResponse comment = commentService.write(entity1, channel, video);
 
         //When
@@ -78,10 +82,10 @@ class CommentServiceTest{
                 .title("Title")
                 .description("Description")
                 .build();
-        channelRepository.save(channel);
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
         videoRepository.save(video);
         CommentResponse comment = commentService.write(entity, channel, video);
 
@@ -253,10 +257,10 @@ class CommentServiceTest{
                 .title("Title")
                 .description("Description")
                 .build();
-        channelRepository.save(channel);
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
         videoRepository.save(video);
         CommentResponse comment = commentService.write(entity1, channel, video);
         CommentResponse replyComment = commentService.replyWrite(entity2, channel, comment.getId());

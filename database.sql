@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `youtube_clone`.`comment` (
   `created_time` DATETIME NOT NULL,
   `updated_time` DATETIME NOT NULL,
   `channel_id` BIGINT(20) NOT NULL,
-  `root_comment_id` BIGINT(20) NOT NULL,
+  `root_comment_id` BIGINT(20),
   `video_id` BINARY(16) NOT NULL,
   PRIMARY KEY (`comment_id`),
   INDEX `fk_comment_channel1_idx` (`channel_id` ASC) VISIBLE,

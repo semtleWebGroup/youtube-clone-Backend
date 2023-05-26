@@ -31,9 +31,9 @@ public class CommentService {
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .build();
-        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력
         video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
+        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         return new CommentResponse(newComment);
     }
     @Transactional
@@ -50,10 +50,10 @@ public class CommentService {
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .build();
-        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력
         video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
         rootComment.addReplyComment(newComment);
+        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         return new CommentResponse(newComment);
     }
     @Transactional
