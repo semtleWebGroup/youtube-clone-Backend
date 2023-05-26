@@ -15,8 +15,3 @@ spring:
 logging:
   level:
     root: debug
-media-server:
-  url: http://129.154.59.47:80
-auth:
-  secret-key: secretadsfsdfsdfasdfasdfasdfasdfaasdfasdfasdfasdfasdfasdfaf
-  token-expiration-msec: 864000000
