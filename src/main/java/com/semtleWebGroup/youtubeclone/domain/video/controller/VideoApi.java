@@ -97,8 +97,7 @@ public class VideoApi {
             @AuthenticationPrincipal TokenInfo principal
     ) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannelEntity(channelId);
-
+        Channel channel = channelId == null? null : channelService.getChannelEntity(channelId);
         VideoViewResponse videoViewResponse = videoService.view(videoId, channel);
         return ResponseEntity
             .status(HttpStatus.OK)
