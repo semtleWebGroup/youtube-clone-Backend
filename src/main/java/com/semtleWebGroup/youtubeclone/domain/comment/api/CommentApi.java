@@ -16,6 +16,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -46,7 +48,7 @@ public class CommentApi {
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity editComment(@PathVariable("commentId")Long commentId, @Valid @RequestBody CommentRequest dto, @AuthenticationPrincipal TokenInfo principal){
+    public ResponseEntity editComment(@PathVariable("commentId")Long commentId, @Valid @RequestPart CommentRequest dto, @AuthenticationPrincipal TokenInfo principal){
         Long channelId = principal.getChannelId();
         Channel channel = channelService.getChannelEntity(channelId);
         CommentResponse comment = commentService.updateComment(commentId, dto, channel);
@@ -64,16 +66,23 @@ public class CommentApi {
     @GetMapping("")
     public ResponseEntity list(@RequestParam("videoId") UUID videoId, @AuthenticationPrincipal TokenInfo principal, Pageable pageable) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannelEntity(channelId);
+        Channel channel = channelId == null? null : channelService.getChannelEntity(channelId);
         CommentPageResponse CommentList = commentService.getCommentList(videoId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
     }
     @GetMapping("/reply")
     public ResponseEntity replyList(@RequestParam("commentId") Long commentId, @AuthenticationPrincipal TokenInfo principal, Pageable pageable) {
         Long channelId = principal.getChannelId();
-        Channel channel = channelService.getChannelEntity(channelId);
+        Channel channel = channelId == null? null : channelService.getChannelEntity(channelId);
         CommentPageResponse CommentList = commentService.getReplyList(commentId, channel, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(CommentList);
+    }
+    @GetMapping("/count")
+    public ResponseEntity CountOfComments(@RequestParam("videoId") UUID videoId){
+        Map<String,Long> countResponse = new HashMap<>();
+        Long count = commentService.getCommentListCount(videoId);
+        countResponse.put("Video CountOfComments",count);
+        return ResponseEntity.status(HttpStatus.OK).body(countResponse);
     }
     @PostMapping("/{commentId}/like")
     public ResponseEntity like(@PathVariable("commentId")Long commentId, @AuthenticationPrincipal TokenInfo principal) {

@@ -7,6 +7,13 @@
 # - alpha : ?? ?? ??? ???, db validate
 # - prod : ?? ?, db validate
 
+# application-{}.yml 설정
+auth:
+  secret-key: secretadsfsdfsdfasdfasdfasdfasdfaasdfasdfasdfasdfasdfasdfaf
+# 시크릿 키 인데, 32글자가 안넘으면 보안 에러가 뜨게 설정해 놓았습니다.
+  token-expiration-msec: 864000000
+# ms 단위로 만료시간(단 토큰은 만료시간까지 절대 회수가 불가능하므로, 적당히)
+
 spring:
   profiles:
     active: # dev, test, alpha, prod
