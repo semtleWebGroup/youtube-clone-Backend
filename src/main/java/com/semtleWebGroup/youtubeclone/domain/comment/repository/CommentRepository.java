@@ -12,5 +12,6 @@ import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findByVideo_IdAndRootComment_Id(UUID videoId,Long rootCommentId, Pageable pageable);  //외래키인 video 검색해야함
+    List<Comment> findByVideo_Id(UUID videoId);
     Page<Comment> findByRootComment_Id(Long idx, Pageable pageable);  //외래키인 comment 검색해야함
 }

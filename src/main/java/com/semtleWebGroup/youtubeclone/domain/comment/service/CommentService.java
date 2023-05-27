@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -85,6 +86,10 @@ public class CommentService {
     public CommentPageResponse getReplyList(Long comment_Idx, Channel channel, Pageable pageable){
         Page<Comment> commentList = commentRepository.findByRootComment_Id(comment_Idx, pageable);
         return new CommentPageResponse(commentList,channel);
+    }
+    public Long getCommentListCount(UUID video_Idx){
+        List<Comment> commentList = commentRepository.findByVideo_Id(video_Idx);
+        return (long) commentList.size();
     }
     @Transactional
     public void commentDelete(Long idx, Channel channelLogin){
