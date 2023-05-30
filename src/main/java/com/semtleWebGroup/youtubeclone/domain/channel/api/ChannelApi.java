@@ -6,6 +6,8 @@ import com.semtleWebGroup.youtubeclone.domain.channel.application.SubscribeServi
 import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
+import com.semtleWebGroup.youtubeclone.domain.video.service.VideoService;
 import com.semtleWebGroup.youtubeclone.global.error.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -231,5 +233,14 @@ public class ChannelApi {
 
 
         return ResponseEntity.status(HttpStatus.OK).body(channel);
+    }
+
+    @GetMapping("/{channelId}/videos")
+    public ResponseEntity getVideosByChannel(@PathVariable("channelId")Long channelId){
+        final Set<Video> videoList = channelService.getVideos(channelId);
+        List<UUID> response = videoList.stream()
+                .map(video -> video.getId())
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
