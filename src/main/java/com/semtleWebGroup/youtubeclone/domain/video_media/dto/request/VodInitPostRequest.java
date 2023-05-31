@@ -22,7 +22,7 @@ public class VodInitPostRequest extends HttpEntity<MultiValueMap<String, Object>
 
     public static VodInitPostRequest of(MultipartFile videoFile, @Nullable MultipartFile thumbnailFile) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("videoFile", videoFile.getResource());
+        body.add("video", videoFile.getResource());
         if (thumbnailFile != null) body.add("thumbnailFile", thumbnailFile.getResource());
         return new VodInitPostRequest(body);
     }

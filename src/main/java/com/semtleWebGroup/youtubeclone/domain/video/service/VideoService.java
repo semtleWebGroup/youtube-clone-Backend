@@ -4,15 +4,18 @@ import com.semtleWebGroup.youtubeclone.domain.channel.domain.Channel;
 import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.domain.video.dto.*;
 import com.semtleWebGroup.youtubeclone.domain.video.exception.ForbiddenException;
+import com.semtleWebGroup.youtubeclone.domain.video.exception.MediaServerRequestException;
 import com.semtleWebGroup.youtubeclone.domain.video.repository.VideoRepository;
 import com.semtleWebGroup.youtubeclone.domain.video_media.service.MediaServerSpokesman;
 import com.semtleWebGroup.youtubeclone.global.error.ErrorCode;
+import com.semtleWebGroup.youtubeclone.global.error.exception.BusinessException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 
 import java.util.UUID;
 
@@ -37,13 +40,26 @@ public class VideoService {
         videoRepository.save(video);
     }
 
-    @Transactional
     public VideoResponse upload(VideoUploadDto dto) {
         Video video = new Video();
         Channel channel = dto.getChannel();
         channel.addVideo(video);    // channel에 video 추가 & video에 channel 추가
         videoRepository.save(video);
-        mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
+        videoRepository.flush();    // db에 바로 적용
+
+        Video newVideo = videoRepository.findById(video.getId()).orElseThrow(
+                () -> new RuntimeException("no video in db")
+        );
+
+        try {
+            Long videoSec = (long) mediaServerSpokesman.sendEncodingRequest(dto.getVideoFile(), video.getId(), dto.getThumbImg());
+            video.setVideoSec(videoSec);
+            videoRepository.save(video);
+        } catch (Exception e) {
+            channel.removeVideo(video);     // 채널에서 제거
+            videoRepository.delete(video);
+            throw new MediaServerRequestException("Media server request error", ErrorCode.INTERNAL_SERVER_ERROR);
+        }
         return new VideoResponse(video);
     }
 

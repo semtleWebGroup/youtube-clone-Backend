@@ -82,6 +82,8 @@ public class Video {
         this.updatedTime = updatedTime;
     }
 
+    public void setVideoSec(Long videoSec) { this.videoSec = videoSec; }
+
     public int getLikeCount() { return this.likes.size(); }
 
     public Boolean isLike(Channel channel) {

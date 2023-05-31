@@ -28,4 +28,13 @@ public class TokenInfo {
                 (StringUtils.hasText(map.get(AccessToken.Field.CHANNEL_ID))) ? Long.valueOf(map.get(AccessToken.Field.CHANNEL_ID)) : null
         );
     }
+
+    public static TokenInfo ofAnonymous(){
+        return new TokenInfo(
+                null,
+                Role.ROLE_ANONYMOUS,
+                null,
+                null
+        );
+    }
 }

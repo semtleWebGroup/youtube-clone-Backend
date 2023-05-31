@@ -1,6 +1,7 @@
 package com.semtleWebGroup.youtubeclone.global.error;
 
 
+import com.semtleWebGroup.youtubeclone.domain.auth.exception.common.OccupiedEmailException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -124,6 +125,11 @@ public class GlobalExceptionHandler {
         log.error("handleEntityNotFoundException",e);
         ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(OccupiedEmailException.class)
+    protected ResponseEntity<ErrorResponse> handleOccupiedEmailException(OccupiedEmailException e){
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
 

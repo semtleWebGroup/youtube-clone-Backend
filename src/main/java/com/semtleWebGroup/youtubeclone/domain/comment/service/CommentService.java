@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -31,9 +32,9 @@ public class CommentService {
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .build();
-        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력
         video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
+        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         return new CommentResponse(newComment);
     }
     @Transactional
@@ -50,10 +51,10 @@ public class CommentService {
         Comment newComment = Comment.builder()
                 .contents(dto.getContent())
                 .build();
-        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         channel.addComment(newComment);  //채널에 댓글 정보 입력 , 댓글에도 채널 정보 입력
         video.addComment(newComment);   //비디오에 댓글 정보 엽력 , 댓글에도 비디오 정보 입력
         rootComment.addReplyComment(newComment);
+        commentRepository.save(newComment);  //댓글은 부모가 2개여서 따로 저장
         return new CommentResponse(newComment);
     }
     @Transactional
@@ -85,6 +86,10 @@ public class CommentService {
     public CommentPageResponse getReplyList(Long comment_Idx, Channel channel, Pageable pageable){
         Page<Comment> commentList = commentRepository.findByRootComment_Id(comment_Idx, pageable);
         return new CommentPageResponse(commentList,channel);
+    }
+    public Long getCommentListCount(UUID video_Idx){
+        List<Comment> commentList = commentRepository.findByVideo_Id(video_Idx);
+        return (long) commentList.size();
     }
     @Transactional
     public void commentDelete(Long idx, Channel channelLogin){

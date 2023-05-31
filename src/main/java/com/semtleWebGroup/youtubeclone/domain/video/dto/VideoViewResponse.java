@@ -63,8 +63,9 @@ public class VideoViewResponse {
         this.isLike = isLike;
 
         ArrayList<String> qualityList = new ArrayList<String>();
-        qualityList.add("1080p");
-        qualityList.add("360p");
+        qualityList.add("360");
+        qualityList.add("480");
+        qualityList.add("720");
         this.qualityList = qualityList;
     }
 

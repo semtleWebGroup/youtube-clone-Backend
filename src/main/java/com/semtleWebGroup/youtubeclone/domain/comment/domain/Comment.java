@@ -71,7 +71,7 @@ public class Comment {
     private Set<Comment> replyComments = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "root_comment_id")
-    private Comment rootComment;
+    private Comment rootComment = null;
 
     public void addReplyComment(Comment replyComment) {
         this.replyComments.add(replyComment);

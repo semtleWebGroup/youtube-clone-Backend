@@ -3,6 +3,7 @@ package com.semtleWebGroup.youtubeclone.domain.auth.config;
 import com.semtleWebGroup.youtubeclone.domain.auth.dao.MemberRepository;
 import com.semtleWebGroup.youtubeclone.domain.auth.domain.Member;
 import com.semtleWebGroup.youtubeclone.domain.auth.domain.Role;
+import com.semtleWebGroup.youtubeclone.domain.auth.dto.TokenInfo;
 import com.semtleWebGroup.youtubeclone.domain.auth.exception.GlobalAuthFailEntryPoint;
 import com.semtleWebGroup.youtubeclone.domain.auth.filter.JwtAuthorizationFilter;
 import com.semtleWebGroup.youtubeclone.domain.auth.token.AccessToken;
@@ -20,7 +21,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -45,12 +50,22 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .formLogin().disable()
                 .csrf().disable()
-                .cors().disable()
+                .cors()
+                .and()
                 .formLogin().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests(req -> req
                         .antMatchers("/auth/**").permitAll()
+                        .antMatchers("/home").permitAll()
+                        .antMatchers("/search").permitAll()
+                        .antMatchers(HttpMethod.GET,"/video/search").permitAll()
+                        .antMatchers(HttpMethod.GET,"/video/search/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/comments").permitAll()
+                        .antMatchers(HttpMethod.GET,"/comments/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/videos/**").permitAll()
+                        .antMatchers(HttpMethod.GET,"/channels/**/subscribed").authenticated()
+                        .antMatchers(HttpMethod.GET,"/channels/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling()
@@ -58,8 +73,21 @@ public class SecurityConfig {
                 .and()
                 //jwt authorization
                 .addFilterBefore(new JwtAuthorizationFilter(tokenBuilder), BasicAuthenticationFilter.class)
+                .anonymous(a -> a.principal(TokenInfo.ofAnonymous()))
                 .build();
+    }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setExposedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 
@@ -75,8 +103,8 @@ public class SecurityConfig {
                     .description("channel2 des")
                     .build();
 
-            Member member = new Member("test@a.a", passwordEncoder.encode("1234"), Role.ROLE_USER, List.of(channel1, channel2));
-            memberRepository.save(member);
+//            Member member = new Member("test@a.a", passwordEncoder.encode("1234"), Role.ROLE_USER, List.of(channel1, channel2));
+//            memberRepository.save(member);
         };
     }
 }

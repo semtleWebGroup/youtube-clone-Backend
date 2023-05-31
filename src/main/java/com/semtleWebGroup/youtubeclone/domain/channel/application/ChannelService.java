@@ -7,6 +7,7 @@ import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelDto;
 import com.semtleWebGroup.youtubeclone.domain.channel.dto.ChannelProfile;
 import com.semtleWebGroup.youtubeclone.domain.channel.exception.TitleDuplicateException;
 import com.semtleWebGroup.youtubeclone.domain.channel.repository.ChannelRepository;
+import com.semtleWebGroup.youtubeclone.domain.video.domain.Video;
 import com.semtleWebGroup.youtubeclone.global.error.exception.EntityNotFoundException;
 import com.semtleWebGroup.youtubeclone.global.error.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +60,12 @@ public class ChannelService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Channel getChannelEntity(Long channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(()->new EntityNotFoundException(String.format("%d is not found.", channelId)));
+        return channel;
     }
 
     public ChannelDto getChannel(Long channelId){
@@ -109,5 +117,10 @@ public class ChannelService {
         if (channelRepository.existsByTitle(title)){
             throw new TitleDuplicateException(title);
         }
+    }
+
+    public Set<Video> getVideos(Long channelId) {
+        Channel channel = getChannelEntity(channelId);
+        return channel.getVideos();
     }
 }

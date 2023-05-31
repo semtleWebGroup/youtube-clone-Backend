@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 class CommentServiceTest{
     @Autowired  //테스트코드에서는 @RequiredArgsConstructor 사용 불가
@@ -41,6 +43,8 @@ class CommentServiceTest{
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
+        videoRepository.save(video);
         //When
         CommentResponse comment = commentService.write(entity, channel, video);
         //Then
@@ -61,6 +65,8 @@ class CommentServiceTest{
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
+        videoRepository.save(video);
         CommentResponse comment = commentService.write(entity1, channel, video);
 
         //When
@@ -78,10 +84,10 @@ class CommentServiceTest{
                 .title("Title")
                 .description("Description")
                 .build();
-        channelRepository.save(channel);
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
         videoRepository.save(video);
         CommentResponse comment = commentService.write(entity, channel, video);
 
@@ -253,10 +259,10 @@ class CommentServiceTest{
                 .title("Title")
                 .description("Description")
                 .build();
-        channelRepository.save(channel);
         Video video = Video.builder()
                 .channel(channel)
                 .build();
+        channelRepository.save(channel);
         videoRepository.save(video);
         CommentResponse comment = commentService.write(entity1, channel, video);
         CommentResponse replyComment = commentService.replyWrite(entity2, channel, comment.getId());
